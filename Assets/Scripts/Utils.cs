@@ -1,12 +1,12 @@
-
 using System;
 using System.Collections.Generic;
 using Model.Common;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using static Model.Common.Enums;
 
-namespace Common
+namespace Common.Utils
 {
     public static class Utils
     {
@@ -61,7 +61,7 @@ namespace Common
                 return;
             }
 
-            var op = Addressables.InstantiateAsync(reference,parent);
+            var op = Addressables.InstantiateAsync(reference, parent);
             op.Completed += (opHandle) =>
             {
                 if (opHandle.Status == AsyncOperationStatus.Succeeded)
@@ -82,5 +82,32 @@ namespace Common
                 card.Value == cardUI.Card.Value &&
                 card.Suit == cardUI.Card.Suit;
         }
+
+        public static string CardToShortString(Card card)
+        {
+            string suit = Utils.GetSuitStr(card.Suit);
+
+            string revealed = "";
+            if (card.Revealed)
+            {
+                revealed = "*";
+            }
+
+            return $"{card.Value}{suit}{revealed}";
+        }
     }
 }
+
+    public struct CardPileData
+    {
+        public PileKind PileKind;
+        public int Index;
+        private PileKind Kind;
+
+        public CardPileData(PileKind kind, int index) : this()
+        {
+            Kind = kind;
+            Index = index;
+        }
+    }
+

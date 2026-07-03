@@ -1,8 +1,9 @@
-
-public interface IDrag
+namespace Common.Input
 {
-    void OnStartDrag();
-    void OnEndDrag();
-    bool CanDrag();
-    void EnableDrag(bool v);
+    public interface IDrag
+    {
+        void OnStartDrag();
+        void OnEndDrag();
+        bool CanDrag();
+    }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class KlondikeController : MonoBehaviour
 {
-    [SerializeField] KlondikeUI _ui;
+    [SerializeField] KlondikeUIController _ui;
 
     void Start()
     {

@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common;
+using Common.Utils;
 using Model.Common;
 using UnityEngine;
 using static Model.Common.Enums;
@@ -21,7 +22,7 @@ namespace Klondike
             }
         }
 
-        KlondikeUI _ui;
+        KlondikeUIController _ui;
 
         public KlondikeState State => _state;
 
@@ -67,6 +68,10 @@ namespace Klondike
                 if (AutoMoveCardToFoundation(card))
                 {
                     _state.Tableau[tableauIndex].Pop();
+                    if (_state.Tableau[tableauIndex].Count > 0)
+                    {
+                        _state.Tableau[tableauIndex].Peek().FreeCard(true);
+                    }
                     return true;
                 }
 
@@ -87,6 +92,7 @@ namespace Klondike
                 {
                     Card nextCard = _state.StockPile.Pop();
                     nextCard.Show(true);
+                    nextCard.FreeCard(i == 0);
                     _state.WastePile.Push(nextCard);
                 }
 
@@ -95,47 +101,33 @@ namespace Klondike
         }
 
 
-        public bool Action_MoveFromTableauToTableau(int fromTableauIndex, int toTableauIndex, int cardsAmount)
+        public bool Action_MoveFromTableauToTableau(int toTableauIndex, Card card)
         {
             return ExecuteAction(() =>
             {
-                Stack<Card> originPile = _state.Tableau[fromTableauIndex];
-
-                if (originPile.Count < cardsAmount || originPile.Count < 1)
-                    return false;
-
-                bool possibleToPick = true;
-                Card lastCard = null;
-
-                for (int i = cardsAmount - 1; i >= 0; i--)
-                {
-                    Card currentCard = originPile.ElementAt(i);
-
-                    if (!ValidTableauPlacement(lastCard, currentCard))
-                    {
-                        possibleToPick = false;
-                        break;
-                    }
-
-                    lastCard = currentCard;
-                }
-
-                if (!possibleToPick)
-                    return false;
-
+                CardPileData cardData = _state.GetCardPileOwnerData(card);
+                Stack<Card> originPile = _state.Tableau[cardData.Index];
                 Stack<Card> targetPile = _state.Tableau[toTableauIndex];
 
-                if (targetPile.Count == 0 && lastCard.Value != 13)
+                if (targetPile.Count == 0 && card.Value != 13)
                     return false;
 
-                if (targetPile.Count > 0 && !ValidTableauPlacement(lastCard, targetPile.Peek()))
+                if (targetPile.Count > 0 && !ValidTableauPlacement(card, targetPile.Peek()))
                     return false;
 
                 Stack<Card> movingStack = new Stack<Card>();
 
-                for (int i = 0; i < cardsAmount; i++)
+                Card movingCard = originPile.Pop();
+                while (movingCard != card)
                 {
-                    movingStack.Push(originPile.Pop());
+                    movingStack.Push(movingCard);
+                    movingCard = originPile.Pop();
+                }
+
+                movingStack.Push(movingCard);
+                if (originPile.Count > 0)
+                {
+                    originPile.Peek().FreeCard(true);
                 }
 
                 while (movingStack.Count > 0)
@@ -314,7 +306,7 @@ namespace Klondike
         #endregion
 
         #region initialization
-        public KlondikeGame(KlondikeUI ui)
+        public KlondikeGame(KlondikeUIController ui)
         {
             _ui = ui;
             _state = new KlondikeState();
@@ -342,7 +334,7 @@ namespace Klondike
                     Card nextCard = deck.Pop();
                     if (i == j) {
                         nextCard.Show(true);
-                        nextCard.MakeMovable(true);
+                        nextCard.FreeCard(true);
                     }
                     _state.Tableau[i].Push(nextCard);
                 }
@@ -384,34 +376,24 @@ namespace Klondike
         {
             Debug.Log("=== SOLITAIRE STATE ===");
 
-            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile.Select(CardToShortString))}");
-            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile.Select(CardToShortString))}");
+            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile.Select(Utils.CardToShortString))}");
+            if (_state.StockPile.Count > 0) Debug.Log($"Next card in stock is: {Utils.CardToShortString(_state.StockPile.Peek())}");
+            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile.Select(Utils.CardToShortString))}");
 
             Debug.Log("Foundations:");
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
-                Debug.Log($"  F{i + 1}: {string.Join(" ", _state.Foundations[i].Stack.Select(CardToShortString))}");
+                Debug.Log($"  F{i + 1}: {string.Join(" ", _state.Foundations[i].Stack.Select(Utils.CardToShortString))}");
             }
 
             Debug.Log("Tableaus:");
             for (int i = 0; i < _state.Tableau.Length; i++)
             {
-                Debug.Log($"  T{i + 1}: {string.Join(" ", _state.Tableau[i].Select(CardToShortString))}");
+                Debug.Log($"  T{i + 1}: {string.Join(" ", _state.Tableau[i].Select(Utils.CardToShortString))}");
             }
         }
 
-        private string CardToShortString(Card card)
-        {
-            string suit = Utils.GetSuitStr(card.Suit);
 
-            string revealed = "";
-            if (card.Revealed)
-            {
-                revealed = "*";
-            }
-
-            return $"{card.Value}{suit}{revealed}";
-        }
         #endregion
     }
 }

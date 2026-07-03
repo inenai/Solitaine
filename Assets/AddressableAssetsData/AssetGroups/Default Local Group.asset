@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 2d32221b3c9858e459040eea31c134dc
   m_SerializeEntries:
   - m_GUID: 32254c4e19920ca42922b56c136af98d
-    m_Address: CardUI
+    m_Address: CARD_PREFAB
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

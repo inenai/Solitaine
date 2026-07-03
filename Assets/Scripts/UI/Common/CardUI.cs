@@ -1,43 +1,41 @@
-using Common;
+using Common.Utils;
+using Common.Input;
 using Model.Common;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UI.Common;
 
-
-public class CardUI : MonoBehaviour
+[RequireComponent(typeof(Collider2D))]
+public class CardUI : MonoBehaviour, IDrag, IDoubleClick
 {
-    private const float DoubleClickTime = 0.3f;
-    private float _lastClickTime = -1f;
-
     Card _card;
-    KlondikeTableauUI _masterTableau;
-    IDrag dragComponent;
+    IGameUIController _controller;
+    private Vector3 _positionOnStartDrag;
+    private Collider2D _collider;
 
     [SerializeField] GameObject _back;
     [SerializeField] GameObject _front;
     [SerializeField] TextMeshPro[] _suitStr;
     [SerializeField] TextMeshPro[] _valueStr;
-
     [SerializeField] TextMeshPro[] _lightAlpha;
 
+    //DEBUG
+    [SerializeField] GameObject _DEBUG_DRAGGABLE;
+
     public Card Card => _card;
-    private bool Draggable => dragComponent != null;
 
     void Awake()
     {
-        TryGetComponent(out dragComponent);
+        _positionOnStartDrag = transform.position;
+        _collider = GetComponent<Collider2D>();
     }
 
-    public void Init(Card card, KlondikeTableauUI master)
+    public void Init(Card card, IGameUIController controller)
     {
-        _masterTableau = master;
-        Refresh(card);
-    }
-
-    public void Init(Card card)
-    {
-        Refresh(card);
+        _controller = controller;
+        _card = card;
+        Refresh();
     }
 
     public void Reveal(bool reveal)
@@ -45,17 +43,6 @@ public class CardUI : MonoBehaviour
         _card.Show(reveal);
         _front.SetActive(_card.Revealed);
         _back.SetActive(!_card.Revealed);
-
-        if (Draggable)
-        {
-            dragComponent.EnableDrag(reveal);
-        }
-    }
-
-    private void Refresh(Card card)
-    {
-        _card = card;
-        Refresh();
     }
 
     public void Refresh()
@@ -80,42 +67,43 @@ public class CardUI : MonoBehaviour
         _back.SetActive(!_card.Revealed);
     }
 
-
-    void Update()
+    #region IDrag
+    public bool CanDrag()
     {
-        // if (_masterTableau != null) ProcessClicks();
+        return Card.Free;
     }
 
-    // private void ProcessClicks()
-    // {
-    //     if (!Mouse.current.leftButton.wasReleasedThisFrame)
-    //         return;
+    public void OnStartDrag()
+    {
+        Debug.Log($"DraggableCardStack OnStartDrag. Original position: {transform.position}");
+        _positionOnStartDrag = transform.position;
+    }
 
-    //     Vector2 mousePos =
-    //         Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    public void OnEndDrag()
+    {
+        Debug.Log($"DraggableCardStack OnEndDrag. Restoring saved position at {_positionOnStartDrag}");
 
-    //     Collider2D hit = Physics2D.OverlapPoint(mousePos);
+        //TODO LOGIC
+        // if (!_cardOwner.EndDrag(this))
+        // {
+            transform.position = _positionOnStartDrag;
+        // }
+    }
+    #endregion
 
-    //     if (hit != _collider2d)
-    //         return;
-
-    //     float currentTime = Time.time;
-
-    //     if (currentTime - _lastClickTime <= DoubleClickTime)
-    //     {
-    //         _lastClickTime = -1f; // Reset so a triple click doesn't trigger twice
-    //         OnDoubleClick();
-    //     }
-    //     else
-    //     {
-    //         _lastClickTime = currentTime;
-    //     }
-    // }
-
-    protected virtual void OnDoubleClick()
+    #region IDoubleClick
+    public void OnDoubleClick()
     {
         if (_card == null) return;
-        _masterTableau.CardDoublePressed();
-        Debug.Log($"{_card.Value}({_card.Suit}) Double Clicked!");
+        _controller.CardDoubleClicked(_card);
+        Debug.Log($"{Utils.CardToShortString(_card)} Double Clicked! Is controller null by any chance: {_controller == null}");
     }
+    #endregion
+
+    #region DEBUG
+    public void RefreshDEBUG()
+    {
+        _DEBUG_DRAGGABLE.SetActive(!Card.Free);
+    }
+    #endregion
 }

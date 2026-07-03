@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using Common.Utils;
 using Model.Common;
+using static Model.Common.Enums;
 
 namespace Klondike
 {
@@ -14,12 +17,12 @@ namespace Klondike
         bool _allowRestock = true;
 
         public void InitState()
-        {            
+        {
             InitFoundations();
             InitTableau();
             StockPile = new Stack<Card>();
             WastePile = new Stack<Card>();
-           
+
             ApplyConfig();
         }
 
@@ -40,15 +43,67 @@ namespace Klondike
                 Tableau[i] = new Stack<Card>();
             }
         }
-        
+
         private void ApplyConfig()
         {
             _drawCount = KlondikeConfig.DrawAmount;
             _allowRestock = KlondikeConfig.AllowRedraw;
-        }        
+        }
 
         public int DrawCount => _drawCount;
         public bool AllowRestock => _allowRestock;
+
+        public CardPileData GetCardPileOwnerData(Card card)
+        {
+            PileKind kind = PileKind.WASTE;
+            int index = -1;
+            bool found = false;
+
+            if (WastePile.Contains(card))
+            {
+                kind = PileKind.WASTE;
+                found = true;
+            }
+
+            if (!found && StockPile.Contains(card))
+            {
+                kind = PileKind.STOCK;
+                found = true;
+            }
+
+            if (!found)
+            {
+                for (int i = 0; i < Foundations.Length; i++)
+                {
+                    if (Foundations[i].Stack.Contains(card))
+                    {
+                        kind = PileKind.FOUNDATION;
+                        index = i;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                for (int i = 0; i < Tableau.Length; i++)
+                {
+                    if (Tableau[i].Contains(card))
+                    {
+                        kind = PileKind.TABLEAU;
+                        index = i;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                throw new Exception($"Card {Utils.CardToShortString(card)} not found in any pile!");
+            }
+            return new CardPileData(kind, index);
+        }
     }
-    
 }

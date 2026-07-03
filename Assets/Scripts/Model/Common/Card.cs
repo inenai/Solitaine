@@ -1,13 +1,9 @@
-using System;
-using UnityEngine;
-using UnityEngine.InputSystem;
-
 namespace Model.Common {
-    public class Card 
+    public class Card
     {
         private int _value;
         private Enums.Suit _suit;
-        private bool _movable;
+        private bool _free;
         private bool _revealed;
 
         public Card(Enums.Suit suit, int value)
@@ -15,6 +11,7 @@ namespace Model.Common {
             _suit = suit;
             _value = value;
             _revealed = false;
+            _free = false;
         }
 
         public void Show(bool show)
@@ -22,14 +19,14 @@ namespace Model.Common {
             _revealed = show;
         }
 
-        public void MakeMovable(bool movable)
+        public void FreeCard(bool free)
         {
-            _movable = movable;
+            _free = free;
         }
 
         public Enums.Suit Suit => _suit;
         public int Value => _value;
         public bool Revealed => _revealed;
-        public bool Movable => _movable;
+        public bool Free => _free;
     }
 }
