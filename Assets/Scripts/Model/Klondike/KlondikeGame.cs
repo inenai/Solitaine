@@ -1,0 +1,417 @@
+using System.Collections.Generic;
+using System.Linq;
+using Common;
+using Model.Common;
+using UnityEngine;
+using static Model.Common.Enums;
+
+namespace Klondike
+{
+    public class KlondikeGame
+    {
+        KlondikeState _state;
+        GameStatus _status = GameStatus.INITIALIZING;
+        GameStatus Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                Debug.Log(value);
+            }
+        }
+
+        KlondikeUI _ui;
+
+        public KlondikeState State => _state;
+
+
+        #region userInteraction
+
+        public void UIDoneRefreshing()
+        {
+            Status = GameStatus.LISTENING;
+        }
+
+/// <summary>
+/// Command Wrapper!
+/// </summary>
+/// <param name="action"></param>
+/// <returns></returns>
+        private bool ExecuteAction(System.Func<bool> action)
+        {
+            if (Status != GameStatus.LISTENING)
+                return false;
+
+            Status = GameStatus.PROCESSING;
+
+            bool result = action();
+
+            if (result)
+            {
+                Log();
+            }
+            else
+            {
+                Status = GameStatus.LISTENING;
+            }
+
+            return result;
+        }
+
+        public bool Action_MoveFromTableauToFoundation(int tableauIndex)
+        {
+            return ExecuteAction(() =>
+            {
+                Card card = _state.Tableau[tableauIndex].Peek();
+                if (AutoMoveCardToFoundation(card))
+                {
+                    _state.Tableau[tableauIndex].Pop();
+                    return true;
+                }
+
+                return false;
+            });
+        }
+
+        public bool Action_DrawCardsFromStock()
+        {
+            return ExecuteAction(() =>
+            {
+                if (_state.StockPile.Count == 0)
+                {
+                    return AttemptRestock();
+                }
+
+                for (int i = 0; i < _state.DrawCount; i++)
+                {
+                    Card nextCard = _state.StockPile.Pop();
+                    nextCard.Show(true);
+                    _state.WastePile.Push(nextCard);
+                }
+
+                return true;
+            });
+        }
+
+
+        public bool Action_MoveFromTableauToTableau(int fromTableauIndex, int toTableauIndex, int cardsAmount)
+        {
+            return ExecuteAction(() =>
+            {
+                Stack<Card> originPile = _state.Tableau[fromTableauIndex];
+
+                if (originPile.Count < cardsAmount || originPile.Count < 1)
+                    return false;
+
+                bool possibleToPick = true;
+                Card lastCard = null;
+
+                for (int i = cardsAmount - 1; i >= 0; i--)
+                {
+                    Card currentCard = originPile.ElementAt(i);
+
+                    if (!ValidTableauPlacement(lastCard, currentCard))
+                    {
+                        possibleToPick = false;
+                        break;
+                    }
+
+                    lastCard = currentCard;
+                }
+
+                if (!possibleToPick)
+                    return false;
+
+                Stack<Card> targetPile = _state.Tableau[toTableauIndex];
+
+                if (targetPile.Count == 0 && lastCard.Value != 13)
+                    return false;
+
+                if (targetPile.Count > 0 && !ValidTableauPlacement(lastCard, targetPile.Peek()))
+                    return false;
+
+                Stack<Card> movingStack = new Stack<Card>();
+
+                for (int i = 0; i < cardsAmount; i++)
+                {
+                    movingStack.Push(originPile.Pop());
+                }
+
+                while (movingStack.Count > 0)
+                {
+                    targetPile.Push(movingStack.Pop());
+                }
+
+                return true;
+            });
+        }
+
+        public bool Action_MoveFromFoundationToTableau(int foundationIndex, int toTableauIndex)
+        {
+            return ExecuteAction(() =>
+            {
+                Stack<Card> originPile = _state.Foundations[foundationIndex].Stack;
+
+                if (originPile.Count < 1)
+                    return false;
+
+                var targetPile = _state.Tableau[toTableauIndex];
+
+                if (targetPile.Count < 1)
+                    return originPile.Peek().Value == 13;
+
+                if (ValidTableauPlacement(originPile.Peek(), targetPile.Peek()))
+                {
+                    targetPile.Push(originPile.Pop());
+                    return true;
+                }
+
+                return false;
+            });
+        }
+
+        public bool Action_MoveFromWasteToTableau(int toTableauIndex)
+        {
+            return ExecuteAction(() =>
+            {
+                if (_state.WastePile.Count < 1)
+                    return false;
+
+                Card card = _state.WastePile.Peek();
+                Stack<Card> tableau = _state.Tableau[toTableauIndex];
+
+                if (tableau.Count < 1)
+                    return card.Value == 13;
+
+                return ValidTableauPlacement(card, tableau.Peek());
+            });
+        }
+
+        public bool Action_MoveFromWasteToFoundation(int toFoundationIndex)
+        {
+            return ExecuteAction(() =>
+            {
+                if (_state.WastePile.Count < 1)
+                    return false;
+
+                Foundation foundation = _state.Foundations[toFoundationIndex];
+
+                Card card = _state.WastePile.Peek();
+
+                if (foundation.Stack.Count == 0)
+                {
+                    if (card.Value == 1)
+                    {
+                        foundation.Suit = card.Suit;
+                        foundation.Stack.Push(_state.WastePile.Pop());
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                if (card.Suit == foundation.Suit &&
+                    card.Value == foundation.Stack.Peek().Value + 1)
+                {
+                    foundation.Stack.Push(_state.WastePile.Pop());
+                    return true;
+                }
+
+                return false;
+            });
+        }
+
+        public bool Action_MoveFromWasteToAutoFoundation()
+        {
+            return ExecuteAction(() =>
+            {
+                if (_state.WastePile.Count < 1)
+                    return false;
+
+                Card card = _state.WastePile.Peek();
+
+                if (AutoMoveCardToFoundation(card))
+                {
+                    _state.WastePile.Pop();
+                    return true;
+                }
+
+                return false;
+            });
+        }
+        #endregion
+
+
+        #region innerActions
+        private bool AutoMoveCardToFoundation(Card card)
+        {
+            if (card.Value == 1)
+            {
+                foreach (Foundation foundation in _state.Foundations)
+                {
+                    if (foundation.Stack.Count == 0)
+                    {
+                        foundation.Suit = card.Suit;
+                        foundation.Stack.Push(card);
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Foundation foundation in _state.Foundations)
+                {
+                    if (foundation.Suit == card.Suit)
+                    {
+                        if (card.Value == foundation.Stack.Peek().Value + 1)
+                        {
+                            foundation.Stack.Push(card);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool AttemptRestock()
+        {
+            if (_state.WastePile.Count > 0 && _state.AllowRestock)
+            {
+                while (_state.WastePile.Count > 0)
+                {
+                    Card nextCard = _state.WastePile.Pop();
+                    nextCard.Show(false);
+                    _state.StockPile.Push(nextCard);
+                }
+                return true;
+            }
+            return false;
+        }
+
+
+        #endregion
+
+        #region utils
+        private bool ValidTableauPlacement(Card child, Card parent)
+        {
+            if (child == null || parent == null) return false;
+
+            bool sameColor = IsSameColor(child.Suit, parent.Suit);
+            return !sameColor && child.Value == parent.Value - 1;
+        }
+
+        private bool IsSameColor(Enums.Suit suit1, Enums.Suit suit2)
+        {
+            if (suit1 == suit2) return true;
+
+            return (suit1 == Enums.Suit.DIAMONDS && suit2 == Enums.Suit.HEARTS) ||
+                    (suit2 == Enums.Suit.DIAMONDS && suit1 == Enums.Suit.HEARTS) ||
+                    (suit1 == Enums.Suit.CLUBS && suit2 == Enums.Suit.SPADES) ||
+                    (suit2 == Enums.Suit.CLUBS && suit1 == Enums.Suit.SPADES);
+        }
+        #endregion
+
+        #region initialization
+        public KlondikeGame(KlondikeUI ui)
+        {
+            _ui = ui;
+            _state = new KlondikeState();
+            _state.InitState();
+        }
+
+        public void StartGame()
+        {
+            Debug.Log("Starting a Klokdike game.");
+            ShuffleAndDeal();
+            Log();
+            _ui.StartGame();
+            Status = GameStatus.LISTENING;
+        }
+
+
+        private void ShuffleAndDeal()
+        {
+            Stack<Card> deck = CreateDeck(shuffle:true);
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < i+1; j++)
+                {
+                    Card nextCard = deck.Pop();
+                    if (i == j) {
+                        nextCard.Show(true);
+                        nextCard.MakeMovable(true);
+                    }
+                    _state.Tableau[i].Push(nextCard);
+                }
+            }
+
+            _state.StockPile = deck;
+        }
+
+        private Stack<Card> CreateDeck(bool shuffle = false)
+        {
+            List<Card> deck = new();
+
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(Enums.Suit.HEARTS,i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(Enums.Suit.DIAMONDS,i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(Enums.Suit.SPADES,i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(Enums.Suit.CLUBS,i));
+            }
+
+            if (shuffle)
+            {
+                deck = Utils.Shuffle(deck.ToArray()).ToList();
+            }
+
+            return new Stack<Card>(deck);
+        }
+
+        public void Log()
+        {
+            Debug.Log("=== SOLITAIRE STATE ===");
+
+            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile.Select(CardToShortString))}");
+            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile.Select(CardToShortString))}");
+
+            Debug.Log("Foundations:");
+            for (int i = 0; i < _state.Foundations.Length; i++)
+            {
+                Debug.Log($"  F{i + 1}: {string.Join(" ", _state.Foundations[i].Stack.Select(CardToShortString))}");
+            }
+
+            Debug.Log("Tableaus:");
+            for (int i = 0; i < _state.Tableau.Length; i++)
+            {
+                Debug.Log($"  T{i + 1}: {string.Join(" ", _state.Tableau[i].Select(CardToShortString))}");
+            }
+        }
+
+        private string CardToShortString(Card card)
+        {
+            string suit = Utils.GetSuitStr(card.Suit);
+
+            string revealed = "";
+            if (card.Revealed)
+            {
+                revealed = "*";
+            }
+
+            return $"{card.Value}{suit}{revealed}";
+        }
+        #endregion
+    }
+}
