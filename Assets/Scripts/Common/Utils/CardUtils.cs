@@ -1,0 +1,70 @@
+using Common;
+using UnityEngine;
+
+namespace Utils
+{
+    public static class CardUtils
+    {
+        public static string CardPrefabAddress = "CARD_PREFAB";
+
+        public static string GetSuitStr(CardSuit suit)
+        {
+            string suitStr = suit switch
+            {
+                CardSuit.HEARTS => "♥",
+                CardSuit.DIAMONDS => "♦",
+                CardSuit.CLUBS => "♣",
+                CardSuit.SPADES => "♠",
+                _ => "?"
+            };
+            return suitStr;
+        }
+
+        public static Color GetSuitColor(CardSuit suit)
+        {
+            switch (suit)
+            {
+                case CardSuit.HEARTS:
+                case CardSuit.DIAMONDS:
+                    return Color.red;
+                default:
+                    return Color.black;
+            }
+        }
+
+        public static bool SameCard(Card card, CardUI cardUI)
+        {
+            return
+                card.Value == cardUI.Card.Value &&
+                card.Suit == cardUI.Card.Suit;
+        }
+
+        public static string CardValue(Card card)
+        {
+            string value = card.Value.ToString();
+            switch (card.Value)
+            {
+                case 11:
+                    value = "J";
+                    break;
+                case 12:
+                    value = "Q";
+                    break;
+                case 13:
+                    value = "K";
+                    break;
+            }
+            return value;
+        }
+
+        public static bool IsSameColor(CardSuit suit1, CardSuit suit2)
+        {
+            if (suit1 == suit2) return true;
+
+            return (suit1 == CardSuit.DIAMONDS && suit2 == CardSuit.HEARTS) ||
+                    (suit2 == CardSuit.DIAMONDS && suit1 == CardSuit.HEARTS) ||
+                    (suit1 == CardSuit.CLUBS && suit2 == CardSuit.SPADES) ||
+                    (suit2 == CardSuit.CLUBS && suit1 == CardSuit.SPADES);
+        }
+    }
+}
