@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Utils;
+using Common;
 using Model.Common;
 using UnityEngine;
 using static Model.Common.Enums;
@@ -186,7 +186,7 @@ namespace Klondike
 
         public bool Action_MoveFromTableauToTableau(int toTableauIndex, Card card)
         {
-            Log($"USER Action_MoveFromTableauToTableau [{toTableauIndex}], [{Utils.CardToShortString(card)}]");
+            Log($"USER Action_MoveFromTableauToTableau [{toTableauIndex}], [{card}]");
             return ExecuteAction(() =>
             {
                 CardPileData cardData = _state.GetCardPileOwnerData(card);
@@ -338,7 +338,7 @@ namespace Klondike
 
         private bool AutoMoveCardToFoundation(Card card)
         {
-            Log($"INNER AutoMoveCardToFoundation [{Utils.CardToShortString(card)}]");
+            Log($"INNER AutoMoveCardToFoundation [{card}]");
             if (card.Value == 1)
             {
                 foreach (Foundation foundation in _state.Foundations)
@@ -400,23 +400,23 @@ namespace Klondike
         {
             Debug.Log("=== SOLITAIRE STATE ===");
 
-            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile.Select(Utils.CardToShortString))}");
-            if (_state.StockPile.Count > 0) Debug.Log($"Top card in stock is: {Utils.CardToShortString(_state.StockPile.Peek())}");
-            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile.Select(Utils.CardToShortString))}");
-            if (_state.WastePile.Count > 0) Debug.Log($"Top card in waste is: {Utils.CardToShortString(_state.WastePile.Peek())}");
+            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.StockPile)}");
+            if (_state.StockPile.Count > 0) Debug.Log($"Top card in stock is: {_state.StockPile.Peek()}");
+            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile)}");
+            if (_state.WastePile.Count > 0) Debug.Log($"Top card in waste is: {_state.WastePile.Peek()}");
 
             Debug.Log("Foundations:");
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
-                Debug.Log($"  F{i}: {string.Join(" ", _state.Foundations[i].Stack.Select(Utils.CardToShortString))}");
-                if (_state.Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {Utils.CardToShortString(_state.Foundations[i].Stack.Peek())}");
+                Debug.Log($"  F{i}: {string.Join(" ", _state.Foundations[i].Stack)}");
+                if (_state.Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {_state.Foundations[i].Stack.Peek()}");
             }
 
             Debug.Log("Tableaus:");
             for (int i = 0; i < _state.Tableau.Length; i++)
             {
-                Debug.Log($"  T{i}: {string.Join(" ", _state.Tableau[i].Select(Utils.CardToShortString))}");
-                if (_state.Tableau[i].Count > 0) Debug.Log($"Top card in T{i} is: {Utils.CardToShortString(_state.Tableau[i].Peek())}");
+                Debug.Log($"  T{i}: {string.Join(" ", _state.Tableau[i])}");
+                if (_state.Tableau[i].Count > 0) Debug.Log($"Top card in T{i} is: {_state.Tableau[i].Peek()}");
             }
         }
 

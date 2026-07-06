@@ -1,4 +1,4 @@
-using Common.Utils;
+using Common;
 using Common.Input;
 using Model.Common;
 using TMPro;
@@ -75,7 +75,7 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
     private void Log(string message)
     {
         if (Card == null) Debug.Log($"[CARDUI] {message}");
-        else Debug.Log($"[CARDUI][{Utils.CardToShortString(Card)}] {message}");
+        else Debug.Log($"[CARDUI][{Card}] {message}");
     }
 
     #region IDrag
@@ -115,7 +115,7 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
         Log("Double click!");
         if (_card == null) return;
         _controller.CardDoubleClicked(_card);
-        Log($"{Utils.CardToShortString(_card)} Double Clicked!");
+        Log($"{_card} Double Clicked!");
     }
     #endregion
 
