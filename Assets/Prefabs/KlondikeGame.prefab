@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4425d912b0bd3b74f804393e32c07a7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeUIController
+  _defaultConfig: {fileID: 11400000, guid: c7b5101364730fb44a56f08c800279b4, type: 2}
   _stock: {fileID: 0}
   _waste: {fileID: 0}
   _foundations:

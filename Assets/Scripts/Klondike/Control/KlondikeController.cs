@@ -7,6 +7,7 @@ namespace Klondike
 {
     public class KlondikeController : MonoBehaviour, IGameController
     {
+        [SerializeField] KlondikeConfig _defaultConfig;
         [SerializeField] StockUI _stock;
         [SerializeField] WasteUI _waste;
         [SerializeField] FoundationUI[] _foundations;
@@ -16,9 +17,23 @@ namespace Klondike
 
         void Start()
         {
-            _game = new KlondikeGame(this);
+            InitConfig();
+            _game = new KlondikeGame();
             _game.SetupGame();
             InitUI(_game.OnUISetup);
+        }
+
+        private void InitConfig()
+        {
+            if (!KlondikeSettings.SavedSettingsAvailable)
+            {
+                KlondikeSettings.Reset(_defaultConfig);
+            }
+        }
+
+        public void ResetKlondikeSettings()
+        {
+            KlondikeSettings.Reset(_defaultConfig);
         }
 
         public void InitUI(Action onDone)
@@ -61,6 +76,7 @@ namespace Klondike
 
         // }
 
+        #region InterfaceImplementation
         public bool PileClicked(PileKind pileKind, int index)
         {
             Func<bool> action = pileKind switch
@@ -109,6 +125,14 @@ namespace Klondike
 
             return action.Invoke();
         }
+
+        public bool IsRestockAvailable(PileKind pileKind)
+        {
+            if (pileKind != PileKind.STOCK) return false;
+
+            return _game.State.AvailableRestocks != 0;
+        }
+        #endregion
 
         private bool TableauDoubleClicked(int index)
         {

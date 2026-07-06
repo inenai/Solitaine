@@ -12,17 +12,19 @@ namespace Klondike
         public Stack<Card>[] Tableau;
         public Foundation[] Foundations;
 
-        int _drawCount = 1;
-        bool _allowRestock = true;
+        public int DrawCount => _drawAmount;
+        public int AvailableRestocks => _availableRestocks;
+
+        int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
+        int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
 
         public void InitState()
         {
+            ApplyConfig();
             InitFoundations();
             InitTableau();
             StockPile = new Stack<Card>();
             WastePile = new Stack<Card>();
-
-            ApplyConfig();
         }
 
         private void InitFoundations()
@@ -45,12 +47,9 @@ namespace Klondike
 
         private void ApplyConfig()
         {
-            _drawCount = KlondikeConfig.DrawAmount;
-            _allowRestock = KlondikeConfig.AllowRedraw;
+            _drawAmount = KlondikeSettings.DrawAmount;
+            _availableRestocks = KlondikeSettings.AvailableRestocks;
         }
-
-        public int DrawCount => _drawCount;
-        public bool AllowRestock => _allowRestock;
 
         public CardPileData GetCardPileOwnerData(Card card)
         {
@@ -104,6 +103,12 @@ namespace Klondike
             }
             Debug.Log($"Card {card} found in {kind}[{index}]");
             return new CardPileData(kind, index);
+        }
+
+        public void OnRestocked()
+        {
+            if (_availableRestocks > 0)
+                _availableRestocks--;
         }
     }
 }

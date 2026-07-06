@@ -22,12 +22,10 @@ namespace Klondike
             }
         }
 
-
-
         public KlondikeState State => _state;
 
         #region initialization
-        public KlondikeGame(KlondikeController controller)
+        public KlondikeGame()
         {
             _state = new KlondikeState();
             _state.InitState();
@@ -371,7 +369,7 @@ namespace Klondike
         private bool AttemptRestock()
         {
             Log("INNER AttemptRestock");
-            if (_state.WastePile.Count > 0 && _state.AllowRestock)
+            if (_state.WastePile.Count > 0 && _state.AvailableRestocks != 0)
             {
                 while (_state.WastePile.Count > 0)
                 {
@@ -379,6 +377,7 @@ namespace Klondike
                     nextCard.Show(false);
                     _state.StockPile.Push(nextCard);
                 }
+                _state.OnRestocked();
                 return true;
             }
             return false;

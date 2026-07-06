@@ -9,6 +9,7 @@ namespace Klondike
     public class StockUI : MonoBehaviour, IClick
     {
         [SerializeField] GameObject _cardUI;
+        [SerializeField] GameObject _restockLocked;
         private IGameController _controller;
 
         public void Init(Stack<Card> stock, IGameController controller, Action onDone = null)
@@ -20,6 +21,7 @@ namespace Klondike
         public void Refresh(Stack<Card> stock, Action onDone)
         {
             _cardUI.gameObject.SetActive(stock.Count > 0);
+            _restockLocked.SetActive(!_controller.IsRestockAvailable(PileKind.STOCK));
             onDone?.Invoke();
         }
 
