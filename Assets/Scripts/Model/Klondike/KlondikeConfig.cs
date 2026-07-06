@@ -9,8 +9,7 @@ public static class KlondikeConfig
     {
         get
         {
-            return 3; //TODO reset when settings available
-            return PlayerPrefs.GetInt(DrawAmountKey, 1);
+            return PlayerPrefs.GetInt(DrawAmountKey, 1); //TODO SET DEFAULT TO 1
         }
         set
         {

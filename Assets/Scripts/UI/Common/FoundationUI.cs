@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Model.Common;
 using UnityEngine;
 
@@ -26,14 +27,10 @@ public class FoundationUI : CardPileUI
             {
                 _cardUI_top.Init(stock.Pop(), _controller);
             }
-
+            _cardUI_bottom.gameObject.SetActive(stock.Count > 0);
             if (stock.Count > 0)
             {
-                _cardUI_bottom.gameObject.SetActive(stock.Count > 0);
-                if (stock.Count > 0)
-                {
-                    _cardUI_bottom.Init(stock.Pop(), _controller);
-                }
+                _cardUI_bottom.Init(stock.Pop(), _controller);
             }
         }
         onDone?.Invoke();

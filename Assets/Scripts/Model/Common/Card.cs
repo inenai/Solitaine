@@ -1,3 +1,7 @@
+using UnityEngine;
+using Common.Utils;
+
+
 namespace Model.Common {
     public class Card
     {
@@ -21,6 +25,8 @@ namespace Model.Common {
 
         public void FreeCard(bool free)
         {
+            string action = free ? "Freed" : "Locked";
+            Debug.Log($"{action} card {Utils.CardToShortString(this)}");
             _free = free;
         }
 

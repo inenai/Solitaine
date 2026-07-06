@@ -31,6 +31,11 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
         _collider = GetComponent<Collider2D>();
     }
 
+    void Update()
+    {
+        RefreshDEBUG();
+    }
+
     public void Init(Card card, IGameUIController controller)
     {
         _controller = controller;
@@ -55,7 +60,7 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
 
         foreach (TextMeshPro txt in _valueStr)
         {
-            txt.text = _card.Value.ToString();
+            txt.text = Utils.CardValue(_card);
         }
 
         foreach (TextMeshPro txt in _lightAlpha)
@@ -67,6 +72,12 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
         _back.SetActive(!_card.Revealed);
     }
 
+    private void Log(string message)
+    {
+        if (Card == null) Debug.Log($"[CARDUI] {message}");
+        else Debug.Log($"[CARDUI][{Utils.CardToShortString(Card)}] {message}");
+    }
+
     #region IDrag
     public bool CanDrag()
     {
@@ -75,28 +86,36 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
 
     public void OnStartDrag()
     {
-        Debug.Log($"DraggableCardStack OnStartDrag. Original position: {transform.position}");
+        Log("Start drag!");
         _positionOnStartDrag = transform.position;
     }
 
     public void OnEndDrag()
     {
-        Debug.Log($"DraggableCardStack OnEndDrag. Restoring saved position at {_positionOnStartDrag}");
-
+        Log("End drag!");
+        if (_card == null) return;
         //TODO LOGIC
         // if (!_cardOwner.EndDrag(this))
         // {
-            transform.position = _positionOnStartDrag;
+        Log($"DraggableCardStack OnEndDrag. Restoring saved position at {_positionOnStartDrag}");
+        transform.position = _positionOnStartDrag;
         // }
     }
     #endregion
 
     #region IDoubleClick
+
+    public bool CanDoubleClick()
+    {
+        return Card.Free;
+    }
+
     public void OnDoubleClick()
     {
+        Log("Double click!");
         if (_card == null) return;
         _controller.CardDoubleClicked(_card);
-        Debug.Log($"{Utils.CardToShortString(_card)} Double Clicked! Is controller null by any chance: {_controller == null}");
+        Log($"{Utils.CardToShortString(_card)} Double Clicked!");
     }
     #endregion
 

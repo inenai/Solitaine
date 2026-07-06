@@ -3,6 +3,9 @@ using UnityEngine;
 using UI.Common;
 using static Model.Common.Enums;
 using Model.Common;
+using System.Linq;
+using System.Collections.Generic;
+using Common.Utils;
 
 namespace Klondike
 {
@@ -39,25 +42,25 @@ namespace Klondike
             for (int i = 0; i < _tableaus.Length; i++)
             {
                 TableauUI tableau = _tableaus[i];
-                tableau.Init(this, i, _game.State.Tableau[i]);
+                tableau.Init(this, i, Utils.Clone(_game.State.Tableau[i]));
             }
         }
 
         private void RefreshStock(Action onDone)
         {
-            _stock.Refresh(_game.State.StockPile, onDone);
+            _stock.Refresh(Utils.Clone(_game.State.StockPile), onDone);
         }
 
         private void RefreshWaste(Action onDone)
         {
-            _waste.Refresh(_game.State.WastePile, onDone);
+            _waste.Refresh(Utils.Clone(_game.State.WastePile), onDone);
         }
 
         private void RefreshFoundations(Action onDone)
         {
             for (int i = 0; i < _foundations.Length; i++)
             {
-                _foundations[i].Refresh(_game.State.Foundations[i].Stack, onDone);
+                _foundations[i].Refresh(Utils.Clone(_game.State.Foundations[i].Stack), onDone);
             }
         }
 
@@ -99,7 +102,7 @@ namespace Klondike
             Debug.Log("Processing double click.");
             CardPileData pileData = _game.State.GetCardPileOwnerData(card);
 
-            Func<bool> action = pileData.PileKind switch
+            Func<bool> action = pileData.Kind switch
             {
                 PileKind.WASTE => WasteDoubleClicked,
                 PileKind.TABLEAU => () => TableauDoubleClicked(pileData.Index),

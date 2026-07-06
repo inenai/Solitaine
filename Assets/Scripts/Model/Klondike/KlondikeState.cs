@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Common.Utils;
 using Model.Common;
+using UnityEngine;
 using static Model.Common.Enums;
 
 namespace Klondike
@@ -103,6 +104,7 @@ namespace Klondike
             {
                 throw new Exception($"Card {Utils.CardToShortString(card)} not found in any pile!");
             }
+            Debug.Log($"Card {Utils.CardToShortString(card)} found in {kind}[{index}]");
             return new CardPileData(kind, index);
         }
     }

@@ -55,13 +55,13 @@ namespace Common.Input
 
       private void PointerPressed(InputAction.CallbackContext context)
       {
-         Debug.Log("[InputManager] Pointer pressed");
+         // Debug.Log("[InputManager] Pointer pressed");
          Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
          {
-            Debug.Log("[InputManager] Collider hit!");
+            // Debug.Log("[InputManager] Collider hit!");
             TryBeginDrag(hit.collider);
             TryBeginClick(hit.collider);
          }
@@ -83,8 +83,7 @@ namespace Common.Input
 
       private void PointerReleased(InputAction.CallbackContext context)
       {
-         Debug.Log("[InputManager] Pointer released");
-
+         // Debug.Log("[InputManager] Pointer released");
          if (dragging)
          {
             draggingObject.GetComponent<IDrag>()?.OnEndDrag();
@@ -114,10 +113,13 @@ namespace Common.Input
 
          if (hit.collider != null)
          {
-            hit.collider.gameObject.GetComponent<IDoubleClick>()?.OnDoubleClick();
+            IDoubleClick dc = hit.collider.gameObject.GetComponent<IDoubleClick>();
+            if (dc != null && dc.CanDoubleClick())
+            {
+               dc.OnDoubleClick();
+            }
          }
       }
-
 
       private void TryBeginDrag(Collider2D collider)
       {
