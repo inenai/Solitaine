@@ -8,8 +8,6 @@ public class KlondikeController : MonoBehaviour
     void Start()
     {
         KlondikeGame game = new KlondikeGame(_ui);
-        _ui.Setup(game);
         game.StartGame();
     }
-
 }

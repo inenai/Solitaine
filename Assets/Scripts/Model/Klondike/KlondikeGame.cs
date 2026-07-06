@@ -40,10 +40,11 @@ namespace Klondike
             Log("Starting a Klokdike game.");
             ShuffleAndDeal();
             Log();
-            _ui.StartGame();
-            Status = GameStatus.LISTENING;
+            _ui.StartGame(this,() =>
+            {
+                Status = GameStatus.LISTENING;
+            });
         }
-
 
         private void ShuffleAndDeal()
         {
@@ -407,15 +408,15 @@ namespace Klondike
             Debug.Log("Foundations:");
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
-                Debug.Log($"  F{i + 1}: {string.Join(" ", _state.Foundations[i].Stack.Select(Utils.CardToShortString))}");
-                if (_state.Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i + 1} is: {Utils.CardToShortString(_state.Foundations[i].Stack.Peek())}");
+                Debug.Log($"  F{i}: {string.Join(" ", _state.Foundations[i].Stack.Select(Utils.CardToShortString))}");
+                if (_state.Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {Utils.CardToShortString(_state.Foundations[i].Stack.Peek())}");
             }
 
             Debug.Log("Tableaus:");
             for (int i = 0; i < _state.Tableau.Length; i++)
             {
-                Debug.Log($"  T{i + 1}: {string.Join(" ", _state.Tableau[i].Select(Utils.CardToShortString))}");
-                if (_state.Tableau[i].Count > 0) Debug.Log($"Top card in T{i + 1} is: {Utils.CardToShortString(_state.Tableau[i].Peek())}");
+                Debug.Log($"  T{i}: {string.Join(" ", _state.Tableau[i].Select(Utils.CardToShortString))}");
+                if (_state.Tableau[i].Count > 0) Debug.Log($"Top card in T{i} is: {Utils.CardToShortString(_state.Tableau[i].Peek())}");
             }
         }
 

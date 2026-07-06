@@ -17,36 +17,25 @@ namespace Klondike
         [SerializeField] TableauUI[] _tableaus;
 
         private KlondikeGame _game;
-
-        public void Setup(KlondikeGame game)
+        public void StartGame(KlondikeGame game, Action onReady)
         {
             _game = game;
-            _stock.Init(this);
+            _stock.Init(Utils.Clone(_game.State.StockPile),this);
             _waste.Init(this);
             for (int i = 0; i < _foundations.Length; i++)
             {
                 FoundationUI foundation = _foundations[i];
                 foundation.Init(this, i);
             }
-        }
-
-        public void StartGame()
-        {
-            RefreshStock(null);
-            RefreshWaste(null);
-            LoadTableaus();
-        }
-
-        private void LoadTableaus()
-        {
             for (int i = 0; i < _tableaus.Length; i++)
             {
-                TableauUI tableau = _tableaus[i];
-                tableau.Init(this, i, Utils.Clone(_game.State.Tableau[i]));
+                _tableaus[i].Init(this, i, Utils.Clone(_game.State.Tableau[i]));
             }
+            RefreshStock();
+            onReady?.Invoke();
         }
 
-        private void RefreshStock(Action onDone)
+        private void RefreshStock(Action onDone = null)
         {
             _stock.Refresh(Utils.Clone(_game.State.StockPile), onDone);
         }
@@ -123,14 +112,12 @@ namespace Klondike
             Debug.Log("Tableau card was double clicked.");
             if (_game.Action_MoveFromTableauToFoundation(index))
             {
-                RefreshFoundations(() =>
+                _tableaus[index].RemoveTopmostCard(() =>
                 {
-                    _game.UIDoneRefreshing();
+                    RefreshFoundations(_game.UIDoneRefreshing);
                 });
-                Debug.Log("Yup.");
                 return true;
             }
-            Debug.Log("Nope.");
             return false;
         }
 
@@ -146,10 +133,8 @@ namespace Klondike
                         _game.UIDoneRefreshing();
                     });
                 });
-                Debug.Log("Yup.");
                 return true;
             }
-            Debug.Log("Nope.");
             return false;
         }
     }

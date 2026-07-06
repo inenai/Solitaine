@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common.Utils;
@@ -11,9 +12,9 @@ public class TableauUI : CardPileUI
     private float _offsetZ = 0.1f;
     private List<CardUI> _cardUIs;
 
-    public void Init(IGameUIController controller, int index, Stack<Card> cards)
+    public void Init(IGameUIController controller, int index, Stack<Card> cards, Action onDone = null)
     {
-        Debug.Log($"Init tableau [{index}] with {cards.Count} cards");
+        //Debug.Log($"Init tableau [{index}] with {cards.Count} cards");
         Init(controller, index);
 
         _cardUIs = new();
@@ -27,6 +28,7 @@ public class TableauUI : CardPileUI
             offsetY += _offsetY;
             offsetZ += _offsetZ;
         }
+        onDone?.Invoke();
     }
 
     private void StackCard(Card card, float offsetY, float offsetZ)
@@ -45,15 +47,17 @@ public class TableauUI : CardPileUI
         }, () => { });
     }
 
-    public void RemoveTopmostCard()
+    public void RemoveTopmostCard(Action onDone)
     {
-        GameObject go = _cardUIs.ElementAt(_cardUIs.Count - 1).gameObject;
-        _cardUIs.RemoveAt(_cardUIs.Count - 1);
-        Destroy(go);
+        CardUI lastCard = _cardUIs.Last();
+        _cardUIs.Remove(lastCard);
+        Destroy(lastCard.gameObject);
+
         if (_cardUIs.Count > 0)
         {
             CardUI next = _cardUIs.ElementAt(_cardUIs.Count - 1);
             next.Reveal(true);
         }
+        onDone?.Invoke();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UI.Common;
 using UnityEngine;
 using static Model.Common.Enums;
@@ -10,7 +11,7 @@ public abstract class CardPileUI : MonoBehaviour
     public PileKind PileKind => _pileKind;
     public int Index => _index;
 
-    public void Init(IGameUIController controller, int index = -1)
+    public void Init(IGameUIController controller, int index = -1, Action onDone = null)
     {
         _controller = controller;
         _index = index;

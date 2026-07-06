@@ -12,9 +12,10 @@ public class StockUI : MonoBehaviour, IClick
     [SerializeField] GameObject _cardUI;
     private IGameUIController _controller;
 
-    public void Init(IGameUIController controller)
+    public void Init(Stack<Card> stock, IGameUIController controller, Action onDone = null)
     {
         _controller = controller;
+        Refresh(stock,onDone);
     }
 
     public void Refresh(Stack<Card> stock, Action onDone)

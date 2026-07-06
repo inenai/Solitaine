@@ -33,8 +33,7 @@ namespace Common.Utils
 
         public static Stack<T> Clone<T>(this Stack<T> stack)
         {
-            Contract.Ensures(Contract.Result<Stack<T>>() != null);
-                if (stack == null) return new Stack<T>();
+            Contract.Requires(stack != null);
             return new Stack<T>(stack.Reverse());
         }
         #endregion
