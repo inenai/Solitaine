@@ -32,7 +32,7 @@ namespace Common
 
         void Update()
         {
-            RefreshDEBUG();
+            //RefreshDEBUG();
         }
 
         public void Init(Card card, IGameController controller)

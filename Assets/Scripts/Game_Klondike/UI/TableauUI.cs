@@ -20,8 +20,8 @@ namespace Klondike
 
             _cardUIs = new();
 
-            float offsetY = _offsetY;
-            float offsetZ = _offsetZ;
+            float offsetY = 0f;
+            float offsetZ = 0f;
             for (int i = cards.Count - 1; i >= 0; i--)
             {
                 Card card = cards.ToList().ElementAt(i);
