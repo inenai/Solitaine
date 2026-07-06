@@ -10,9 +10,9 @@ using static Model.Common.Enums;
 public class StockUI : MonoBehaviour, IClick
 {
     [SerializeField] GameObject _cardUI;
-    private IGameUIController _controller;
+    private IGameController _controller;
 
-    public void Init(Stack<Card> stock, IGameUIController controller, Action onDone = null)
+    public void Init(Stack<Card> stock, IGameController controller, Action onDone = null)
     {
         _controller = controller;
         Refresh(stock,onDone);

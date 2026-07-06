@@ -10,7 +10,7 @@ using UI.Common;
 public class CardUI : MonoBehaviour, IDrag, IDoubleClick
 {
     Card _card;
-    IGameUIController _controller;
+    IGameController _controller;
     private Vector3 _positionOnStartDrag;
     private Collider2D _collider;
 
@@ -36,7 +36,7 @@ public class CardUI : MonoBehaviour, IDrag, IDoubleClick
         RefreshDEBUG();
     }
 
-    public void Init(Card card, IGameUIController controller)
+    public void Init(Card card, IGameController controller)
     {
         _controller = controller;
         _card = card;

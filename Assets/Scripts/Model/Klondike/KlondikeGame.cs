@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Common.Utils;
 using Model.Common;
-using Mono.Cecil.Cil;
 using UnityEngine;
 using static Model.Common.Enums;
 
@@ -23,27 +22,28 @@ namespace Klondike
             }
         }
 
-        KlondikeUIController _ui;
+
 
         public KlondikeState State => _state;
 
         #region initialization
-        public KlondikeGame(KlondikeUIController ui)
+        public KlondikeGame(KlondikeController controller)
         {
-            _ui = ui;
             _state = new KlondikeState();
             _state.InitState();
         }
 
-        public void StartGame()
+        public void SetupGame()
         {
             Log("Starting a Klokdike game.");
+            Status = GameStatus.INITIALIZING;
             ShuffleAndDeal();
             Log();
-            _ui.StartGame(this,() =>
-            {
-                Status = GameStatus.LISTENING;
-            });
+        }
+
+        public void OnUISetup()
+        {
+            Status = GameStatus.LISTENING;
         }
 
         private void ShuffleAndDeal()

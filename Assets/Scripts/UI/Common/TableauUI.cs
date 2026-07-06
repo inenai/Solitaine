@@ -12,7 +12,7 @@ public class TableauUI : CardPileUI
     private float _offsetZ = 0.1f;
     private List<CardUI> _cardUIs;
 
-    public void Init(IGameUIController controller, int index, Stack<Card> cards, Action onDone = null)
+    public void Init(IGameController controller, int index, Stack<Card> cards, Action onDone = null)
     {
         //Debug.Log($"Init tableau [{index}] with {cards.Count} cards");
         Init(controller, index);
