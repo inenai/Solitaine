@@ -6,15 +6,14 @@ using UnityEngine;
 namespace Klondike
 {
     [RequireComponent(typeof(Collider2D))]
-    public class StockUI : MonoBehaviour, IClick
+    public class StockUI : CardPileUI, IClick
     {
         [SerializeField] GameObject _cardUI;
         [SerializeField] GameObject _restockLocked;
-        private IGameController _controller;
 
         public void Init(Stack<Card> stock, IGameController controller, Action onDone = null)
         {
-            _controller = controller;
+            Init(controller);
             Refresh(stock, onDone);
         }
 

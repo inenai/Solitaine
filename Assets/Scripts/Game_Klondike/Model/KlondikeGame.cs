@@ -194,7 +194,7 @@ namespace Klondike
                 if (targetPile.Count == 0 && card.Value != 13)
                     return false;
 
-                if (targetPile.Count > 0 && !ValidTableauPlacement(card, targetPile.Peek()))
+                if (targetPile.Count > 0 && !CanStackCardsInTableau(card, targetPile.Peek()))
                     return false;
 
                 Stack<Card> movingStack = new Stack<Card>();
@@ -236,7 +236,7 @@ namespace Klondike
                 if (targetPile.Count < 1)
                     return originPile.Peek().Value == 13;
 
-                if (ValidTableauPlacement(originPile.Peek(), targetPile.Peek()))
+                if (CanStackCardsInTableau(originPile.Peek(), targetPile.Peek()))
                 {
                     targetPile.Push(originPile.Pop());
                     return true;
@@ -260,7 +260,7 @@ namespace Klondike
                 if (tableau.Count < 1)
                     return card.Value == 13;
 
-                return ValidTableauPlacement(card, tableau.Peek());
+                return CanStackCardsInTableau(card, tableau.Peek());
             });
         }
 
@@ -386,8 +386,8 @@ namespace Klondike
 
         #endregion
 
-        #region utils
-        private bool ValidTableauPlacement(Card child, Card parent)
+        #region Checks
+        private bool CanStackCardsInTableau(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
 
@@ -395,6 +395,31 @@ namespace Klondike
             return !sameColor && child.Value == parent.Value - 1;
         }
 
+        public bool CanMoveCardToPile(Card card, PileKind targetPile, int targetPileIndex)
+        {
+            switch (targetPile)
+            {
+                case PileKind.STOCK:
+                    return false;
+                case PileKind.WASTE:
+                    return false;
+                case PileKind.FOUNDATION:
+                    bool first = card.Value == 1
+                        && _state.Foundations[targetPileIndex].Stack.Count == 0;
+                    bool next = card.Value > 1
+                        && _state.Foundations[targetPileIndex].Stack.Count > 0
+                        && _state.Foundations[targetPileIndex].Suit == card.Suit
+                        && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value + 1;
+                    return first || next;
+                case PileKind.TABLEAU:
+                    return _state.Tableau[targetPileIndex].Count == 0
+                        && card.Value == 13;
+            }
+            return false;
+        }
+        #endregion
+
+        #region utils
         public void Log()
         {
             Debug.Log("=== SOLITAIRE STATE ===");

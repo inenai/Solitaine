@@ -7,7 +7,7 @@ using Utils;
 
 namespace Klondike
 {
-    public class TableauUI : CardPileUI
+    public class TableauUI : TargetCardPileUI
     {
         private float _offsetY = -0.3f;
         private float _offsetZ = 0.1f;
@@ -21,7 +21,7 @@ namespace Klondike
             _cardUIs = new();
 
             float offsetY = 0f;
-            float offsetZ = 0f;
+            float offsetZ = _offsetZ;
             for (int i = cards.Count - 1; i >= 0; i--)
             {
                 Card card = cards.ToList().ElementAt(i);

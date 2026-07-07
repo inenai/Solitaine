@@ -71,11 +71,6 @@ namespace Klondike
             }
         }
 
-        // public bool CardDraggedTo(Card card, PileKind targetPile, int targetPileIndex)
-        // {
-
-        // }
-
         #region InterfaceImplementation
         public bool PileClicked(PileKind pileKind, int index)
         {
@@ -131,6 +126,11 @@ namespace Klondike
             if (pileKind != PileKind.STOCK) return false;
 
             return _game.State.AvailableRestocks != 0;
+        }
+
+        public bool IsCardAllowedHere(Card card, PileKind targetPile, int targetPileIndex)
+        {
+            return _game.CanMoveCardToPile(card, targetPile, targetPileIndex);
         }
         #endregion
 

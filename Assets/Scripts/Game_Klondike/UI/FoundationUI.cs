@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace Klondike
 {
-    [RequireComponent(typeof(Collider2D))]
-    public class FoundationUI : CardPileUI
+    public class FoundationUI : TargetCardPileUI
     {
         [SerializeField] CardUI _cardUI_top;
         [SerializeField] CardUI _cardUI_bottom;
