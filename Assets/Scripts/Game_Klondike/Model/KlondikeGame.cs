@@ -33,7 +33,7 @@ namespace Klondike
 
         public void SetupGame()
         {
-            Log("Starting a Klokdike game.");
+            Log("Starting a Klondike game.");
             Status = GameStatus.INITIALIZING;
             ShuffleAndDeal();
             Log();
@@ -110,7 +110,7 @@ namespace Klondike
         /// Command Wrapper!
         /// </summary>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns>Whether a UI refresh is needed</returns>
         private bool ExecuteAction(Func<bool> action)
         {
             if (Status != GameStatus.LISTENING)
@@ -118,9 +118,9 @@ namespace Klondike
 
             Status = GameStatus.PROCESSING;
 
-            bool result = action();
+            bool uiRefreshNeeded = action();
 
-            if (result)
+            if (uiRefreshNeeded)
             {
                 Log();
             }
@@ -128,19 +128,18 @@ namespace Klondike
             {
                 Status = GameStatus.LISTENING;
             }
-
-            return result;
+            return uiRefreshNeeded;
         }
 
         public List<PileKind> Action_TryDrawCardsFromStock()
         {
             List<PileKind> affectedPiles = new List<PileKind>();
-            bool success = ExecuteAction(() =>
+            bool uiRefreshNeeded = ExecuteAction(() =>
             {
                 return TryDrawCardsFromStock();
             });
 
-            if (success)
+            if (uiRefreshNeeded)
             {
                 affectedPiles.Add(PileKind.WASTE);
                 affectedPiles.Add(PileKind.STOCK);
@@ -160,7 +159,7 @@ namespace Klondike
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
-            bool success = ExecuteAction(() =>
+            bool uiRefreshPending = ExecuteAction(() =>
             {
                 bool cardMoved = false;
 
@@ -201,7 +200,7 @@ namespace Klondike
                 return cardMoved;
             });
 
-            return success ? affectedPiles : new List<PileKind>();
+            return affectedPiles;
         }
 
         /// <summary>
@@ -217,7 +216,7 @@ namespace Klondike
             List<PileKind> affectedPiles = new List<PileKind>();
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
 
-            bool success = ExecuteAction(() =>
+            bool uiRefreshPending = ExecuteAction(() =>
             {
                 bool cardMoved = false;
                 switch (sourcePileData.Kind)
@@ -371,7 +370,7 @@ namespace Klondike
 
         private bool TryMoveCardsToTableauIndex(Card card, int index)
         {
-            Log($"INNER TryMoveCardToFoundationIndex {card} > T[{index}]");
+            Log($"INNER TryMoveCardsToTableauIndex {card} > T[{index}]");
             if (CanAddCardToPile(card, PileKind.TABLEAU, index)) //VALIDATION DONE
             {
                 PileData sourcePileData = _state.GetCardPileOwnerData(card);
@@ -486,7 +485,7 @@ namespace Klondike
         {
             Debug.Log("=== SOLITAIRE STATE ===");
 
-            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.StockPile)}");
+            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile)}");
             if (_state.StockPile.Count > 0) Debug.Log($"Top card in stock is: {_state.StockPile.Peek()}");
             Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile)}");
             if (_state.WastePile.Count > 0) Debug.Log($"Top card in waste is: {_state.WastePile.Peek()}");
