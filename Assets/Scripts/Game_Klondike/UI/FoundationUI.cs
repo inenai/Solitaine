@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -16,30 +17,29 @@ namespace Klondike
             _cardUI_bottom.Init(_controller);
         }
 
-        public void Refresh(Stack<Card> stock, Action onDone)
+        public override Task Refresh(Stack<Card> cards)
         {
-            if (stock.Count == 0)
+            if (cards.Count == 0)
             {
                 _cardUI_top.gameObject.SetActive(false);
                 _cardUI_bottom.gameObject.SetActive(false);
-                onDone?.Invoke();
-                return;
+                return Task.CompletedTask;
             }
 
-            if (stock.Count > 0)
+            if (cards.Count > 0)
             {
-                _cardUI_top.gameObject.SetActive(stock.Count > 0);
-                if (stock.Count > 0)
+                _cardUI_top.gameObject.SetActive(cards.Count > 0);
+                if (cards.Count > 0)
                 {
-                    _cardUI_top.LoadCardData(stock.Pop());
+                    _cardUI_top.LoadCardData(cards.Pop());
                 }
-                _cardUI_bottom.gameObject.SetActive(stock.Count > 0);
-                if (stock.Count > 0)
+                _cardUI_bottom.gameObject.SetActive(cards.Count > 0);
+                if (cards.Count > 0)
                 {
-                    _cardUI_bottom.LoadCardData(stock.Pop());
+                    _cardUI_bottom.LoadCardData(cards.Pop());
                 }
             }
-            onDone?.Invoke();
+            return Task.CompletedTask;
         }
     }
 }

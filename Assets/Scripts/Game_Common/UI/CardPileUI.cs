@@ -13,6 +13,7 @@ namespace Common
         public PileKind PileKind => _pileKind;
         public int Index => _index;
         protected abstract void OnInit();
+        public abstract Task Refresh(Stack<Card> cards);
 
         public void Init(IGameController controller, int index = -1, Action onDone = null)
         {

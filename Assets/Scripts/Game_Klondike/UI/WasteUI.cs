@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -23,17 +24,17 @@ namespace Klondike
             }
         }
 
-        public void Refresh(Stack<Card> waste, Action onDone)
+        public override Task Refresh(Stack<Card> cards)
         {
             if (_cardUIs.Length < 1)
             {
                 throw new Exception("Waste has no card UI available in scene!");
             }
 
-            TurnOffUnusedCardUIs(waste.Count);
-            RefreshWasteCardUIs(waste);
+            TurnOffUnusedCardUIs(cards.Count);
+            RefreshWasteCardUIs(cards);
 
-            onDone?.Invoke();
+            return Task.CompletedTask;
         }
 
         private void RefreshWasteCardUIs(Stack<Card> waste)

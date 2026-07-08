@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.Linq;
+using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 using Utils;
@@ -10,8 +11,6 @@ namespace Klondike
 {
     public class TableauUI : TargetCardPileUI
     {
-        private const float _offsetY = -0.3f;
-        private const float _offsetZ = 0.1f;
         private List<CardUI> _cardUIs;
 
         protected override void OnInit()
@@ -19,56 +18,42 @@ namespace Klondike
             _cardUIs = new();
         }
 
-        public void Refresh(Stack<Card> cards, Action onDone)
+        private async Task<CardUI> CreateCardUI(Transform transform)
         {
-            cards = new Stack<Card>(cards); //InvertOrder
-            RemoveExtraCardUIs(cards.Count);
+            GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddress, transform);
+            CardUI cardUI = go.GetComponent<CardUI>();
+            cardUI.Init(_controller);
+            return cardUI;
+        }
 
-            int index = 0;
-            while (cards.Count > 0)
+        public override async Task Refresh(Stack<Card> tableauCards)
+        {
+            Card[] cards = tableauCards.Reverse().ToArray();
+            RemoveExtraCardUIs(cards.Length);
+
+            List<Task<CardUI>> tasks = new();
+
+            for (int i = _cardUIs.Count; i < cards.Length; i++)
             {
-                Card cardToLoad = cards.Pop();
-                if (_cardUIs.Count >= index + 1)
-                {
-                    _cardUIs[index].LoadCardData(cardToLoad, index);
-                }
-                else
-                {
-                    StackCard(index, cardToLoad, null);
-                }
-                index++;
+                tasks.Add(CreateCardUI(transform));
             }
-            onDone?.Invoke();
-        }
 
-        private void StackCard(int index, Card card, Action<CardUI> callback) //Tercera carta se puso tan abajo como si fuera la 4ta y tan adelante como si fuera la 5ta
-        {
-            float offsetY = 0f + (_offsetY * index);
-            float offsetZ = _offsetZ + (_offsetZ * index);
+            CardUI[] newCards = await Task.WhenAll(tasks);
 
-            Transform parentTr = _cardUIs.Count > 0 ?
-                _cardUIs.ElementAt(_cardUIs.Count - 1).transform :
-                transform;
+            _cardUIs.AddRange(newCards);
 
-            CreateCardUI(parentTr,(gameObject) =>
+            if (_cardUIs.Count != cards.Length)
+                throw new Exception("Missmatch in tableau cards amount after initializing new cards");
+
+            for (int i = 0; i < cards.Length; i++)
             {
-                gameObject.transform.localPosition += Vector3.up * offsetY;
-                gameObject.transform.localPosition += Vector3.back * offsetZ;
-                CardUI cardUI = gameObject.GetComponent<CardUI>();
-                if (cardUI == null) throw new Exception("Fatal error: CardUI prefab does not contain CardUI component!");
-                _cardUIs.Add(cardUI);
-                cardUI.Init(_controller);
-                callback?.Invoke(cardUI);
-                cardUI.LoadCardData(card);
-            });
-        }
-
-        private void CreateCardUI(Transform parentTr, Action<GameObject> onDone)
-        {
-            AssetManager.InstantiateAsync(CardUtils.CardPrefabAddress, parentTr, (go) =>
-            {
-                onDone?.Invoke(go);
-            }, () => { });
+                Transform desiredParent = i == 0 ? transform : _cardUIs[i - 1].transform;
+                if (_cardUIs[i].transform.parent != desiredParent)
+                {
+                    _cardUIs[i].transform.SetParent(_cardUIs[i - 1].transform);
+                }
+                _cardUIs[i].LoadCardData(cards[i],i);
+            }
         }
 
         private void RemoveExtraCardUIs(int amountNeeded)
@@ -77,8 +62,9 @@ namespace Klondike
 
             while (_cardUIs.Count > amountNeeded)
             {
-                Destroy(_cardUIs.ElementAt(_cardUIs.Count - 1).gameObject);
-                _cardUIs.Remove(_cardUIs.ElementAt(_cardUIs.Count - 1));
+                CardUI last = _cardUIs[^1];
+                Destroy(last.gameObject);
+                _cardUIs.RemoveAt(_cardUIs.Count - 1);
             }
         }
     }

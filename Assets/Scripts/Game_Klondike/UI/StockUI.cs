@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -13,11 +14,11 @@ namespace Klondike
 
         protected override void OnInit() {}
 
-        public void Refresh(Stack<Card> stock, Action onDone)
+        public override Task Refresh(Stack<Card> cards)
         {
-            _cardUI.gameObject.SetActive(stock.Count > 0);
+            _cardUI.gameObject.SetActive(cards.Count > 0);
             _restockLocked.SetActive(!_controller.IsRestockAvailable(PileKind.STOCK));
-            onDone?.Invoke();
+            return Task.CompletedTask;
         }
 
         public void OnClick()

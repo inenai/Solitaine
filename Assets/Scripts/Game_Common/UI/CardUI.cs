@@ -10,7 +10,7 @@ namespace Common
     public class CardUI : MonoBehaviour, IDrag, IDoubleClick
     {
         private const float _offsetY = -0.3f;
-        private const float _offsetZ = 0.1f;
+        private const float _offsetZ = -0.1f;
 
         [SerializeField] GameObject _back;
         [SerializeField] GameObject _front;
@@ -63,7 +63,7 @@ namespace Common
 
         private Vector3 GetCardOffset(int index)
         {
-            float offsetY = 0f + (_offsetY * index);
+            float offsetY = _offsetY * index;
             float offsetZ = _offsetZ + (_offsetZ * index);
             return new Vector3(0f, offsetY, offsetZ);
         }
@@ -73,8 +73,7 @@ namespace Common
             if (index >= 0)
             {
                 Vector3 offset = GetCardOffset(index);
-                gameObject.transform.localPosition += Vector3.up * offset.y;
-                gameObject.transform.localPosition += Vector3.back * offset.z;
+                gameObject.transform.localPosition = offset;
             }
 
             foreach (TextMeshPro txt in _suitStr)
@@ -209,7 +208,7 @@ namespace Common
         #region DEBUG
         public void RefreshDEBUG()
         {
-            _DEBUG_DRAGGABLE.SetActive(!Card.Free);
+            _DEBUG_DRAGGABLE.SetActive(Card != null ? !Card.Free : false);
         }
         #endregion
     }

@@ -70,8 +70,31 @@ namespace Klondike
             KlondikeSettings.Reset(_defaultConfig);
         }
 
+        private bool UpdateUIWithChanges(List<PileKind> pilesToRefresh)
+        {
+            bool moved = pilesToRefresh.Count > 0;
+            if (moved)
+            {
+                _ = FinishRefresh(pilesToRefresh);
+            }
+            return moved;
+        }
+
+        private async Task FinishRefresh(List<PileKind> pilesToRefresh)
+        {
+            try
+            {
+                await RefreshPileUI(pilesToRefresh);
+            }
+            finally
+            {
+                _game.UIDoneRefreshing();
+            }
+        }
+
         public bool PileClicked(PileKind pileKind, int index)
         {
+            Debug.Log("Processing pile clicked.");
             Func<List<PileKind>> action = pileKind switch
             {
                 PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
@@ -84,42 +107,22 @@ namespace Klondike
                 return false;
             }
 
-            List<PileKind> result = action.Invoke();
-            RefreshPileUI(result, () =>
-            {
-                _game.UIDoneRefreshing();
-            });
-            return result.Count > 0;
+            return UpdateUIWithChanges(
+                action.Invoke());
         }
 
         public bool CardDoubleClicked(Card card)
         {
             Debug.Log("Processing double click.");
-
-            List<PileKind> result = _game.Action_TryMoveCardAutomatic(card);
-            bool cardsMoved = result.Count > 0;
-            if (cardsMoved)
-            {
-                RefreshPileUI(result, () =>
-                {
-                    _game.UIDoneRefreshing();
-                });
-            }
-            return cardsMoved;
+            return UpdateUIWithChanges(
+                _game.Action_TryMoveCardAutomatic(card));
         }
 
         public bool CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex)
         {
-            List<PileKind> result = _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
-            bool cardsMoved = result.Count > 0;
-            if (cardsMoved)
-            {
-                RefreshPileUI(result, () =>
-                {
-                    _game.UIDoneRefreshing();
-                });
-            }
-            return cardsMoved;
+            Debug.Log("Processing card dragged to pile.");
+            return UpdateUIWithChanges(
+               _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex));
         }
 
         public bool IsRestockAvailable(PileKind pileKind)
@@ -136,54 +139,63 @@ namespace Klondike
         #endregion
 
         #region UI
-        private void RefreshPileUI(List<PileKind> toRefresh, Action onDone = null)
+        private async Task RefreshPileUI(List<PileKind> toRefresh)
         {
+            List<Task> tasks = new();
+
             foreach (PileKind kind in toRefresh)
             {
-                //TODO when this waiting for animations, wait for all to be done before continuing (async Tasks?)
                 switch (kind)
                 {
                     case PileKind.WASTE:
-                        RefreshWaste();
+                        tasks.Add(RefreshWaste());
                         break;
+
                     case PileKind.STOCK:
-                        RefreshStock();
+                        tasks.Add(RefreshStock());
                         break;
+
                     case PileKind.FOUNDATION:
-                        RefreshFoundations();
+                        tasks.Add(RefreshFoundations());
                         break;
+
                     case PileKind.TABLEAU:
-                        RefreshTableaus();
+                        tasks.Add(RefreshTableaus());
                         break;
                 }
             }
-            onDone?.Invoke();
+
+            await Task.WhenAll(tasks);
         }
 
-        private void RefreshStock(Action onDone = null)
+        private Task RefreshStock()
         {
-            _stock.Refresh(CloneStack(_game.State.StockPile),onDone);
+            return _stock.Refresh(CloneStack(_game.State.StockPile));
         }
 
-        private void RefreshWaste(Action onDone = null)
+        private Task RefreshWaste()
         {
-            _waste.Refresh(CloneStack(_game.State.WastePile), onDone);
+            return _waste.Refresh(CloneStack(_game.State.WastePile));
         }
 
-        private void RefreshFoundations(Action onDone = null)
+        private Task RefreshFoundations()
         {
+            List<Task> tasks = new();
             for (int i = 0; i < _foundations.Length; i++)
             {
-                _foundations[i].Refresh(CloneStack(_game.State.Foundations[i].Stack), onDone);
+                tasks.Add(_foundations[i].Refresh(CloneStack(_game.State.Foundations[i].Stack)));
             }
+            return Task.WhenAll(tasks);
         }
 
-        private void RefreshTableaus(Action onDone = null)
+        private Task RefreshTableaus()
         {
+            List<Task> tasks = new();
             for (int i = 0; i < _tableaus.Length; i++)
             {
-                _tableaus[i].Refresh(CloneStack(_game.State.Tableaus[i]), onDone);
+                tasks.Add(_tableaus[i].Refresh(CloneStack(_game.State.Tableaus[i])));
             }
+            return Task.WhenAll(tasks);
         }
         #endregion
     }

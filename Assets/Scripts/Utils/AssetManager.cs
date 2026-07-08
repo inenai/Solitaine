@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
+using System.Threading.Tasks;
+using System.Collections;
+using Common;
 
 namespace Utils
 {
@@ -28,6 +31,24 @@ namespace Utils
                     onError?.Invoke();
                 }
             };
+        }
+
+        public static async Task<GameObject> InstantiateAsync(string reference, Transform parent)
+        {
+            if (reference == null)
+                throw new ArgumentNullException(nameof(reference));
+
+            var handle = Addressables.InstantiateAsync(reference, parent);
+
+            await handle.Task;
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"Failed to load asset at {reference}. Status: {handle.Status}");
+                throw new Exception($"Failed to instantiate {reference}");
+            }
+
+            return handle.Result;
         }
     }
 }
