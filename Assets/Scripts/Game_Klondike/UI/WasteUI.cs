@@ -16,11 +16,30 @@ namespace Klondike
         /// </summary>
         [SerializeField] CardUI[] _cardUIs;
 
+        private Vector3[] _cardPositions;
+
+        void Awake()
+        {
+            _cardPositions = new Vector3[_cardUIs.Length];
+            for (int i = 0; i < _cardUIs.Length; i++)
+            {
+                _cardPositions[i] = _cardUIs[i].transform.position;
+            }
+        }
+
         protected override void OnInit()
         {
             for (int i = 0; i < _cardUIs.Length; i++)
             {
                 _cardUIs[i].Init(_controller);
+            }
+        }
+
+        private void ResetPositions()
+        {
+            for (int i = 0; i < _cardUIs.Length; i++)
+            {
+                _cardUIs[i].transform.position = _cardPositions[i];
             }
         }
 
@@ -30,7 +49,7 @@ namespace Klondike
             {
                 throw new Exception("Waste has no card UI available in scene!");
             }
-
+            ResetPositions();
             TurnOffUnusedCardUIs(cards.Count);
             RefreshWasteCardUIs(cards);
 

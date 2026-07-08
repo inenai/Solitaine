@@ -61,19 +61,11 @@ namespace Common
             _back.SetActive(!_card.Revealed);
         }
 
-        private Vector3 GetCardOffset(int index)
-        {
-            float offsetY = _offsetY * index;
-            float offsetZ = _offsetZ + (_offsetZ * index);
-            return new Vector3(0f, offsetY, offsetZ);
-        }
-
         public void Refresh(int index)
         {
-            if (index >= 0)
+            if (index > 0)
             {
-                Vector3 offset = GetCardOffset(index);
-                gameObject.transform.localPosition = offset;
+                gameObject.transform.localPosition = new Vector3(0f, _offsetY, _offsetZ);
             }
 
             foreach (TextMeshPro txt in _suitStr)

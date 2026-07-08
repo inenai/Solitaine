@@ -51,6 +51,7 @@ namespace Klondike
         {
             _drawAmount = KlondikeSettings.DrawAmount;
             _availableRestocks = KlondikeSettings.AvailableRestocks;
+            _foundationCardsFree = KlondikeSettings.FoundationCardsFree;
         }
 
         public PileData GetCardPileOwnerData(Card card)
@@ -111,11 +112,6 @@ namespace Klondike
         {
             if (_availableRestocks > 0)
                 _availableRestocks--;
-
-            // foreach (Card card in StockPile)
-            // {
-            //     card.FreeCard(false);
-            // }
         }
     }
 }

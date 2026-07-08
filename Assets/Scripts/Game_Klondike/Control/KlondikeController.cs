@@ -31,7 +31,7 @@ namespace Klondike
         {
             if (!KlondikeSettings.SavedSettingsAvailable)
             {
-                KlondikeSettings.Reset(_defaultConfig);
+                _defaultConfig.ApplyDefaultSettings();
             }
         }
 

@@ -212,7 +212,7 @@ namespace Klondike
         /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
         public List<PileKind> Action_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
         {
-            Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]]");
+            Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
             List<PileKind> affectedPiles = new List<PileKind>();
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
 
@@ -378,26 +378,26 @@ namespace Klondike
                 {
                     case PileKind.TABLEAU:
                         Stack<Card> fromTableau = _state.Tableaus[sourcePileData.Index];
-                        Queue<Card> tempQueue = new();
 
-                        //Copy
-                        for (int i = fromTableau.Count - 1; i >= 0; i--)
+                        Stack<Card> tempStack = new Stack<Card>();
+                        while (tempStack.Count == 0 || tempStack.Peek() != card)
                         {
-                            Card movingCard = fromTableau.ElementAt(i);
-                            tempQueue.Enqueue(movingCard);
-                            if (movingCard == card) break;
+                            tempStack.Push(fromTableau.Pop());
                         }
-
-                        //Delete
-                        RemoveCardFromPile(card);
-
-                        //Insert
-                        while (tempQueue.Count > 0)
+                        if (fromTableau.Count > 0)
                         {
-                            _state.Tableaus[index].Push(tempQueue.Dequeue());
+                            fromTableau.Peek().Show(true);
+                            fromTableau.Peek().FreeCard(true);
+                        }
+                        while (tempStack.Count > 0)
+                        {
+                            _state.Tableaus[index].Push(tempStack.Pop());
                         }
                         break;
                     case PileKind.FOUNDATION:
+                        RemoveCardFromPile(card);
+                        _state.Tableaus[index].Push(card);
+                        break;
                     case PileKind.WASTE:
                         RemoveCardFromPile(card);
                         _state.Tableaus[index].Push(card);
