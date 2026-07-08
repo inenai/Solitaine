@@ -9,7 +9,7 @@ namespace Utils
     {
         public static IList<T> Shuffle<T>(IList<T> list)
         {
-            System.Random rng = new System.Random(1234);
+            Random rng = new Random();
             int n = list.Count;
             while (n > 1)
             {

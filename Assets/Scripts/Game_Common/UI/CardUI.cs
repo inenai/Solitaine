@@ -63,6 +63,10 @@ namespace Common
 
         public void Refresh(int index)
         {
+            if (index == 0)
+            {
+                gameObject.transform.localPosition = new Vector3(0f, 0f, _offsetZ);
+            }
             if (index > 0)
             {
                 gameObject.transform.localPosition = new Vector3(0f, _offsetY, _offsetZ);

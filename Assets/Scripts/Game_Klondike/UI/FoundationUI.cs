@@ -11,6 +11,15 @@ namespace Klondike
         [SerializeField] CardUI _cardUI_top;
         [SerializeField] CardUI _cardUI_bottom;
 
+        private Vector3 _topPosition;
+        private Vector3 _bottomPosition;
+
+        void Awake()
+        {
+            _topPosition = _cardUI_top.transform.position;
+            _bottomPosition = _cardUI_bottom.transform.position;
+        }
+
         protected override void OnInit()
         {
             _cardUI_top.Init(_controller);
@@ -19,6 +28,7 @@ namespace Klondike
 
         public override Task Refresh(Stack<Card> cards)
         {
+            ResetCardPositions();
             if (cards.Count == 0)
             {
                 _cardUI_top.gameObject.SetActive(false);
@@ -40,6 +50,12 @@ namespace Klondike
                 }
             }
             return Task.CompletedTask;
+        }
+
+        private void ResetCardPositions()
+        {
+            _cardUI_top.transform.position = _topPosition;
+            _cardUI_bottom.transform.position = _bottomPosition;
         }
     }
 }
