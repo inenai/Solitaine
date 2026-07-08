@@ -48,7 +48,7 @@ namespace Common
             _controller = controller;
         }
 
-        public void LoadCardData(Card card, int index)
+        public void LoadCardData(Card card, int index = -1)
         {
             _card = card;
             Refresh(index);
@@ -70,9 +70,12 @@ namespace Common
 
         public void Refresh(int index)
         {
-            Vector3 offset = GetCardOffset(index);
-            gameObject.transform.localPosition += Vector3.up * offset.y;
-            gameObject.transform.localPosition += Vector3.back * offset.z;
+            if (index >= 0)
+            {
+                Vector3 offset = GetCardOffset(index);
+                gameObject.transform.localPosition += Vector3.up * offset.y;
+                gameObject.transform.localPosition += Vector3.back * offset.z;
+            }
 
             foreach (TextMeshPro txt in _suitStr)
             {
