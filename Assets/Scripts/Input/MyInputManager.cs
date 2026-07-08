@@ -108,6 +108,8 @@ namespace Common
       private void DoublePressed(InputAction.CallbackContext context)
       {
          Debug.Log("[InputManager] Pointer double pressed");
+         draggingObject = null; //Cancel drag
+
          Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 

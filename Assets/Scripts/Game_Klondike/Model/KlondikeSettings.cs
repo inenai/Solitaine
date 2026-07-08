@@ -7,8 +7,10 @@ namespace Klondike
         const string SavedSettingsFlag = "KL_SAVED_SETTINGS";
         const string DrawAmountKey = "KL_DRAW_AMOUNT";
         const string AllowRedrawKey = "KL_ALLOW_REDRAW";
+        const string FoundationCardsFreeKey = "KL_FOUNDATION_CARDS_FREE";
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
+        public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;
 
         public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(SavedSettingsFlag, 0) != 0;
 
@@ -38,6 +40,19 @@ namespace Klondike
             }
         }
 
+        public static bool FoundationCardsFree
+        {
+            get
+            {
+                return PlayerPrefs.GetInt(FoundationCardsFreeKey, DEFAULT_FOUNDATION_CARDS_FREE ? 1 : 0) != 0;
+            }
+            set
+            {
+                PlayerPrefs.SetInt(AllowRedrawKey, value ? 1 : 0);
+                Save();
+            }
+        }
+
         private static void Save()
         {
             PlayerPrefs.SetInt(SavedSettingsFlag, 1);
@@ -48,6 +63,7 @@ namespace Klondike
         {
             DrawAmount = defaultConfig.DrawAmount;
             AvailableRestocks = defaultConfig.AvailableRestocks;
+            FoundationCardsFree = defaultConfig.FoundationCardsFree;
         }
     }
 }

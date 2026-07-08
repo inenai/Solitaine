@@ -9,14 +9,16 @@ namespace Klondike
     {
         public Stack<Card> StockPile;
         public Stack<Card> WastePile;
-        public Stack<Card>[] Tableau;
+        public Stack<Card>[] Tableaus;
         public Foundation[] Foundations;
 
         public int DrawCount => _drawAmount;
         public int AvailableRestocks => _availableRestocks;
+        public bool FoundationCardsFree => _foundationCardsFree;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
+        bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
 
         public void InitState()
         {
@@ -38,10 +40,10 @@ namespace Klondike
 
         private void InitTableau()
         {
-            Tableau = new Stack<Card>[7];
+            Tableaus = new Stack<Card>[7];
             for (int i = 0; i < 7; i++)
             {
-                Tableau[i] = new Stack<Card>();
+                Tableaus[i] = new Stack<Card>();
             }
         }
 
@@ -51,7 +53,7 @@ namespace Klondike
             _availableRestocks = KlondikeSettings.AvailableRestocks;
         }
 
-        public CardPileData GetCardPileOwnerData(Card card)
+        public PileData GetCardPileOwnerData(Card card)
         {
             PileKind kind = PileKind.WASTE;
             int index = -1;
@@ -85,9 +87,9 @@ namespace Klondike
 
             if (!found)
             {
-                for (int i = 0; i < Tableau.Length; i++)
+                for (int i = 0; i < Tableaus.Length; i++)
                 {
-                    if (Tableau[i].Contains(card))
+                    if (Tableaus[i].Contains(card))
                     {
                         kind = PileKind.TABLEAU;
                         index = i;
@@ -102,13 +104,18 @@ namespace Klondike
                 throw new Exception($"Card {card} not found in any pile!");
             }
             Debug.Log($"Card {card} found in {kind}[{index}]");
-            return new CardPileData(kind, index);
+            return new PileData(kind, index);
         }
 
         public void OnRestocked()
         {
             if (_availableRestocks > 0)
                 _availableRestocks--;
+
+            // foreach (Card card in StockPile)
+            // {
+            //     card.FreeCard(false);
+            // }
         }
     }
 }

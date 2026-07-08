@@ -6,18 +6,13 @@ public abstract class TargetCardPileUI : CardPileUI
 {
     [SerializeField] private GameObject triggerHighlight;
 
-    void OnTriggerEnter2D(Collider2D collision)
+    public bool IsCardAllowedHere(Card card)
     {
-        CardUI cardUI = collision.gameObject.GetComponent<CardUI>();
-        if (cardUI != null && _controller.IsCardAllowedHere(cardUI.Card, _pileKind, _index))
-        {
-            triggerHighlight.SetActive(true);
-        }
-
+        return _controller.IsCardAllowedHere(card, _pileKind, _index);
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    public void EnableHighlight(bool value)
     {
-        triggerHighlight.SetActive(false);
+        triggerHighlight.SetActive(value);
     }
 }

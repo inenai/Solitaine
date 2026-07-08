@@ -3,18 +3,6 @@ using Utils;
 
 namespace Common {
 
-    public struct CardPileData
-    {
-        public int Index;
-        public PileKind Kind;
-
-        public CardPileData(PileKind kind, int index) : this()
-        {
-            Kind = kind;
-            Index = index;
-        }
-    }
-
     public class Card
     {
         private int _value;
@@ -38,8 +26,8 @@ namespace Common {
         public void FreeCard(bool free)
         {
             string action = free ? "Freed" : "Locked";
-            Debug.Log($"{action} card {this}");
             _free = free;
+            Debug.Log($"{action} card {this}");
         }
 
         public CardSuit Suit => _suit;
@@ -50,13 +38,14 @@ namespace Common {
         public override string ToString()
         {
             string suitTxt = CardUtils.GetSuitStr(_suit);
-
+            string lockedPref = _free ? "" : "[";
+            string lockedSuf = _free ? "" : "]";
             string revealedTxt = "";
             if (Revealed)
             {
                 revealedTxt = "*";
             }
-            return $"{CardUtils.CardValue(this)}{suitTxt}{revealedTxt}";
+            return $"{lockedPref}{CardUtils.CardValue(this)}{suitTxt}{revealedTxt}{lockedSuf}";
         }
     }
 }

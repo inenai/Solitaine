@@ -10,9 +10,11 @@ namespace Klondike
         /// -1 for infinite
         /// </summary>
         [SerializeField] int _availableRestocks = -1;
+        [SerializeField] bool _foundationCardsFree = false;
 
         public int DrawAmount => _drawAmount;
         public int AvailableRestocks => _availableRestocks;
+        public bool FoundationCardsFree => _foundationCardsFree;
 
         [ContextMenu("Apply default Klondike settings")]
         public void ApplyDefaultSettings()

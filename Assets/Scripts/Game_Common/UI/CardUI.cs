@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -8,16 +9,21 @@ namespace Common
     [RequireComponent(typeof(Collider2D))]
     public class CardUI : MonoBehaviour, IDrag, IDoubleClick
     {
-        Card _card;
-        IGameController _controller;
-        private Vector3 _positionOnStartDrag;
-        private Collider2D _collider;
+        private const float _offsetY = -0.3f;
+        private const float _offsetZ = 0.1f;
 
         [SerializeField] GameObject _back;
         [SerializeField] GameObject _front;
         [SerializeField] TextMeshPro[] _suitStr;
         [SerializeField] TextMeshPro[] _valueStr;
         [SerializeField] TextMeshPro[] _lightAlpha;
+
+        private Card _card;
+        private IGameController _controller;
+        private Vector3 _positionOnStartDrag;
+        private Collider2D _collider;
+        private List<TargetCardPileUI> _overlappingPiles;
+        private TargetCardPileUI _targetPile;
 
         //DEBUG
         [SerializeField] GameObject _DEBUG_DRAGGABLE;
@@ -28,18 +34,24 @@ namespace Common
         {
             _positionOnStartDrag = transform.position;
             _collider = GetComponent<Collider2D>();
+            _overlappingPiles = new();
+            _targetPile = null;
         }
 
         void Update()
         {
-            //RefreshDEBUG();
+            RefreshDEBUG();
         }
 
-        public void Init(Card card, IGameController controller)
+        public void Init(IGameController controller)
         {
             _controller = controller;
+        }
+
+        public void LoadCardData(Card card, int index)
+        {
             _card = card;
-            Refresh();
+            Refresh(index);
         }
 
         public void Reveal(bool reveal)
@@ -49,8 +61,19 @@ namespace Common
             _back.SetActive(!_card.Revealed);
         }
 
-        public void Refresh()
+        private Vector3 GetCardOffset(int index)
         {
+            float offsetY = 0f + (_offsetY * index);
+            float offsetZ = _offsetZ + (_offsetZ * index);
+            return new Vector3(0f, offsetY, offsetZ);
+        }
+
+        public void Refresh(int index)
+        {
+            Vector3 offset = GetCardOffset(index);
+            gameObject.transform.localPosition += Vector3.up * offset.y;
+            gameObject.transform.localPosition += Vector3.back * offset.z;
+
             foreach (TextMeshPro txt in _suitStr)
             {
                 txt.text = CardUtils.GetSuitStr(_card.Suit);
@@ -91,14 +114,76 @@ namespace Common
 
         public void OnEndDrag()
         {
-            Log("End drag!");
             if (_card == null) return;
-            //TODO LOGIC
-            // if (!_cardOwner.EndDrag(this))
-            // {
-            Log($"DraggableCardStack OnEndDrag. Restoring saved position at {_positionOnStartDrag}");
-            transform.position = _positionOnStartDrag;
-            // }
+
+            bool successfulMove = false;
+            if (_targetPile != null)
+            {
+                successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index);
+            }
+
+            if (!successfulMove)
+            {
+                Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
+                transform.position = _positionOnStartDrag;
+            }
+            else
+            {
+                Log("End drag! Sent card to target pile.");
+            }
+
+        }
+        #endregion
+
+        #region CardToPileInteraction
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
+            if (pile != null && !_overlappingPiles.Contains(pile))
+            {
+                _overlappingPiles.Add(pile);
+            }
+            UpdateClosestTarget();
+        }
+
+        private void UpdateClosestTarget()
+        {
+            _targetPile = null;
+            if (_overlappingPiles.Count == 0) return;
+
+            float closestDistance = float.MaxValue;
+            TargetCardPileUI closestPile = null;
+            foreach (TargetCardPileUI pile in _overlappingPiles)
+            {
+                float distance = Vector3.Distance(pile.transform.position, transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestPile = pile;
+                }
+            }
+
+            foreach (TargetCardPileUI pile in _overlappingPiles)
+            {
+                bool allowedMove = pile.IsCardAllowedHere(Card);
+                if (pile == closestPile && allowedMove)
+                {
+                    _targetPile = pile;
+                }
+
+                pile.EnableHighlight(pile == _targetPile);
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
+            if (pile != null && _overlappingPiles.Contains(pile))
+            {
+                _overlappingPiles.Remove(pile);
+            }
+            UpdateClosestTarget();
         }
         #endregion
 

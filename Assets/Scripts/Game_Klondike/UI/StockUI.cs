@@ -11,11 +11,7 @@ namespace Klondike
         [SerializeField] GameObject _cardUI;
         [SerializeField] GameObject _restockLocked;
 
-        public void Init(Stack<Card> stock, IGameController controller, Action onDone = null)
-        {
-            Init(controller);
-            Refresh(stock, onDone);
-        }
+        protected override void OnInit() {}
 
         public void Refresh(Stack<Card> stock, Action onDone)
         {

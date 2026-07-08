@@ -15,6 +15,14 @@ namespace Klondike
         /// </summary>
         [SerializeField] CardUI[] _cardUIs;
 
+        protected override void OnInit()
+        {
+            for (int i = 0; i < _cardUIs.Length; i++)
+            {
+                _cardUIs[i].Init(_controller);
+            }
+        }
+
         public void Refresh(Stack<Card> waste, Action onDone)
         {
             if (_cardUIs.Length < 1)
@@ -36,7 +44,7 @@ namespace Klondike
                 CardUI cardUI = _cardUIs[j];
                 Debug.Log($"Activating waste card index {j}.");
                 cardUI.gameObject.SetActive(true);
-                cardUI.Init(waste.Pop(), _controller);
+                cardUI.LoadCardData(waste.Pop());
                 j--;
             }
         }

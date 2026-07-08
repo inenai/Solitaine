@@ -1,5 +1,8 @@
 using Common;
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -15,12 +18,13 @@ namespace Klondike
 
         private KlondikeGame _game;
 
+        #region Initialization
         void Start()
         {
             InitConfig();
-            _game = new KlondikeGame();
-            _game.SetupGame();
-            InitUI(_game.OnUISetup);
+            InitGame();
+            InitUI();
+            FirstLoadUI(_game.OnUISetup);
         }
 
         private void InitConfig()
@@ -31,14 +35,15 @@ namespace Klondike
             }
         }
 
-        public void ResetKlondikeSettings()
+        private void InitGame()
         {
-            KlondikeSettings.Reset(_defaultConfig);
+            _game = new KlondikeGame();
+            _game.SetupGame();
         }
 
-        public void InitUI(Action onDone)
+        public void InitUI()
         {
-            _stock.Init(CloneStack(_game.State.StockPile),this);
+            _stock.Init(this);
             _waste.Init(this);
             for (int i = 0; i < _foundations.Length; i++)
             {
@@ -47,36 +52,29 @@ namespace Klondike
             }
             for (int i = 0; i < _tableaus.Length; i++)
             {
-                _tableaus[i].Init(this, i, CloneStack(_game.State.Tableau[i]));
+                _tableaus[i].Init(this, i);
             }
+        }
+
+        private void FirstLoadUI(Action onDone)
+        {
+            RefreshTableaus();
             RefreshStock();
             onDone?.Invoke();
         }
+        #endregion
 
-        private void RefreshStock(Action onDone = null)
+        #region GameController
+        public void ResetSettingsToDefault()
         {
-            _stock.Refresh(CloneStack(_game.State.StockPile), onDone);
+            KlondikeSettings.Reset(_defaultConfig);
         }
 
-        private void RefreshWaste(Action onDone)
-        {
-            _waste.Refresh(CloneStack(_game.State.WastePile), onDone);
-        }
-
-        private void RefreshFoundations(Action onDone)
-        {
-            for (int i = 0; i < _foundations.Length; i++)
-            {
-                _foundations[i].Refresh(CloneStack(_game.State.Foundations[i].Stack), onDone);
-            }
-        }
-
-        #region InterfaceImplementation
         public bool PileClicked(PileKind pileKind, int index)
         {
-            Func<bool> action = pileKind switch
+            Func<List<PileKind>> action = pileKind switch
             {
-                PileKind.STOCK => _game.Action_DrawCardsFromStock,
+                PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
                 _ => null
             };
 
@@ -86,39 +84,42 @@ namespace Klondike
                 return false;
             }
 
-            if (action.Invoke())
+            List<PileKind> result = action.Invoke();
+            RefreshPileUI(result, () =>
             {
-                RefreshStock(() =>
-                {
-                    RefreshWaste(() =>
-                    {
-                        _game.UIDoneRefreshing();
-                    });
-                });
-                return true;
-            }
-            return false;
+                _game.UIDoneRefreshing();
+            });
+            return result.Count > 0;
         }
 
         public bool CardDoubleClicked(Card card)
         {
             Debug.Log("Processing double click.");
-            CardPileData pileData = _game.State.GetCardPileOwnerData(card);
 
-            Func<bool> action = pileData.Kind switch
+            List<PileKind> result = _game.Action_TryMoveCardAutomatic(card);
+            bool cardsMoved = result.Count > 0;
+            if (cardsMoved)
             {
-                PileKind.WASTE => WasteDoubleClicked,
-                PileKind.TABLEAU => () => TableauDoubleClicked(pileData.Index),
-                _ => null
-            };
-
-            if (action == null)
-            {
-                _game.UIDoneRefreshing();
-                return false;
+                RefreshPileUI(result, () =>
+                {
+                    _game.UIDoneRefreshing();
+                });
             }
+            return cardsMoved;
+        }
 
-            return action.Invoke();
+        public bool CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex)
+        {
+            List<PileKind> result = _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
+            bool cardsMoved = result.Count > 0;
+            if (cardsMoved)
+            {
+                RefreshPileUI(result, () =>
+                {
+                    _game.UIDoneRefreshing();
+                });
+            }
+            return cardsMoved;
         }
 
         public bool IsRestockAvailable(PileKind pileKind)
@@ -130,39 +131,60 @@ namespace Klondike
 
         public bool IsCardAllowedHere(Card card, PileKind targetPile, int targetPileIndex)
         {
-            return _game.CanMoveCardToPile(card, targetPile, targetPileIndex);
+            return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
         }
         #endregion
 
-        private bool TableauDoubleClicked(int index)
+        #region UI
+        private void RefreshPileUI(List<PileKind> toRefresh, Action onDone = null)
         {
-            Debug.Log("Tableau card was double clicked.");
-            if (_game.Action_MoveFromTableauToFoundation(index))
+            foreach (PileKind kind in toRefresh)
             {
-                _tableaus[index].RemoveTopmostCard(() =>
+                //TODO when this waiting for animations, wait for all to be done before continuing (async Tasks?)
+                switch (kind)
                 {
-                    RefreshFoundations(_game.UIDoneRefreshing);
-                });
-                return true;
+                    case PileKind.WASTE:
+                        RefreshWaste();
+                        break;
+                    case PileKind.STOCK:
+                        RefreshStock();
+                        break;
+                    case PileKind.FOUNDATION:
+                        RefreshFoundations();
+                        break;
+                    case PileKind.TABLEAU:
+                        RefreshTableaus();
+                        break;
+                }
             }
-            return false;
+            onDone?.Invoke();
         }
 
-        private bool WasteDoubleClicked()
+        private void RefreshStock(Action onDone = null)
         {
-            Debug.Log("Waste card was double clicked.");
-            if (_game.Action_MoveFromWasteToAutoFoundation())
-            {
-                RefreshWaste(() =>
-                {
-                    RefreshFoundations(() =>
-                    {
-                        _game.UIDoneRefreshing();
-                    });
-                });
-                return true;
-            }
-            return false;
+            _stock.Refresh(CloneStack(_game.State.StockPile),onDone);
         }
+
+        private void RefreshWaste(Action onDone = null)
+        {
+            _waste.Refresh(CloneStack(_game.State.WastePile), onDone);
+        }
+
+        private void RefreshFoundations(Action onDone = null)
+        {
+            for (int i = 0; i < _foundations.Length; i++)
+            {
+                _foundations[i].Refresh(CloneStack(_game.State.Foundations[i].Stack), onDone);
+            }
+        }
+
+        private void RefreshTableaus(Action onDone = null)
+        {
+            for (int i = 0; i < _tableaus.Length; i++)
+            {
+                _tableaus[i].Refresh(CloneStack(_game.State.Tableaus[i]), onDone);
+            }
+        }
+        #endregion
     }
 }

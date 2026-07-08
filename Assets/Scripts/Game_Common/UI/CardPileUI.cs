@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Common
@@ -10,11 +12,13 @@ namespace Common
         protected IGameController _controller;
         public PileKind PileKind => _pileKind;
         public int Index => _index;
+        protected abstract void OnInit();
 
         public void Init(IGameController controller, int index = -1, Action onDone = null)
         {
             _controller = controller;
             _index = index;
+            OnInit();
         }
     }
 }
