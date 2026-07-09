@@ -15,6 +15,7 @@ namespace Klondike
         [SerializeField] WasteUI _waste;
         [SerializeField] FoundationUI[] _foundations;
         [SerializeField] TableauUI[] _tableaus;
+        [SerializeField] ParticleSystem _victoryParticles;
 
         private KlondikeGame _game;
         private GameStatus _status = GameStatus.INITIALIZING;
@@ -36,7 +37,6 @@ namespace Klondike
             InitConfig();
             InitGame();
             InitUI();
-            FirstRefreshUI();
         }
 
         private void InitConfig()
@@ -51,6 +51,7 @@ namespace Klondike
         {
 
             _game = new KlondikeGame();
+            _game.OnWin += OnGameWon;
             _game.SetupGame();
         }
 
@@ -67,10 +68,6 @@ namespace Klondike
             {
                 _tableaus[i].Init(this, i);
             }
-        }
-
-        private void FirstRefreshUI()
-        {
             _ = FinishRefresh(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU });
         }
         #endregion
@@ -81,26 +78,9 @@ namespace Klondike
             KlondikeSettings.Reset(_defaultConfig);
         }
 
-        private bool UpdateUIWithChanges(List<PileKind> pilesToRefresh)
+        private void OnGameWon()
         {
-            bool moved = pilesToRefresh.Count > 0;
-            if (moved)
-            {
-                _ = FinishRefresh(pilesToRefresh);
-            }
-            return moved;
-        }
-
-        private async Task FinishRefresh(List<PileKind> pilesToRefresh)
-        {
-            try
-            {
-                await RefreshPileUI(pilesToRefresh);
-            }
-            finally
-            {
-                Status = GameStatus.LISTENING;
-            }
+            _victoryParticles.Play();
         }
 
         public bool PileClicked(PileKind pileKind, int index)
@@ -178,6 +158,31 @@ namespace Klondike
         #endregion
 
         #region UI
+        private bool UpdateUIWithChanges(List<PileKind> pilesToRefresh)
+        {
+            bool moved = pilesToRefresh.Count > 0;
+            if (moved)
+            {
+                _ = FinishRefresh(pilesToRefresh);
+            } else
+            {
+                Status = GameStatus.LISTENING;
+            }
+            return moved;
+        }
+
+        private async Task FinishRefresh(List<PileKind> pilesToRefresh)
+        {
+            try
+            {
+                await RefreshPileUI(pilesToRefresh);
+            }
+            finally
+            {
+                Status = GameStatus.LISTENING;
+            }
+        }
+
         private async Task RefreshPileUI(List<PileKind> toRefresh)
         {
             List<Task> tasks = new();
