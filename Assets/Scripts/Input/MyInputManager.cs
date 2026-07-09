@@ -13,20 +13,23 @@ namespace Common
       [SerializeField] private float mouseDragSpeed = 0.1f;
       [SerializeField] private float dragDepth = 5f;
 
-      private Vector3 dragOffset;
-      private Camera mainCamera;
-      private Plane dragPlane;
-      private Vector3 velocity = Vector3.zero;
-      private GameObject draggingObject;
-      private GameObject clickingObject;
-      private Vector3 pointerPosition;
-      private bool dragging => draggingObject != null;
-      private bool clicking => clickingObject != null;
+      private Vector3 _dragOffset;
+      private Camera _mainCamera;
+      private Plane _dragPlane;
+      private Vector3 _velocity = Vector3.zero;
+      private GameObject _draggingObject;
+      private GameObject _clickingObject;
+      private Vector3 _pointerPosition;
+      private bool dragging => _draggingObject != null;
+      private bool clicking => _clickingObject != null;
+
+      private Collider2D _previousClickedCollider;
+      private Collider2D _lastClickCollider;
 
       private void Awake()
       {
-         mainCamera = Camera.main;
-         dragPlane = new Plane(Vector3.forward, dragDepth);
+         _mainCamera = Camera.main;
+         _dragPlane = new Plane(Vector3.forward, dragDepth);
       }
 
       private void OnEnable()
@@ -56,12 +59,14 @@ namespace Common
       private void PointerPressed(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer pressed");
-         Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
+         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
          {
             // Debug.Log("[InputManager] Collider hit!");
+            _previousClickedCollider = _lastClickCollider;
+            _lastClickCollider = hit.collider;
             bool dragAvailable = TryBeginDrag(hit.collider);
             bool clickAvailable = TryBeginClick(hit.collider);
             if (!(dragAvailable || clickAvailable))
@@ -76,13 +81,13 @@ namespace Common
       private void PointerMoved(InputAction.CallbackContext context)
       {
          //Debug.Log("[InputManager] Pointer moved");
-         pointerPosition = context.ReadValue<Vector2>();
+         _pointerPosition = context.ReadValue<Vector2>();
          if (dragging)
          {
-            Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
-            if (dragPlane.Raycast(ray, out float distance))
+            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            if (_dragPlane.Raycast(ray, out float distance))
             {
-               draggingObject.transform.position = Vector3.SmoothDamp(draggingObject.transform.position, ray.GetPoint(distance), ref velocity, mouseDragSpeed) + dragOffset;
+               _draggingObject.transform.position = Vector3.SmoothDamp(_draggingObject.transform.position, ray.GetPoint(distance), ref _velocity, mouseDragSpeed) + _dragOffset;
             }
          }
       }
@@ -92,21 +97,21 @@ namespace Common
          // Debug.Log("[InputManager] Pointer released");
          if (dragging)
          {
-            draggingObject.GetComponent<IDrag>()?.OnEndDrag();
-            draggingObject = null;
+            _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
+            _draggingObject = null;
             Debug.Log("[InputManager] Drag ended");
          }
 
          if (clicking)
          {
-            Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
+            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
-            if (hit.collider != null && hit.collider.gameObject == clickingObject)
+            if (hit.collider != null && hit.collider.gameObject == _clickingObject)
             {
-              clickingObject.GetComponent<IClick>()?.OnClick();
+              _clickingObject.GetComponent<IClick>()?.OnClick();
             }
-            clickingObject = null;
+            _clickingObject = null;
             Debug.Log("[InputManager] Click ended (happened)");
          }
       }
@@ -114,19 +119,21 @@ namespace Common
       private void DoublePressed(InputAction.CallbackContext context)
       {
          Debug.Log("[InputManager] Pointer double pressed");
-         draggingObject = null; //Cancel drag
+         _draggingObject = null; //Cancel drag
 
-         Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
+         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
          {
             IDoubleClick dc = hit.collider.gameObject.GetComponent<IDoubleClick>();
-            if (dc != null && dc.CanDoubleClick())
+            if (dc != null && _lastClickCollider == _previousClickedCollider && dc.CanDoubleClick())
             {
                dc.OnDoubleClick();
             }
          }
+         _previousClickedCollider = null;
+         _lastClickCollider = null;
       }
 
       private bool TryBeginDrag(Collider2D collider)
@@ -134,13 +141,13 @@ namespace Common
          IDrag dragComponent = collider.gameObject.GetComponent<IDrag>();
          if (dragComponent != null && dragComponent.CanDrag())
          {
-            Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
-            if (dragPlane.Raycast(ray, out float distance))
+            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            if (_dragPlane.Raycast(ray, out float distance))
             {
                Vector3 fullOffset = collider.transform.position - ray.GetPoint(distance);
-               dragOffset = new Vector3(fullOffset.x, fullOffset.y, 0f);
+               _dragOffset = new Vector3(fullOffset.x, fullOffset.y, 0f);
             }
-            draggingObject = collider.gameObject;
+            _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             Debug.Log("[InputManager] Drag started");
             return true;
@@ -153,7 +160,7 @@ namespace Common
          IClick click = collider.gameObject.GetComponent<IClick>();
          if (click != null)
          {
-            clickingObject = collider.gameObject;
+            _clickingObject = collider.gameObject;
             Debug.Log("[InputManager] Click started");
             return true;
          }

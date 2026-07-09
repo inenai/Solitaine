@@ -61,7 +61,7 @@
                     "name": "",
                     "id": "a99ac5b1-f862-46dc-8934-ad4c942054b9",
                     "path": "<Pointer>/press",
-                    "interactions": "MultiTap",
+                    "interactions": "MultiTap(tapDelay=0.2)",
                     "processors": "",
                     "groups": ";Keyboard&Mouse;Touch",
                     "action": "DoubleTap",
