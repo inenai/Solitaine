@@ -104,7 +104,7 @@ namespace Klondike
             {
                 throw new Exception($"Card {card} not found in any pile!");
             }
-            Debug.Log($"Card {card} found in {kind}[{index}]");
+            //Debug.Log($"Card {card} found in {kind}[{index}]");
             return new PileData(kind, index);
         }
 
@@ -112,6 +112,17 @@ namespace Klondike
         {
             if (_availableRestocks > 0)
                 _availableRestocks--;
+        }
+
+        public void OnWin()
+        {
+            foreach (Foundation f in Foundations)
+            {
+                foreach (Card card in f.Stack)
+                {
+                    card.FreeCard(false);
+                }
+            }
         }
     }
 }

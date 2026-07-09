@@ -17,14 +17,26 @@ namespace Klondike
         [SerializeField] TableauUI[] _tableaus;
 
         private KlondikeGame _game;
+        private GameStatus _status = GameStatus.INITIALIZING;
+
+        GameStatus Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                Debug.Log($"STATUS {value}");
+            }
+        }
 
         #region Initialization
         void Start()
         {
+            Status = GameStatus.INITIALIZING;
             InitConfig();
             InitGame();
             InitUI();
-            FirstLoadUI(_game.OnUISetup);
+            FirstRefreshUI();
         }
 
         private void InitConfig()
@@ -37,6 +49,7 @@ namespace Klondike
 
         private void InitGame()
         {
+
             _game = new KlondikeGame();
             _game.SetupGame();
         }
@@ -56,11 +69,9 @@ namespace Klondike
             }
         }
 
-        private void FirstLoadUI(Action onDone)
+        private void FirstRefreshUI()
         {
-            RefreshTableaus();
-            RefreshStock();
-            onDone?.Invoke();
+            _ = FinishRefresh(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU });
         }
         #endregion
 
@@ -88,13 +99,15 @@ namespace Klondike
             }
             finally
             {
-                _game.UIDoneRefreshing();
+                Status = GameStatus.LISTENING;
             }
         }
 
         public bool PileClicked(PileKind pileKind, int index)
         {
             Debug.Log("Processing pile clicked.");
+            if (Status != GameStatus.LISTENING) return false;
+            Status = GameStatus.PROCESSING;
             Func<List<PileKind>> action = pileKind switch
             {
                 PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
@@ -103,7 +116,7 @@ namespace Klondike
 
             if (action == null)
             {
-                _game.UIDoneRefreshing();
+                Status = GameStatus.LISTENING;
                 return false;
             }
 
@@ -114,6 +127,9 @@ namespace Klondike
         public bool CardDoubleClicked(Card card)
         {
             Debug.Log("Processing double click.");
+            if (Status != GameStatus.LISTENING) return false;
+            Status = GameStatus.PROCESSING;
+
             return UpdateUIWithChanges(
                 _game.Action_TryMoveCardAutomatic(card));
         }
@@ -121,6 +137,9 @@ namespace Klondike
         public bool CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex)
         {
             Debug.Log("Processing card dragged to pile.");
+            if (Status != GameStatus.LISTENING) return false;
+            Status = GameStatus.PROCESSING;
+
             return UpdateUIWithChanges(
                _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex));
         }

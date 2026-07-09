@@ -8,21 +8,11 @@ using UnityEngine;
 
 namespace Klondike
 {
-        public class KlondikeGame
+    public class KlondikeGame
     {
-        KlondikeState _state;
-        GameStatus _status = GameStatus.INITIALIZING;
-        GameStatus Status
-        {
-            get => _status;
-            set
-            {
-                _status = value;
-                Log($"STATUS {value}");
-            }
-        }
-
+        public Action OnWin;
         public KlondikeState State => _state;
+        KlondikeState _state;
 
         #region initialization
         public KlondikeGame()
@@ -34,14 +24,8 @@ namespace Klondike
         public void SetupGame()
         {
             Log("Starting a Klondike game.");
-            Status = GameStatus.INITIALIZING;
             ShuffleAndDeal();
             Log();
-        }
-
-        public void OnUISetup()
-        {
-            Status = GameStatus.LISTENING;
         }
 
         private void ShuffleAndDeal()
@@ -97,13 +81,6 @@ namespace Klondike
         }
         #endregion
 
-        #region GameFlow
-        public void UIDoneRefreshing()
-        {
-            Status = GameStatus.LISTENING;
-        }
-        #endregion
-
         #region userInteraction
 
         /// <summary>
@@ -113,22 +90,29 @@ namespace Klondike
         /// <returns>Whether a UI refresh is needed</returns>
         private bool ExecuteAction(Func<bool> action)
         {
-            if (Status != GameStatus.LISTENING)
-                return false;
-
-            Status = GameStatus.PROCESSING;
-
             bool uiRefreshNeeded = action();
 
             if (uiRefreshNeeded)
             {
                 Log();
             }
-            else
+
+            if (Won())
             {
-                Status = GameStatus.LISTENING;
+                _state.OnWin();
+                OnWin?.Invoke();
             }
             return uiRefreshNeeded;
+        }
+
+        public bool Won()
+        {
+            int total = 0;
+            foreach (Foundation f in _state.Foundations)
+            {
+                total += f.Stack.Count;
+            }
+            return total == 13 * 4;
         }
 
         public List<PileKind> Action_TryDrawCardsFromStock()
