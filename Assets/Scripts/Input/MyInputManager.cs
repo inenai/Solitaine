@@ -12,8 +12,8 @@ namespace Common
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
       [SerializeField] private float dragDepth = 5f;
-      [SerializeField] private Vector3 dragOffset = new Vector3(0, 0.3f, 0);
 
+      private Vector3 dragOffset;
       private Camera mainCamera;
       private Plane dragPlane;
       private Vector3 velocity = Vector3.zero;
@@ -128,6 +128,12 @@ namespace Common
          IDrag dragComponent = collider.gameObject.GetComponent<IDrag>();
          if (dragComponent != null && dragComponent.CanDrag())
          {
+            Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
+            if (dragPlane.Raycast(ray, out float distance))
+            {
+               Vector3 fullOffset = collider.transform.position - ray.GetPoint(distance);
+               dragOffset = new Vector3(fullOffset.x, fullOffset.y, 0f);
+            }
             draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             Debug.Log("[InputManager] Drag started");
