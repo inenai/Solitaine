@@ -10,5 +10,6 @@ namespace Common
         bool IsRestockAvailable(PileKind pileKind);
         bool IsCardAllowedHere(Card card, PileKind pileKind, int pileIndex);
         void ResetSettingsToDefault();
+        bool IsCardInTargetPile(Card card, out TargetCardPileUI targetPile);
     }
 }

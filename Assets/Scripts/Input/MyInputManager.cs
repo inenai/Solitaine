@@ -62,8 +62,14 @@ namespace Common
          if (hit.collider != null)
          {
             // Debug.Log("[InputManager] Collider hit!");
-            TryBeginDrag(hit.collider);
-            TryBeginClick(hit.collider);
+            bool dragAvailable = TryBeginDrag(hit.collider);
+            bool clickAvailable = TryBeginClick(hit.collider);
+            if (!(dragAvailable || clickAvailable))
+            {
+               CardUI targetCard = hit.collider.GetComponent<CardUI>();
+               if (targetCard != null)
+                  targetCard.PlayLocked();
+            }
          }
       }
 
@@ -123,7 +129,7 @@ namespace Common
          }
       }
 
-      private void TryBeginDrag(Collider2D collider)
+      private bool TryBeginDrag(Collider2D collider)
       {
          IDrag dragComponent = collider.gameObject.GetComponent<IDrag>();
          if (dragComponent != null && dragComponent.CanDrag())
@@ -137,17 +143,21 @@ namespace Common
             draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             Debug.Log("[InputManager] Drag started");
+            return true;
          }
+         return false;
       }
 
-      private void TryBeginClick(Collider2D collider)
+      private bool TryBeginClick(Collider2D collider)
       {
          IClick click = collider.gameObject.GetComponent<IClick>();
          if (click != null)
          {
             clickingObject = collider.gameObject;
             Debug.Log("[InputManager] Click started");
+            return true;
          }
+         return false;
       }
    }
 }

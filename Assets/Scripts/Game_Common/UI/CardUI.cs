@@ -1,3 +1,5 @@
+
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
@@ -9,14 +11,13 @@ namespace Common
     [RequireComponent(typeof(Collider2D))]
     public class CardUI : MonoBehaviour, IDrag, IDoubleClick
     {
-        private const float _offsetY = -0.3f;
-        private const float _offsetZ = -0.1f;
 
         [SerializeField] GameObject _back;
         [SerializeField] GameObject _front;
         [SerializeField] TextMeshPro[] _suitStr;
         [SerializeField] TextMeshPro[] _valueStr;
         [SerializeField] TextMeshPro[] _lightAlpha;
+        [SerializeField] GameObject _lockedGO;
 
         private Card _card;
         private IGameController _controller;
@@ -24,10 +25,7 @@ namespace Common
         private Collider2D _collider;
         private List<TargetCardPileUI> _overlappingPiles;
         private TargetCardPileUI _targetPile;
-
-        //DEBUG
-        [SerializeField] GameObject _DEBUG_DRAGGABLE;
-
+        private bool _dragging;
         public Card Card => _card;
 
         void Awake()
@@ -40,7 +38,7 @@ namespace Common
 
         void Update()
         {
-            RefreshDEBUG();
+            //RefreshDEBUG();
         }
 
         public void Init(IGameController controller)
@@ -48,10 +46,16 @@ namespace Common
             _controller = controller;
         }
 
-        public void LoadCardData(Card card, int index = -1)
+        public void LoadCardData(Card card, float offsetY = 0f, float offsetZ = 0f)
         {
             _card = card;
-            Refresh(index);
+            RefreshDynamicOffset(offsetY, offsetZ);
+        }
+
+        public void LoadCardData(Card card)
+        {
+            _card = card;
+            Refresh();
         }
 
         public void Reveal(bool reveal)
@@ -61,17 +65,8 @@ namespace Common
             _back.SetActive(!_card.Revealed);
         }
 
-        public void Refresh(int index)
+        public void Refresh()
         {
-            if (index == 0)
-            {
-                gameObject.transform.localPosition = new Vector3(0f, 0f, _offsetZ);
-            }
-            if (index > 0)
-            {
-                gameObject.transform.localPosition = new Vector3(0f, _offsetY, _offsetZ);
-            }
-
             foreach (TextMeshPro txt in _suitStr)
             {
                 txt.text = CardUtils.GetSuitStr(_card.Suit);
@@ -92,6 +87,37 @@ namespace Common
             _back.SetActive(!_card.Revealed);
         }
 
+        public void RefreshDynamicOffset(float offsetY, float offsetZ)
+        {
+            gameObject.transform.localPosition = new Vector3(0f, offsetY, offsetZ);
+            Refresh();
+        }
+
+        public void PlayLocked()
+        {
+            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+            _lockedGO.SetActive(true);
+            _lockedGO.GetComponent<SpriteRenderer>().color = new Color(1,0,0,0.5f);
+            fadeCoroutine = StartCoroutine(FadeLocked());
+        }
+
+        float fadeTime;
+        Coroutine fadeCoroutine;
+        private IEnumerator FadeLocked()
+        {
+            SpriteRenderer r = _lockedGO.GetComponent<SpriteRenderer>();
+            fadeTime = 0f;
+            while (fadeTime < 0.5f)
+            {
+                float newAlpha = Mathf.Lerp(0.5f, 0f, fadeTime);
+                r.color = r.color.WithAlpha(newAlpha);
+                yield return null;
+                fadeTime += Time.deltaTime;
+            }
+            _lockedGO.SetActive(false);
+            fadeCoroutine = null;
+        }
+
         private void Log(string message)
         {
             if (Card == null) Debug.Log($"[CARDUI] {message}");
@@ -107,11 +133,13 @@ namespace Common
         public void OnStartDrag()
         {
             Log("Start drag!");
+            _dragging = true;
             _positionOnStartDrag = transform.position;
         }
 
         public void OnEndDrag()
         {
+            _dragging = false;
             if (_card == null) return;
 
             bool successfulMove = false;
@@ -142,7 +170,30 @@ namespace Common
             {
                 _overlappingPiles.Add(pile);
             }
-            UpdateClosestTarget();
+            CardUI otherCard = collision.gameObject.GetComponent<CardUI>();
+            if (_controller != null && otherCard != null && otherCard.Card != null)
+            {
+                if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileUI targetPile)){
+                    if (!_overlappingPiles.Contains(targetPile))
+                    {
+                        _overlappingPiles.Add(targetPile);
+                    }
+                }
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
+            if (pile != null && _overlappingPiles.Contains(pile))
+            {
+                _overlappingPiles.Remove(pile);
+            }
+        }
+
+        void LateUpdate()
+        {
+           if (_dragging) UpdateClosestTarget();
         }
 
         private void UpdateClosestTarget()
@@ -168,20 +219,9 @@ namespace Common
                 if (pile == closestPile && allowedMove)
                 {
                     _targetPile = pile;
+                    pile.EnableHighlight(true);
                 }
-
-                pile.EnableHighlight(pile == _targetPile);
             }
-        }
-
-        private void OnTriggerExit2D(Collider2D collision)
-        {
-            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
-            if (pile != null && _overlappingPiles.Contains(pile))
-            {
-                _overlappingPiles.Remove(pile);
-            }
-            UpdateClosestTarget();
         }
         #endregion
 
@@ -204,7 +244,7 @@ namespace Common
         #region DEBUG
         public void RefreshDEBUG()
         {
-            _DEBUG_DRAGGABLE.SetActive(Card != null ? !Card.Free : false);
+            _lockedGO.SetActive(Card != null ? !Card.Free : false);
         }
         #endregion
     }

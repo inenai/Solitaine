@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public abstract class TargetCardPileUI : CardPileUI
 {
-    [SerializeField] private GameObject triggerHighlight;
+    [SerializeField] protected GameObject triggerHighlight;
 
     public bool IsCardAllowedHere(Card card)
     {
@@ -14,5 +14,13 @@ public abstract class TargetCardPileUI : CardPileUI
     public void EnableHighlight(bool value)
     {
         triggerHighlight.SetActive(value);
+    }
+
+/// <summary>
+/// triggerHighlight will be turned on if needed in CardUI's late update
+/// </summary>
+    void Update()
+    {
+        EnableHighlight(false);
     }
 }

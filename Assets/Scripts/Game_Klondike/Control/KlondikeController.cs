@@ -136,6 +136,26 @@ namespace Klondike
         {
             return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
         }
+
+        public bool IsCardInTargetPile(Card card, out TargetCardPileUI result)
+        {
+            result = null;
+            PileData cardPileData = _game.State.GetCardPileOwnerData(card);
+            switch (cardPileData.Kind)
+            {
+                case PileKind.WASTE:
+                    return false;
+                case PileKind.STOCK:
+                    return false;
+                case PileKind.FOUNDATION:
+                    result = _foundations[cardPileData.Index];
+                    return true;
+                case PileKind.TABLEAU:
+                    result = _tableaus[cardPileData.Index];
+                    return true;
+            }
+            return false;
+        }
         #endregion
 
         #region UI

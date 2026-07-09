@@ -917,7 +917,7 @@ GameObject:
   - component: {fileID: 8021635670175079361}
   - component: {fileID: 8805500242276699540}
   m_Layer: 0
-  m_Name: DEBUG_LOCKED
+  m_Name: Locked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1472,7 +1472,7 @@ MonoBehaviour:
   - {fileID: 905957056913721867}
   _lightAlpha:
   - {fileID: 434820241542669855}
-  _DEBUG_DRAGGABLE: {fileID: 4489907958362179309}
+  _lockedGO: {fileID: 4489907958362179309}
 --- !u!50 &8831886530301560429
 Rigidbody2D:
   serializedVersion: 5

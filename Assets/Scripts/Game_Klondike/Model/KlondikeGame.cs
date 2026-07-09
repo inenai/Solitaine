@@ -455,6 +455,10 @@ namespace Klondike
 
         public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
+            PileData sourcePileData = State.GetCardPileOwnerData(card);
+            if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
+                return false;
+
             switch (targetPile)
             {
                 case PileKind.STOCK:

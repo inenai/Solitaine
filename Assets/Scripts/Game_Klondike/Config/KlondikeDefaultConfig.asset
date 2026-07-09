@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeConfig
   _drawAmount: 3
   _availableRestocks: -1
+  _foundationCardsFree: 0

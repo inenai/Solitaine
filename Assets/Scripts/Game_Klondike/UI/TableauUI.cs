@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
+using UnityEngine.AI;
 using Utils;
 
 namespace Klondike
 {
     public class TableauUI : TargetCardPileUI
     {
+        private const float _offsetY = -0.3f;
+        private const float _offsetZ = -0.1f;
+
         private List<CardUI> _cardUIs;
 
         protected override void OnInit()
@@ -52,8 +55,22 @@ namespace Klondike
                 {
                     _cardUIs[i].transform.SetParent(_cardUIs[i - 1].transform);
                 }
-                _cardUIs[i].LoadCardData(cards[i],i);
+                float yOffset = i == 0 ? 0f : _offsetY;
+                _cardUIs[i].LoadCardData(cards[i], yOffset, _offsetZ);
             }
+
+            float yPos = GetAverageYPos();
+            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, yPos, -0.1f * (_cardUIs.Count + 1));
+        }
+
+        private float GetAverageYPos()
+        {
+            if (_cardUIs.Count <= 1)
+            {
+                return transform.position.y;
+            }
+
+            return _offsetY * (_cardUIs.Count-1) / 2f;
         }
 
         private void RemoveExtraCardUIs(int amountNeeded)
