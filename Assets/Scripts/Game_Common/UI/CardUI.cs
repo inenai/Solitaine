@@ -202,9 +202,17 @@ namespace Common
             _targetPile = null;
             if (_overlappingPiles.Count == 0) return;
 
+            List<TargetCardPileUI> compatiblePiles = new();
+            foreach (TargetCardPileUI pile in _overlappingPiles)
+            {
+                bool allowedMove = pile.IsCardAllowedHere(Card);
+                if (allowedMove) compatiblePiles.Add(pile);
+                else pile.EnableHighlight(false);
+            }
+
             float closestDistance = float.MaxValue;
             TargetCardPileUI closestPile = null;
-            foreach (TargetCardPileUI pile in _overlappingPiles)
+            foreach (TargetCardPileUI pile in compatiblePiles)
             {
                 float distance = Vector3.Distance(pile.transform.position, transform.position);
                 if (distance < closestDistance)
@@ -214,13 +222,15 @@ namespace Common
                 }
             }
 
-            foreach (TargetCardPileUI pile in _overlappingPiles)
+            foreach (TargetCardPileUI pile in compatiblePiles)
             {
-                bool allowedMove = pile.IsCardAllowedHere(Card);
-                if (pile == closestPile && allowedMove)
+                if (pile == closestPile)
                 {
                     _targetPile = pile;
                     pile.EnableHighlight(true);
+                } else
+                {
+                    pile.EnableHighlight(false);
                 }
             }
         }
