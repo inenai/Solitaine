@@ -67,14 +67,8 @@ namespace Common
             // Debug.Log("[InputManager] Collider hit!");
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
-            bool dragAvailable = TryBeginDrag(hit.collider);
-            bool clickAvailable = TryBeginClick(hit.collider);
-            if (!(dragAvailable || clickAvailable))
-            {
-               CardUI targetCard = hit.collider.GetComponent<CardUI>();
-               if (targetCard != null)
-                  targetCard.PlayLocked();
-            }
+            TryBeginDrag(hit.collider);
+            TryBeginClick(hit.collider);
          }
       }
 
@@ -87,7 +81,11 @@ namespace Common
             Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
             {
-               _draggingObject.transform.position = Vector3.SmoothDamp(_draggingObject.transform.position, ray.GetPoint(distance), ref _velocity, mouseDragSpeed) + _dragOffset;
+               _draggingObject.transform.position = Vector3.SmoothDamp(
+                  current: _draggingObject.transform.position,
+                  target: ray.GetPoint(distance),
+                  currentVelocity: ref _velocity,
+                  smoothTime: mouseDragSpeed) + _dragOffset;
             }
          }
       }
@@ -136,7 +134,7 @@ namespace Common
          _lastClickCollider = null;
       }
 
-      private bool TryBeginDrag(Collider2D collider)
+      private void TryBeginDrag(Collider2D collider)
       {
          IDrag dragComponent = collider.gameObject.GetComponent<IDrag>();
          if (dragComponent != null && dragComponent.CanDrag())
@@ -150,21 +148,17 @@ namespace Common
             _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             Debug.Log("[InputManager] Drag started");
-            return true;
          }
-         return false;
       }
 
-      private bool TryBeginClick(Collider2D collider)
+      private void TryBeginClick(Collider2D collider)
       {
          IClick click = collider.gameObject.GetComponent<IClick>();
          if (click != null)
          {
             _clickingObject = collider.gameObject;
             Debug.Log("[InputManager] Click started");
-            return true;
          }
-         return false;
       }
    }
 }
