@@ -59,18 +59,24 @@ namespace Klondike
                 _cardUIs[i].LoadCardData(cards[i], yOffset, _offsetZ);
             }
 
-            float yPos = GetAverageYPos();
-            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, yPos, -0.1f * (_cardUIs.Count + 1));
+            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardUIs.Count + 1));
+            triggerHighlight.transform.localScale = new Vector3(1f, GetHighlightYScale(),1f);
         }
 
-        private float GetAverageYPos()
+        private float GetHighlightYPos()
         {
             if (_cardUIs.Count <= 1)
             {
                 return transform.position.y;
             }
 
-            return _offsetY * (_cardUIs.Count-1) / 2f;
+            return transform.position.y + _offsetY * (_cardUIs.Count - 1) / 2f;
+        }
+
+        private float GetHighlightYScale()
+        {
+            if (_cardUIs.Count == 0) return 1.5f;
+            return 1.5f + (-_offsetY) * (_cardUIs.Count - 1);
         }
 
         private void RemoveExtraCardUIs(int amountNeeded)
