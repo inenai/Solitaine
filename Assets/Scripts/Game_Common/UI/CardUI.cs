@@ -1,9 +1,10 @@
-
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using Utils;
 
 namespace Common
@@ -22,8 +23,7 @@ namespace Common
         private Card _card;
         private IGameController _controller;
         private Vector3 _positionOnStartDrag;
-        private Collider2D _collider;
-        private List<TargetCardPileUI> _overlappingPiles;
+        private List<Collider2D> _overlappingColliders;
         private TargetCardPileUI _targetPile;
         private bool _dragging;
         public Card Card => _card;
@@ -31,8 +31,7 @@ namespace Common
         void Awake()
         {
             _positionOnStartDrag = transform.position;
-            _collider = GetComponent<Collider2D>();
-            _overlappingPiles = new();
+            _overlappingColliders = new();
             _targetPile = null;
         }
 
@@ -136,77 +135,111 @@ namespace Common
             Log("Start drag!");
             _dragging = true;
             _positionOnStartDrag = transform.position;
+            gameObject.layer = LayerMask.NameToLayer("DraggingCard");
         }
 
         public void OnEndDrag()
         {
-            _dragging = false;
-            if (_card == null) return;
-
-            bool successfulMove = false;
             if (_targetPile != null)
             {
-                successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index);
-            }
-
-            if (!successfulMove)
-            {
-                Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
-                transform.position = _positionOnStartDrag;
+                bool successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index);
+                if (!successfulMove)
+                {
+                    Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
+                    transform.position = _positionOnStartDrag;
+                }
+                else
+                {
+                    Log("End drag! Sent card to target pile.");
+                }
             }
             else
             {
-                Log("End drag! Sent card to target pile.");
+                transform.position = _positionOnStartDrag;
             }
 
+            //TODO if card pool, these should be reset when going to the pool:
+            _targetPile = null;
+            _dragging = false;
+            gameObject.layer = LayerMask.NameToLayer("StaticCard");
+
+            foreach (TargetCardPileUI pile in GetOverlappingPiles())
+            {
+                pile.EnableHighlight(false);
+            }
+            _overlappingColliders.Clear();
         }
         #endregion
+
+        private List<TargetCardPileUI> GetOverlappingPiles()
+        {
+            List<TargetCardPileUI> piles = new();
+            foreach (Collider2D col in _overlappingColliders)
+            {
+                TargetCardPileUI pile = col.gameObject.GetComponent<TargetCardPileUI>();
+                if (pile != null && !piles.Contains(pile))
+                {
+                    piles.Add(pile);
+                    continue;
+                }
+
+                CardUI otherCard = col.gameObject.GetComponent<CardUI>();
+                if (_controller != null && otherCard != null && otherCard.Card != null)
+                {
+                    if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileUI targetPile))
+                    {
+                        if (targetPile != null && !piles.Contains(targetPile))
+                        {
+                            piles.Add(targetPile);
+                        }
+                    }
+                }
+            }
+
+            return piles;
+        }
 
         #region CardToPileInteraction
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
-            if (pile != null && !_overlappingPiles.Contains(pile))
-            {
-                _overlappingPiles.Add(pile);
-            }
-            CardUI otherCard = collision.gameObject.GetComponent<CardUI>();
-            if (_controller != null && otherCard != null && otherCard.Card != null)
-            {
-                if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileUI targetPile)){
-                    if (!_overlappingPiles.Contains(targetPile))
-                    {
-                        _overlappingPiles.Add(targetPile);
-                    }
-                }
-            }
+            if (!_dragging) return;
+
+            if (!_overlappingColliders.Contains(collision)) _overlappingColliders.Add(collision);
+
+            UpdateClosestTarget();
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            TargetCardPileUI pile = collision.gameObject.GetComponent<TargetCardPileUI>();
-            if (pile != null && _overlappingPiles.Contains(pile))
-            {
-                _overlappingPiles.Remove(pile);
-            }
+            if (!_dragging) return;
+
+            if (_overlappingColliders.Contains(collision)) _overlappingColliders.Remove(collision);
+
+            UpdateClosestTarget();
         }
 
         void LateUpdate()
         {
-           if (_dragging) UpdateClosestTarget();
+            if (_dragging && _overlappingColliders.Count > 0)
+            {
+                UpdateClosestTarget();
+            }
         }
 
         private void UpdateClosestTarget()
         {
             _targetPile = null;
-            if (_overlappingPiles.Count == 0) return;
+            if (_overlappingColliders.Count == 0) return;
 
             List<TargetCardPileUI> compatiblePiles = new();
-            foreach (TargetCardPileUI pile in _overlappingPiles)
+            foreach (TargetCardPileUI pile in GetOverlappingPiles())
             {
                 bool allowedMove = pile.IsCardAllowedHere(Card);
-                if (allowedMove) compatiblePiles.Add(pile);
+                if (allowedMove && !compatiblePiles.Contains(pile))
+                {
+                    compatiblePiles.Add(pile);
+                }
                 else pile.EnableHighlight(false);
             }
 
@@ -214,7 +247,9 @@ namespace Common
             TargetCardPileUI closestPile = null;
             foreach (TargetCardPileUI pile in compatiblePiles)
             {
-                float distance = Vector3.Distance(pile.transform.position, transform.position);
+                Vector2 pileXYPos = new Vector2(pile.transform.position.x, pile.transform.position.y);
+                Vector2 thisXYPos = new Vector2(transform.position.x, transform.position.y);
+                float distance = Vector2.Distance(pileXYPos, thisXYPos);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
