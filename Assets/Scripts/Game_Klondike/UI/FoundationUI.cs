@@ -25,7 +25,7 @@ namespace Klondike
             _cardUI_bottom.Init(_controller);
         }
 
-        public override Task Refresh(Stack<Card> cards)
+        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
         {
             ResetCardPositions();
             if (cards.Count == 0)
@@ -48,8 +48,16 @@ namespace Klondike
                     _cardUI_bottom.LoadCardData(cards.Pop());
                 }
             }
-            return Task.CompletedTask;
+            if (_cardUI_top.Card == cardMoved)
+            {
+                _cardUI_top.transform.position = originalCardPosition;
+                return _cardUI_top.AnimateCard(_topPosition,0.1f);
+            }
+            else
+                return Task.CompletedTask;
         }
+
+
 
         private void ResetCardPositions()
         {

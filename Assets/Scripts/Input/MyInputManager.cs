@@ -11,7 +11,8 @@ namespace Common
       [SerializeField] private InputActionReference doublePressAction;
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
-      [SerializeField] private float dragDepth = 5f;
+
+      public const float DragDepth = 5f;
 
       private bool _paused;
       private Vector3 _dragOffset;
@@ -23,14 +24,13 @@ namespace Common
       private Vector3 _pointerPosition;
       private bool dragging => _draggingObject != null;
       private bool clicking => _clickingObject != null;
-
       private Collider2D _previousClickedCollider;
       private Collider2D _lastClickCollider;
 
       private void Awake()
       {
          _mainCamera = Camera.main;
-         _dragPlane = new Plane(Vector3.forward, dragDepth);
+         _dragPlane = new Plane(Vector3.forward, DragDepth);
       }
 
       private void OnEnable()

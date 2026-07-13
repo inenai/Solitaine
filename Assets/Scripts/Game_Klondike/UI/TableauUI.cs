@@ -32,7 +32,7 @@ namespace Klondike
             return cardUI;
         }
 
-        public override async Task Refresh(Stack<Card> tableauCards)
+        public override async Task Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition)
         {
             Card[] cards = tableauCards.Reverse().ToArray();
             RemoveExtraCardUIs(cards.Length);
@@ -60,6 +60,16 @@ namespace Klondike
                 }
                 float yOffset = i == 0 ? 0f : _offsetY;
                 _cardUIs[i].LoadCardData(cards[i], yOffset, _offsetZ);
+            }
+
+            foreach (CardUI cardUi in _cardUIs)
+            {
+                if (cardMoved == cardUi.Card)
+                {
+                    Vector3 finalPosition = cardUi.transform.position;
+                    cardUi.transform.position = originalCardPosition;
+                    await cardUi.AnimateCard(finalPosition, 0.1f);
+                }
             }
 
             triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardUIs.Count + 1));

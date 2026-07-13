@@ -43,7 +43,7 @@ namespace Klondike
             }
         }
 
-        public override Task Refresh(Stack<Card> cards)
+        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
         {
             if (_cardUIs.Length < 1)
             {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Common;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -16,6 +17,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     private List<Collider2D> _overlappingColliders;
     private TargetCardPileUI _targetPile;
     private bool _dragging;
+    private bool _animating;
     public Card Card => _card;
 
     void Awake()
@@ -104,7 +106,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     #region IDrag
     public bool CanDrag()
     {
-        return Card.Free;
+        return !_animating && Card.Free;
     }
 
     public void OnDragAttemptFailed()
@@ -129,7 +131,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     {
         if (_targetPile != null)
         {
-            bool successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index);
+            bool successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
             if (!successfulMove)
             {
                 Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
@@ -263,18 +265,40 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     }
     #endregion
 
+    #region Animation
+    public async Task AnimateCard(Vector3 targetPosition, float duration)
+    {
+        _animating = true;
+
+        Vector3 start = new Vector3(transform.position.x, transform.position.y, -MyInputManager.DragDepth);
+        Vector3 goal = new Vector3(targetPosition.x, targetPosition.y, -MyInputManager.DragDepth);
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            transform.position = Vector3.Lerp(start, goal, t);
+            await Task.Yield();
+        }
+
+        transform.position = targetPosition;
+        _animating = false;
+    }
+    #endregion
+
     #region IDoubleClick
 
     public bool CanDoubleClick()
     {
-        return Card.Free;
+        return !_animating && Card.Free;
     }
 
     public void OnDoubleClick()
     {
         Log("Double click!");
         if (_card == null) return;
-        _controller.CardDoubleClicked(_card);
+        _controller.CardDoubleClicked(_card, transform.position);
         Log($"{_card} Double Clicked!");
     }
     #endregion

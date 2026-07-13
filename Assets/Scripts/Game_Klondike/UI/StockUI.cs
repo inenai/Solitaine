@@ -13,7 +13,7 @@ namespace Klondike
 
         protected override void OnInit() {}
 
-        public override Task Refresh(Stack<Card> cards)
+        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
         {
             _cardUI.gameObject.SetActive(cards.Count > 0);
             _restockLocked.SetActive(!_controller.IsRestockAvailable(PileKind.STOCK));
