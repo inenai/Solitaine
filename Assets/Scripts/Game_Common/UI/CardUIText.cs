@@ -28,7 +28,9 @@ namespace Common
 
             foreach (TextMeshPro txt in _lightAlpha)
             {
-                txt.color = txt.color.WithAlpha(0.5f);
+                Color newColor = txt.color;
+                newColor.a = 0.5f;
+                txt.color = newColor;
             }
 
             base.Refresh();

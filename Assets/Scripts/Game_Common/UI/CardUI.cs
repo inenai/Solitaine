@@ -85,7 +85,9 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
         while (fadeTime < 0.5f)
         {
             float newAlpha = Mathf.Lerp(0.5f, 0f, fadeTime);
-            r.color = r.color.WithAlpha(newAlpha);
+            Color newColor = r.color;
+            newColor.a = newAlpha;
+            r.color = newColor;
             yield return null;
             fadeTime += Time.deltaTime;
         }

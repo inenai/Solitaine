@@ -5321,9 +5321,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1837432013}
-        m_TargetAssemblyTypeName: Klondike.KlondikeSettingsScreen, Assembly-CSharp
-        m_MethodName: Close
+      - m_Target: {fileID: 997754109}
+        m_TargetAssemblyTypeName: Klondike.KlondikeController, Assembly-CSharp
+        m_MethodName: CloseSettings
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
