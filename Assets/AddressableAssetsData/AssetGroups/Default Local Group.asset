@@ -20,11 +20,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 32254c4e19920ca42922b56c136af98d
-    m_Address: CARD_PREFAB_TEXT
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8d98674f4c3dd694aa9cde934b47d99b, type: 2}
   m_SchemaSet:
