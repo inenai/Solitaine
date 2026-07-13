@@ -3,8 +3,6 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
 using System.Threading.Tasks;
-using System.Collections;
-using Common;
 
 namespace Utils
 {

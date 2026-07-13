@@ -1,5 +1,3 @@
-using System;
-
 namespace Common {
     public struct PileData
     {

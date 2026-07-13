@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Common;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.ResourceManagement.ResourceProviders.Simulation;
 
 public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
 {

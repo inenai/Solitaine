@@ -1,7 +1,4 @@
-using System.Linq;
 using Common;
-using Unity.VisualScripting;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class CardTextureGetter : MonoBehaviour
