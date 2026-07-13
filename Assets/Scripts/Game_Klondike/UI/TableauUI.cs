@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
-using UnityEngine.AI;
 using Utils;
 
 namespace Klondike
@@ -15,17 +14,21 @@ namespace Klondike
         private const float _offsetZ = -0.1f;
 
         private List<CardUI> _cardUIs;
+        private float _cardHeight;
 
         protected override void OnInit()
         {
             _cardUIs = new();
+            _cardHeight = 0f;
         }
 
         private async Task<CardUI> CreateCardUI(Transform transform)
         {
-            GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddress, transform);
+            GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform);
             CardUI cardUI = go.GetComponent<CardUI>();
             cardUI.Init(_controller);
+            if (_cardHeight == 0f)
+                _cardHeight = cardUI.GetComponent<Collider2D>().bounds.size.y;
             return cardUI;
         }
 
@@ -60,7 +63,7 @@ namespace Klondike
             }
 
             triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardUIs.Count + 1));
-            triggerHighlight.transform.localScale = new Vector3(1f, GetHighlightYScale(),1f);
+            triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(),1f);
         }
 
         private float GetHighlightYPos()
@@ -75,8 +78,8 @@ namespace Klondike
 
         private float GetHighlightYScale()
         {
-            if (_cardUIs.Count == 0) return 1.5f;
-            return 1.5f + (-_offsetY) * (_cardUIs.Count - 1);
+            if (_cardUIs.Count == 0) return _cardHeight;
+            return _cardHeight + (-_offsetY) * (_cardUIs.Count - 1);
         }
 
         private void RemoveExtraCardUIs(int amountNeeded)

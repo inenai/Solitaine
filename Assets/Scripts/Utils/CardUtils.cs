@@ -5,7 +5,8 @@ namespace Utils
 {
     public static class CardUtils
     {
-        public static string CardPrefabAddress = "CARD_PREFAB";
+        public static string CardPrefabAddressText = "CARD_PREFAB_TEXT";
+        public static string CardPrefabAddressSprite = "CARD_PREFAB_SPRITE";
 
         public static string GetSuitStr(CardSuit suit)
         {
@@ -65,6 +66,20 @@ namespace Utils
                     (suit2 == CardSuit.DIAMONDS && suit1 == CardSuit.HEARTS) ||
                     (suit1 == CardSuit.CLUBS && suit2 == CardSuit.SPADES) ||
                     (suit2 == CardSuit.CLUBS && suit1 == CardSuit.SPADES);
+        }
+
+        public static Sprite GetCardSprite(Card card)
+        {
+            if (CardTextureGetter.Instance == null) throw new System.Exception("Card Texture Getter unavailable.");
+
+            return CardTextureGetter.Instance.GetCardFace(card.Suit, card.Value);
+        }
+
+        public static Sprite GetCardBack()
+        {
+            if (CardTextureGetter.Instance == null) throw new System.Exception("Card Texture Getter unavailable.");
+
+            return CardTextureGetter.Instance.GetBlueDeck();
         }
     }
 }

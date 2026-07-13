@@ -15,8 +15,13 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 2d32221b3c9858e459040eea31c134dc
   m_SerializeEntries:
+  - m_GUID: 077ec85fd4a6a40449e5c93339821c09
+    m_Address: CARD_PREFAB_SPRITE
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 32254c4e19920ca42922b56c136af98d
-    m_Address: CARD_PREFAB
+    m_Address: CARD_PREFAB_TEXT
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
