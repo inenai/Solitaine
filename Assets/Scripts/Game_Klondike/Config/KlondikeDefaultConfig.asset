@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2ee1f13a4bc458419a9f3c90190e911, type: 3}
   m_Name: KlondikeDefaultConfig
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeConfig
-  _drawAmount: 3
+  _drawAmount: 1
   _availableRestocks: -1
-  _foundationCardsFree: 0
+  _foundationCardsFree: 1

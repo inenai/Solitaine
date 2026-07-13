@@ -13,6 +13,7 @@ namespace Common
       [SerializeField] private float mouseDragSpeed = 0.1f;
       [SerializeField] private float dragDepth = 5f;
 
+      private bool _paused;
       private Vector3 _dragOffset;
       private Camera _mainCamera;
       private Plane _dragPlane;
@@ -38,10 +39,10 @@ namespace Common
          pointerDownAction.action.Enable();
          doublePressAction.action.Enable();
 
-         pointerDownAction.action.performed += PointerPressed;
-         pointerMovedAction.action.performed += PointerMoved;
-         pointerDownAction.action.canceled += PointerReleased;
-         doublePressAction.action.performed += DoublePressed;
+         pointerDownAction.action.performed += Action_PointerPressed;
+         pointerMovedAction.action.performed += Action_PointerMoved;
+         pointerDownAction.action.canceled += Action_PointerReleased;
+         doublePressAction.action.performed += Action_DoublePressed;
       }
 
       private void OnDisable()
@@ -50,15 +51,22 @@ namespace Common
          pointerDownAction.action.Disable();
          doublePressAction.action.Disable();
 
-         pointerDownAction.action.performed -= PointerPressed;
-         pointerMovedAction.action.performed -= PointerMoved;
-         pointerDownAction.action.canceled -= PointerReleased;
-         doublePressAction.action.performed -= DoublePressed;
+         pointerDownAction.action.performed -= Action_PointerPressed;
+         pointerMovedAction.action.performed -= Action_PointerMoved;
+         pointerDownAction.action.canceled -= Action_PointerReleased;
+         doublePressAction.action.performed -= Action_DoublePressed;
       }
 
-      private void PointerPressed(InputAction.CallbackContext context)
+      public void Pause(bool pause)
+      {
+         _paused = pause;
+      }
+
+      private void Action_PointerPressed(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer pressed");
+         if (_paused) return;
+
          Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
@@ -72,9 +80,11 @@ namespace Common
          }
       }
 
-      private void PointerMoved(InputAction.CallbackContext context)
+      private void Action_PointerMoved(InputAction.CallbackContext context)
       {
          //Debug.Log("[InputManager] Pointer moved");
+         if (_paused) return;
+
          _pointerPosition = context.ReadValue<Vector2>();
          if (dragging)
          {
@@ -90,9 +100,11 @@ namespace Common
          }
       }
 
-      private void PointerReleased(InputAction.CallbackContext context)
+      private void Action_PointerReleased(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer released");
+         if (_paused) return;
+
          if (dragging)
          {
             _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
@@ -114,9 +126,11 @@ namespace Common
          }
       }
 
-      private void DoublePressed(InputAction.CallbackContext context)
+      private void Action_DoublePressed(InputAction.CallbackContext context)
       {
          Debug.Log("[InputManager] Pointer double pressed");
+         if (_paused) return;
+
          _draggingObject = null; //Cancel drag
 
          Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);

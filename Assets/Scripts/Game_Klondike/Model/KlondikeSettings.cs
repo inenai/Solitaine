@@ -22,6 +22,7 @@ namespace Klondike
             }
             set
             {
+                Log($"Draw amount set to {value}");
                 PlayerPrefs.SetInt(DrawAmountKey, value);
                 Save();
             }
@@ -35,6 +36,7 @@ namespace Klondike
             }
             set
             {
+                Log($"Available restocks set to {value}");
                 PlayerPrefs.SetInt(AvailableRestocksKey, value);
                 Save();
             }
@@ -48,6 +50,7 @@ namespace Klondike
             }
             set
             {
+                Log($"Free foundations set to {value}");
                 PlayerPrefs.SetInt(AvailableRestocksKey, value ? 1 : 0);
                 Save();
             }
@@ -65,6 +68,11 @@ namespace Klondike
             PlayerPrefs.SetInt(AvailableRestocksKey, defaultConfig.AvailableRestocks);
             PlayerPrefs.SetInt(FoundationCardsFreeKey, defaultConfig.FoundationCardsFree ? 1 : 0);
             Save();
+        }
+
+        private static void Log(string message)
+        {
+            Debug.Log($"[KlondikeSettings] {message}");
         }
     }
 }

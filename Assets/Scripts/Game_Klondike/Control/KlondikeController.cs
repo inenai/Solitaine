@@ -16,7 +16,8 @@ namespace Klondike
         [SerializeField] FoundationUI[] _foundations;
         [SerializeField] TableauUI[] _tableaus;
         [SerializeField] ParticleSystem _victoryParticles;
-
+        [SerializeField] GameObject _settingsScreen;
+        [SerializeField] MyInputManager _input;
         private KlondikeGame _game;
         private GameStatus _status = GameStatus.INITIALIZING;
 
@@ -35,8 +36,16 @@ namespace Klondike
         {
             Status = GameStatus.INITIALIZING;
             InitConfig();
-            InitGame();
             InitUI();
+            StartNewGame();
+        }
+
+        private void StartNewGame()
+        {
+            ClearGame();
+            _game = new KlondikeGame();
+            _game.OnWin += OnGameWon;
+            RefreshAllUI();
         }
 
         private void InitConfig()
@@ -47,10 +56,10 @@ namespace Klondike
             }
         }
 
-        private void InitGame()
+        private void ClearGame()
         {
-            _game = new KlondikeGame();
-            _game.OnWin += OnGameWon;
+            if (_game != null)
+                _game.OnWin -= OnGameWon;
         }
 
         public void InitUI()
@@ -66,7 +75,11 @@ namespace Klondike
             {
                 _tableaus[i].Init(this, i);
             }
-            _ = FinishRefresh(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU });
+        }
+
+        private void RefreshAllUI()
+        {
+            _ = FinishRefresh(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION });
         }
         #endregion
 
@@ -156,13 +169,33 @@ namespace Klondike
         #endregion
 
         #region UI
+        public void RestartGame()
+        {
+            StartNewGame();
+        }
+
+        public void OpenSettings()
+        {
+            _input.Pause(true);
+            _settingsScreen.SetActive(true);
+        }
+
+        public void CloseSettings()
+        {
+            _input.Pause(false);
+            _settingsScreen.SetActive(false);
+        }
+        #endregion
+
+        #region UIInternal
         private bool UpdateUIWithChanges(List<PileKind> pilesToRefresh)
         {
             bool moved = pilesToRefresh.Count > 0;
             if (moved)
             {
                 _ = FinishRefresh(pilesToRefresh);
-            } else
+            }
+            else
             {
                 Status = GameStatus.LISTENING;
             }
