@@ -125,9 +125,16 @@ namespace Common
          if (hit.collider != null)
          {
             IDoubleClick dc = hit.collider.gameObject.GetComponent<IDoubleClick>();
-            if (dc != null && _lastClickCollider == _previousClickedCollider && dc.CanDoubleClick())
+            if (dc != null && _lastClickCollider == _previousClickedCollider)
             {
-               dc.OnDoubleClick();
+               if (dc.CanDoubleClick())
+               {
+                  dc.OnDoubleClick();
+               }
+               else
+               {
+                  dc.OnDoubleClickAttemptFailed();
+               }
             }
          }
          _previousClickedCollider = null;
@@ -137,7 +144,9 @@ namespace Common
       private void TryBeginDrag(Collider2D collider)
       {
          IDrag dragComponent = collider.gameObject.GetComponent<IDrag>();
-         if (dragComponent != null && dragComponent.CanDrag())
+         if (dragComponent == null) return;
+
+         if (dragComponent.CanDrag())
          {
             Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
@@ -148,6 +157,10 @@ namespace Common
             _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             Debug.Log("[InputManager] Drag started");
+         }
+         else
+         {
+            dragComponent.OnDragAttemptFailed();
          }
       }
 

@@ -126,8 +126,17 @@ namespace Common
         #region IDrag
         public bool CanDrag()
         {
-            if (!Card.Free) PlayLocked();
             return Card.Free;
+        }
+
+        public void OnDragAttemptFailed()
+        {
+            PlayLocked();
+        }
+
+        public void OnDoubleClickAttemptFailed()
+        {
+            PlayLocked();
         }
 
         public void OnStartDrag()

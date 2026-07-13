@@ -5,5 +5,6 @@ namespace Common
         void OnStartDrag();
         void OnEndDrag();
         bool CanDrag();
+        void OnDragAttemptFailed();
     }
 }

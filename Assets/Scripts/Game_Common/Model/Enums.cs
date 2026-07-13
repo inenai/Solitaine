@@ -13,8 +13,7 @@ namespace Common
         HEARTS,
         DIAMONDS,
         CLUBS,
-        SPADES,
-        ANY
+        SPADES
     }
 
     public enum GameStatus

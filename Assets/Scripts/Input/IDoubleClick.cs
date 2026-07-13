@@ -4,5 +4,6 @@ namespace Common
     {
         void OnDoubleClick();
         bool CanDoubleClick();
+        void OnDoubleClickAttemptFailed();
     }
 }

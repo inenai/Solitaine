@@ -8,7 +8,7 @@ public abstract class TargetCardPileUI : CardPileUI
 
     public bool IsCardAllowedHere(Card card)
     {
-        return _controller.IsCardAllowedHere(card, _pileKind, _index);
+        return _controller.IsCardAllowedInPile(card, _pileKind, _index);
     }
 
     public void EnableHighlight(bool value)

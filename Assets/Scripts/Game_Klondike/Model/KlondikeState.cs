@@ -20,7 +20,7 @@ namespace Klondike
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
         bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
 
-        public void InitState()
+        public KlondikeState()
         {
             ApplyConfig();
             InitFoundations();

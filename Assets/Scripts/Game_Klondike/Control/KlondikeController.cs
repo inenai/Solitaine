@@ -49,10 +49,8 @@ namespace Klondike
 
         private void InitGame()
         {
-
             _game = new KlondikeGame();
             _game.OnWin += OnGameWon;
-            _game.SetupGame();
         }
 
         public void InitUI()
@@ -131,7 +129,7 @@ namespace Klondike
             return _game.State.AvailableRestocks != 0;
         }
 
-        public bool IsCardAllowedHere(Card card, PileKind targetPile, int targetPileIndex)
+        public bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
         {
             return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
         }

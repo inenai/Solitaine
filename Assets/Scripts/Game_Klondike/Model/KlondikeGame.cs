@@ -17,13 +17,8 @@ namespace Klondike
         #region initialization
         public KlondikeGame()
         {
-            _state = new KlondikeState();
-            _state.InitState();
-        }
-
-        public void SetupGame()
-        {
             Log("Starting a Klondike game.");
+            _state = new KlondikeState();
             ShuffleAndDeal();
             Log();
         }
@@ -90,19 +85,18 @@ namespace Klondike
         /// <returns>Whether a UI refresh is needed</returns>
         private bool ExecuteAction(Func<bool> action)
         {
-            bool uiRefreshNeeded = action();
+            bool moveMade = action();
 
-            if (uiRefreshNeeded)
+            if (moveMade)
             {
                 Log();
+                if (Won())
+                {
+                    _state.OnWin();
+                    OnWin?.Invoke();
+                }
             }
-
-            if (Won())
-            {
-                _state.OnWin();
-                OnWin?.Invoke();
-            }
-            return uiRefreshNeeded;
+            return moveMade;
         }
 
         public bool Won()
@@ -203,42 +197,13 @@ namespace Klondike
             bool uiRefreshPending = ExecuteAction(() =>
             {
                 bool cardMoved = false;
-                switch (sourcePileData.Kind)
+                switch (targetPileKind)
                 {
-                    case PileKind.WASTE: // > Tableau, Foundations
-                        switch (targetPileKind)
-                        {
-                            case PileKind.FOUNDATION:
-                                cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
-                                break;
-                            case PileKind.TABLEAU:
-                                cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
-                                break;
-                        }
+                    case PileKind.FOUNDATION:
+                        cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
                         break;
-
-                    case PileKind.FOUNDATION:// > Tableau
-                        if (State.FoundationCardsFree)
-                        {
-                            switch (targetPileKind)
-                            {
-                                case PileKind.TABLEAU:
-                                    cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
-                                    break;
-                            }
-                        }
-                        break;
-
-                    case PileKind.TABLEAU: // > Tableau, Foundations
-                        switch (targetPileKind)
-                        {
-                            case PileKind.FOUNDATION:
-                                cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
-                                break;
-                            case PileKind.TABLEAU:
-                                cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
-                                break;
-                        }
+                    case PileKind.TABLEAU:
+                        cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
                         break;
                 }
 
@@ -441,6 +406,8 @@ namespace Klondike
         {
             PileData sourcePileData = State.GetCardPileOwnerData(card);
             if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
+                return false;
+            if (sourcePileData.Kind == PileKind.FOUNDATION && !State.FoundationCardsFree)
                 return false;
 
             switch (targetPile)
