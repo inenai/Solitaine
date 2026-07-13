@@ -8,6 +8,8 @@ namespace Klondike
         const string DrawAmountKey = "KL_DRAW_AMOUNT";
         const string AvailableRestocksKey = "KL_AVAILABLE_RESTOCKS";
         const string FoundationCardsFreeKey = "KL_FOUNDATION_CARDS_FREE";
+        const string KlondikeWinCountKey = "KL_WIN_COUNT";
+
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
         public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;
@@ -52,6 +54,20 @@ namespace Klondike
             {
                 Log($"Free foundations set to {value}");
                 PlayerPrefs.SetInt(AvailableRestocksKey, value ? 1 : 0);
+                Save();
+            }
+        }
+
+        public static int WinCount
+        {
+            get
+            {
+                return PlayerPrefs.GetInt(KlondikeWinCountKey, 0);
+            }
+            set
+            {
+                Log($"Win count set to {value}");
+                PlayerPrefs.SetInt(KlondikeWinCountKey, value);
                 Save();
             }
         }

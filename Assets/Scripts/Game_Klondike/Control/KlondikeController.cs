@@ -1,8 +1,8 @@
 using Common;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -10,6 +10,7 @@ namespace Klondike
 {
     public class KlondikeController : MonoBehaviour, IGameController
     {
+        [SerializeField] MyInputManager _input;
         [SerializeField] KlondikeConfig _defaultConfig;
         [SerializeField] StockUI _stock;
         [SerializeField] WasteUI _waste;
@@ -17,7 +18,8 @@ namespace Klondike
         [SerializeField] TableauUI[] _tableaus;
         [SerializeField] ParticleSystem _victoryParticles;
         [SerializeField] GameObject _settingsScreen;
-        [SerializeField] MyInputManager _input;
+        [SerializeField] TextMeshProUGUI _winsTxt;
+
         private KlondikeGame _game;
         private GameStatus _status = GameStatus.INITIALIZING;
 
@@ -42,6 +44,7 @@ namespace Klondike
 
         private void StartNewGame()
         {
+            _victoryParticles.Stop();
             ClearGame();
             _game = new KlondikeGame();
             _game.OnWin += OnGameWon;
@@ -64,6 +67,7 @@ namespace Klondike
 
         public void InitUI()
         {
+            _winsTxt.text = $"Wins: {KlondikeSettings.WinCount}";
             _stock.Init(this);
             _waste.Init(this);
             for (int i = 0; i < _foundations.Length; i++)
@@ -91,6 +95,8 @@ namespace Klondike
 
         private void OnGameWon()
         {
+            KlondikeSettings.WinCount++;
+            _winsTxt.text = $"Wins: {KlondikeSettings.WinCount}";
             _victoryParticles.Play();
         }
 
