@@ -1,22 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
-using Utils;
 
 namespace Klondike
 {
     public class WasteView : CardPileView
     {
-        /// <summary>
-        /// <para> index => gameobject</para>
-        /// <para>0 => 1st card, leftmost</para>
-        /// <para>1 => 2nd card, middle</para>
-        /// <para>2 => 3rd card, rightmost</para>
-        /// </summary>
-
         [SerializeField] private Transform[] _cardPositions;
         protected List<CardView> _cardViews;
 
