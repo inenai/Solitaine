@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common;
-using Unity.VisualScripting;
 using UnityEngine;
+using Utils;
 
-public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
+public class CardView : MonoBehaviour, IDrag, IDoubleClick
 {
+    [SerializeField] protected GameObject _rotationRoot;
     [SerializeField] protected GameObject _back;
     [SerializeField] protected GameObject _front;
     [SerializeField] GameObject _lockedGO;
@@ -15,9 +16,11 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     private IGameController _controller;
     private Vector3 _positionOnStartDrag;
     private List<Collider2D> _overlappingColliders;
-    private TargetCardPileUI _targetPile;
+    private SpriteRenderer _rend;
+    private TargetCardPileView _targetPile;
     private bool _dragging;
     private bool _animating;
+
     public Card Card => _card;
 
     void Awake()
@@ -25,10 +28,8 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
         _positionOnStartDrag = transform.position;
         _overlappingColliders = new();
         _targetPile = null;
-        OnAwake();
+        _rend = _front.GetComponent<SpriteRenderer>();
     }
-
-    protected virtual void OnAwake(){}
 
     public void Init(IGameController controller)
     {
@@ -60,6 +61,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     }
 
     public virtual void Refresh(){
+        _rend.sprite = CardUtils.GetCardSprite(Card);
         _front.SetActive(_card.Revealed);
         _back.SetActive(!_card.Revealed);
     }
@@ -152,7 +154,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
         _dragging = false;
         gameObject.layer = LayerMask.NameToLayer("StaticCard");
 
-        foreach (TargetCardPileUI pile in GetOverlappingPiles())
+        foreach (TargetCardPileView pile in GetOverlappingPiles())
         {
             pile.EnableHighlight(false);
         }
@@ -160,22 +162,22 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     }
     #endregion
 
-    private List<TargetCardPileUI> GetOverlappingPiles()
+    private List<TargetCardPileView> GetOverlappingPiles()
     {
-        List<TargetCardPileUI> piles = new();
+        List<TargetCardPileView> piles = new();
         foreach (Collider2D col in _overlappingColliders)
         {
-            TargetCardPileUI pile = col.gameObject.GetComponent<TargetCardPileUI>();
+            TargetCardPileView pile = col.gameObject.GetComponent<TargetCardPileView>();
             if (pile != null && !piles.Contains(pile))
             {
                 piles.Add(pile);
                 continue;
             }
 
-            CardUI otherCard = col.gameObject.GetComponent<CardUI>();
+            CardView otherCard = col.gameObject.GetComponent<CardView>();
             if (_controller != null && otherCard != null && otherCard.Card != null)
             {
-                if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileUI targetPile))
+                if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileView targetPile))
                 {
                     if (targetPile != null && !piles.Contains(targetPile))
                     {
@@ -225,8 +227,8 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
         _targetPile = null;
         if (_overlappingColliders.Count == 0) return;
 
-        List<TargetCardPileUI> compatiblePiles = new();
-        foreach (TargetCardPileUI pile in GetOverlappingPiles())
+        List<TargetCardPileView> compatiblePiles = new();
+        foreach (TargetCardPileView pile in GetOverlappingPiles())
         {
             bool allowedMove = pile.IsCardAllowedHere(Card);
             if (allowedMove && !compatiblePiles.Contains(pile))
@@ -237,8 +239,8 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
         }
 
         float closestDistance = float.MaxValue;
-        TargetCardPileUI closestPile = null;
-        foreach (TargetCardPileUI pile in compatiblePiles)
+        TargetCardPileView closestPile = null;
+        foreach (TargetCardPileView pile in compatiblePiles)
         {
             Vector2 pileXYPos = new Vector2(pile.transform.position.x, pile.transform.position.y);
             Vector2 thisXYPos = new Vector2(transform.position.x, transform.position.y);
@@ -250,7 +252,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
             }
         }
 
-        foreach (TargetCardPileUI pile in compatiblePiles)
+        foreach (TargetCardPileView pile in compatiblePiles)
         {
             if (pile == closestPile)
             {
@@ -266,7 +268,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
     #endregion
 
     #region Animation
-    public async Task AnimateCard(Vector3 targetPosition, float duration)
+    public async Task AnimateCard(Vector3 targetPosition, float duration, bool withRevealFlip = false)
     {
         _animating = true;
 
@@ -279,6 +281,7 @@ public abstract class CardUI : MonoBehaviour, IDrag, IDoubleClick
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
             transform.position = Vector3.Lerp(start, goal, t);
+            if (withRevealFlip) transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
             await Task.Yield();
         }
 

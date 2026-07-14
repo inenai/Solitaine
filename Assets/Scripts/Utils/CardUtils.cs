@@ -6,7 +6,7 @@ namespace Utils
     public static class CardUtils
     {
         public static string CardPrefabAddressText = "CARD_PREFAB_TEXT";
-        public static string CardPrefabAddressSprite = "CARD_PREFAB_SPRITE";
+        public static string CardPrefabAddressSprite = "CARD_PREFAB";
 
         public static string GetSuitStr(CardSuit suit)
         {
@@ -33,7 +33,7 @@ namespace Utils
             }
         }
 
-        public static bool SameCard(Card card, CardUI cardUI)
+        public static bool SameCard(Card card, CardView cardUI)
         {
             return
                 card.Value == cardUI.Card.Value &&

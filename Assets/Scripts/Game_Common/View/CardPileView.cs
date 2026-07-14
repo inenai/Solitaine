@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Common
 {
-    public abstract class CardPileUI : MonoBehaviour
+    public abstract class CardPileView : MonoBehaviour
     {
         [SerializeField] protected PileKind _pileKind;
         protected int _index = -1;

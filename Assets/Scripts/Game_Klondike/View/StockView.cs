@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Klondike
 {
     [RequireComponent(typeof(Collider2D))]
-    public class StockUI : CardPileUI, IClick
+    public class StockView : CardPileView, IClick
     {
         [SerializeField] GameObject _cardUI;
         [SerializeField] GameObject _restockLocked;

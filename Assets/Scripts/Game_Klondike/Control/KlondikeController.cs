@@ -12,10 +12,10 @@ namespace Klondike
     {
         [SerializeField] MyInputManager _input;
         [SerializeField] KlondikeConfig _defaultConfig;
-        [SerializeField] StockUI _stock;
-        [SerializeField] WasteUI _waste;
-        [SerializeField] FoundationUI[] _foundations;
-        [SerializeField] TableauUI[] _tableaus;
+        [SerializeField] StockView _stock;
+        [SerializeField] WasteView _waste;
+        [SerializeField] FoundationView[] _foundations;
+        [SerializeField] TableauView[] _tableaus;
         [SerializeField] ParticleSystem _victoryParticles;
         [SerializeField] GameObject _settingsScreen;
         [SerializeField] TextMeshProUGUI _winsTxt;
@@ -37,9 +37,17 @@ namespace Klondike
         void Start()
         {
             Status = GameStatus.INITIALIZING;
+            EventManager.OnResetGameEvent += OnResetGameEvent;
+            EventManager.OnDrawFromStockEvent += OnDrawFromStockEvent;
             InitConfig();
             InitUI();
             StartNewGame();
+        }
+
+        void OnDestroy()
+        {
+            EventManager.OnResetGameEvent -= OnResetGameEvent;
+            EventManager.OnDrawFromStockEvent -= OnDrawFromStockEvent;
         }
 
         private void StartNewGame()
@@ -72,7 +80,7 @@ namespace Klondike
             _waste.Init(this);
             for (int i = 0; i < _foundations.Length; i++)
             {
-                FoundationUI foundation = _foundations[i];
+                FoundationView foundation = _foundations[i];
                 foundation.Init(this, i);
             }
             for (int i = 0; i < _tableaus.Length; i++)
@@ -154,7 +162,7 @@ namespace Klondike
             return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
         }
 
-        public bool IsCardInTargetPile(Card card, out TargetCardPileUI result)
+        public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
         {
             result = null;
             PileData cardPileData = _game.State.GetCardPileOwnerData(card);
@@ -172,6 +180,16 @@ namespace Klondike
                     return true;
             }
             return false;
+        }
+
+        private void OnResetGameEvent()
+        {
+            RestartGame();
+        }
+
+        private void OnDrawFromStockEvent()
+        {
+            PileClicked(PileKind.STOCK, -1);
         }
         #endregion
 

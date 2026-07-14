@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Klondike
 {
-    public class WasteUI : CardPileUI
+    public class WasteView : CardPileView
     {
         /// <summary>
         /// <para> index => gameobject</para>
@@ -14,7 +14,7 @@ namespace Klondike
         /// <para>1 => 2nd card, middle</para>
         /// <para>2 => 3rd card, rightmost</para>
         /// </summary>
-        [SerializeField] CardUI[] _cardUIs;
+        [SerializeField] CardView[] _cardUIs;
 
         private Vector3[] _cardPositions;
 
@@ -61,7 +61,7 @@ namespace Klondike
             int j = waste.Count > 2 ? 2 : waste.Count - 1;
             while (waste.Count > 0 && j >= 0)
             {
-                CardUI cardUI = _cardUIs[j];
+                CardView cardUI = _cardUIs[j];
                 Debug.Log($"Activating waste card index {j}.");
                 cardUI.gameObject.SetActive(true);
                 cardUI.LoadCardData(waste.Pop());

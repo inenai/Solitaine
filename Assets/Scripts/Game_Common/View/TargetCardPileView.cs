@@ -2,7 +2,7 @@ using Common;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public abstract class TargetCardPileUI : CardPileUI
+public abstract class TargetCardPileView : CardPileView
 {
     [SerializeField] protected GameObject triggerHighlight;
 

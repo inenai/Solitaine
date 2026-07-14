@@ -10,6 +10,9 @@ namespace Common
       [SerializeField] private InputActionReference pointerDownAction;
       [SerializeField] private InputActionReference doublePressAction;
 
+      [SerializeField] private InputActionReference resetGameAction;
+      [SerializeField] private InputActionReference drawFromStockAction;
+
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
       public const float DragDepth = 5f;
@@ -38,11 +41,15 @@ namespace Common
          pointerMovedAction.action.Enable();
          pointerDownAction.action.Enable();
          doublePressAction.action.Enable();
+         resetGameAction.action.Enable();
+         drawFromStockAction.action.Enable();
 
          pointerDownAction.action.performed += Action_PointerPressed;
          pointerMovedAction.action.performed += Action_PointerMoved;
          pointerDownAction.action.canceled += Action_PointerReleased;
          doublePressAction.action.performed += Action_DoublePressed;
+         resetGameAction.action.performed += Action_ResetGame;
+         drawFromStockAction.action.performed += Action_DrawFromStock;
       }
 
       private void OnDisable()
@@ -50,16 +57,32 @@ namespace Common
          pointerMovedAction.action.Disable();
          pointerDownAction.action.Disable();
          doublePressAction.action.Disable();
+         resetGameAction.action.Disable();
+         drawFromStockAction.action.Disable();
 
          pointerDownAction.action.performed -= Action_PointerPressed;
          pointerMovedAction.action.performed -= Action_PointerMoved;
          pointerDownAction.action.canceled -= Action_PointerReleased;
          doublePressAction.action.performed -= Action_DoublePressed;
+         resetGameAction.action.performed -= Action_ResetGame;
+         drawFromStockAction.action.performed -= Action_DrawFromStock;
       }
 
       public void Pause(bool pause)
       {
          _paused = pause;
+      }
+
+      private void Action_ResetGame(InputAction.CallbackContext context)
+      {
+         if (_paused) return;
+         EventManager.ResetGameEvent();
+      }
+
+      private void Action_DrawFromStock(InputAction.CallbackContext context)
+      {
+         if (_paused) return;
+         EventManager.DrawFromStockEvent();
       }
 
       private void Action_PointerPressed(InputAction.CallbackContext context)

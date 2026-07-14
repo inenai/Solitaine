@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Klondike
 {
-    public class FoundationUI : TargetCardPileUI
+    public class FoundationView : TargetCardPileView
     {
-        [SerializeField] CardUI _cardUI_top;
-        [SerializeField] CardUI _cardUI_bottom;
+        [SerializeField] CardView _cardUI_top;
+        [SerializeField] CardView _cardUI_bottom;
 
         private Vector3 _topPosition;
         private Vector3 _bottomPosition;

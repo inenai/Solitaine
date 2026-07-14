@@ -47,6 +47,6 @@ MonoBehaviour:
   pointerMovedAction: {fileID: -4622605027913168950, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   pointerDownAction: {fileID: -6385276113615828715, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   doublePressAction: {fileID: 3042684234344800339, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  resetGameAction: {fileID: 3702535587559308308, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  drawFromStockAction: {fileID: -4692990639484379486, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   mouseDragSpeed: 0
-  dragDepth: 5
-  dragOffset: {x: 0, y: 0.3, z: 0}

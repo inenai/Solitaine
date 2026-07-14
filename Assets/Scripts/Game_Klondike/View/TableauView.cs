@@ -8,12 +8,12 @@ using Utils;
 
 namespace Klondike
 {
-    public class TableauUI : TargetCardPileUI
+    public class TableauView : TargetCardPileView
     {
         private const float _offsetY = -0.3f;
         private const float _offsetZ = -0.1f;
 
-        private List<CardUI> _cardUIs;
+        private List<CardView> _cardUIs;
         private float _cardHeight;
 
         protected override void OnInit()
@@ -22,10 +22,10 @@ namespace Klondike
             _cardHeight = 0f;
         }
 
-        private async Task<CardUI> CreateCardUI(Transform transform)
+        private async Task<CardView> CreateCardUI(Transform transform)
         {
             GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform);
-            CardUI cardUI = go.GetComponent<CardUI>();
+            CardView cardUI = go.GetComponent<CardView>();
             cardUI.Init(_controller);
             if (_cardHeight == 0f)
                 _cardHeight = cardUI.GetComponent<Collider2D>().bounds.size.y;
@@ -37,14 +37,14 @@ namespace Klondike
             Card[] cards = tableauCards.Reverse().ToArray();
             RemoveExtraCardUIs(cards.Length);
 
-            List<Task<CardUI>> tasks = new();
+            List<Task<CardView>> tasks = new();
 
             for (int i = _cardUIs.Count; i < cards.Length; i++)
             {
                 tasks.Add(CreateCardUI(transform));
             }
 
-            CardUI[] newCards = await Task.WhenAll(tasks);
+            CardView[] newCards = await Task.WhenAll(tasks);
 
             _cardUIs.AddRange(newCards);
 
@@ -62,7 +62,7 @@ namespace Klondike
                 _cardUIs[i].LoadCardData(cards[i], yOffset, _offsetZ);
             }
 
-            foreach (CardUI cardUi in _cardUIs)
+            foreach (CardView cardUi in _cardUIs)
             {
                 if (cardMoved == cardUi.Card)
                 {
@@ -98,7 +98,7 @@ namespace Klondike
 
             while (_cardUIs.Count > amountNeeded)
             {
-                CardUI last = _cardUIs[^1];
+                CardView last = _cardUIs[^1];
                 Destroy(last.gameObject);
                 _cardUIs.RemoveAt(_cardUIs.Count - 1);
             }
