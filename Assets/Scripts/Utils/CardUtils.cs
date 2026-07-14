@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Common;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace Utils
     {
         public static string CardPrefabAddressText = "CARD_PREFAB_TEXT";
         public static string CardPrefabAddressSprite = "CARD_PREFAB";
+        public const float CardStackZOffset = -0.1f;
 
         public static string GetSuitStr(CardSuit suit)
         {
@@ -81,5 +83,27 @@ namespace Utils
 
             return CardTextureGetter.Instance.GetBlueDeck();
         }
+
+
+        public static List<Stack<Card>> GetClonedStacks(Foundation[] foundations)
+        {
+            List<Stack<Card>> stacks = new();
+            foreach (Foundation f in foundations)
+            {
+                stacks.Add(Utils.CloneStack(f.Stack));
+            }
+            return stacks;
+        }
+
+        public static List<Stack<Card>> GetClonedStacks(Stack<Card>[] stacks)
+        {
+            List<Stack<Card>> result = new();
+            foreach (Stack<Card> s in stacks)
+            {
+                result.Add(Utils.CloneStack(s));
+            }
+            return result;
+        }
+
     }
 }

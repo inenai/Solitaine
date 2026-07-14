@@ -6,6 +6,7 @@ namespace Klondike
 {
     public class KlondikeState
     {
+        public Stack<Card> Deck;
         public Stack<Card> StockPile;
         public Stack<Card> WastePile;
         public Stack<Card>[] Tableaus;

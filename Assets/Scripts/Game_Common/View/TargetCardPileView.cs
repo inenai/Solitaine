@@ -8,7 +8,7 @@ public abstract class TargetCardPileView : CardPileView
 
     public bool IsCardAllowedHere(Card card)
     {
-        return _controller.IsCardAllowedInPile(card, _pileKind, _index);
+        return _view.Controller.IsCardAllowedInPile(card, _pileKind, _index);
     }
 
     public void EnableHighlight(bool value)

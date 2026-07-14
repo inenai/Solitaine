@@ -2,8 +2,8 @@ using Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
+using Utils;
 using static Utils.Utils;
 
 namespace Klondike
@@ -12,14 +12,10 @@ namespace Klondike
     {
         [SerializeField] MyInputManager _input;
         [SerializeField] KlondikeConfig _defaultConfig;
-        [SerializeField] StockView _stock;
-        [SerializeField] WasteView _waste;
-        [SerializeField] FoundationView[] _foundations;
-        [SerializeField] TableauView[] _tableaus;
-        [SerializeField] ParticleSystem _victoryParticles;
-        [SerializeField] GameObject _settingsScreen;
-        [SerializeField] TextMeshProUGUI _winsTxt;
+        [SerializeField] KlondikeView _view;
+        [SerializeField] KlondikeUI _ui;
 
+        private List<Card> _deck;
         private KlondikeGame _game;
         private GameStatus _status = GameStatus.INITIALIZING;
 
@@ -37,26 +33,19 @@ namespace Klondike
         void Start()
         {
             Status = GameStatus.INITIALIZING;
-            EventManager.OnResetGameEvent += OnResetGameEvent;
-            EventManager.OnDrawFromStockEvent += OnDrawFromStockEvent;
-            InitConfig();
-            InitUI();
-            StartNewGame();
+            Initialize(() =>
+            {
+                StartNewGame(() =>
+                    {
+                        Status = GameStatus.LISTENING;
+                    });
+            });
+
         }
 
         void OnDestroy()
         {
-            EventManager.OnResetGameEvent -= OnResetGameEvent;
-            EventManager.OnDrawFromStockEvent -= OnDrawFromStockEvent;
-        }
-
-        private void StartNewGame()
-        {
-            _victoryParticles.Stop();
-            ClearGame();
-            _game = new KlondikeGame();
-            _game.OnWin += OnGameWon;
-            RefreshAllUI();
+            DeregisterFromEvents();
         }
 
         private void InitConfig()
@@ -67,53 +56,63 @@ namespace Klondike
             }
         }
 
-        private void ClearGame()
+        private void Initialize(Action onDone)
         {
-            if (_game != null)
-                _game.OnWin -= OnGameWon;
+            _deck = KlondikeGame.CreateGameDeck();
+            RegisterToEvents();
+            InitConfig();
+            _ui.Init(this);
+            _view.Init(this);
+            LoadDeckView(onDone);
         }
 
-        public void InitUI()
+        private void StartNewGame(Action onDone)
         {
-            _winsTxt.text = $"Wins: {KlondikeSettings.WinCount}";
-            _stock.Init(this);
-            _waste.Init(this);
-            for (int i = 0; i < _foundations.Length; i++)
+            _ui.OnStartNewGame();
+            ResetDeck();
+            _game = new KlondikeGame(_deck);
+            RefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone);
+        }
+
+        private void ResetDeck()
+        {
+            foreach (Card card in _deck)
             {
-                FoundationView foundation = _foundations[i];
-                foundation.Init(this, i);
-            }
-            for (int i = 0; i < _tableaus.Length; i++)
-            {
-                _tableaus[i].Init(this, i);
+                card.Show(false);
+                card.FreeCard(false);
             }
         }
 
-        private void RefreshAllUI()
+        private async void LoadDeckView(Action onDone)
         {
-            _ = FinishRefresh(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default);
+            Debug.Log("LoadDeckView.");
+            await _view.Deck.Load(_deck);
+            onDone?.Invoke();
         }
-
-        private void OnGameWon()
-        {
-            KlondikeSettings.WinCount++;
-            _winsTxt.text = $"Wins: {KlondikeSettings.WinCount}";
-            _victoryParticles.Play();
-        }
-
         #endregion
 
         #region GameController
+        public void RestartGame()
+        {
+            if (Status != GameStatus.LISTENING) return;
+            Status = GameStatus.PROCESSING;
+            StartNewGame(() =>
+            {
+                Status = GameStatus.LISTENING;
+            });
+        }
+
         public void ResetSettingsToDefault()
         {
             KlondikeSettings.Reset(_defaultConfig);
         }
 
-        public bool PileClicked(PileKind pileKind, int index)
+        public bool PileClicked(PileKind pileKind, int pileIndex)
         {
             Debug.Log("Processing pile clicked.");
             if (Status != GameStatus.LISTENING) return false;
             Status = GameStatus.PROCESSING;
+
             Func<List<PileKind>> action = pileKind switch
             {
                 PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
@@ -126,9 +125,13 @@ namespace Klondike
                 return false;
             }
 
-            return UpdateUIWithChanges(
-                action.Invoke(),null,default);
+            return RefreshView(
+                action.Invoke(), null, default, () =>
+                {
+                    Status = GameStatus.LISTENING;
+                });
         }
+
 
         public bool CardDoubleClicked(Card card, Vector3 originalCardPosition)
         {
@@ -136,8 +139,11 @@ namespace Klondike
             if (Status != GameStatus.LISTENING) return false;
             Status = GameStatus.PROCESSING;
 
-            return UpdateUIWithChanges(
-                _game.Action_TryMoveCardAutomatic(card), card, originalCardPosition);
+            return RefreshView(
+                _game.Action_TryMoveCardAutomatic(card), card, originalCardPosition, () =>
+                {
+                    Status = GameStatus.LISTENING;
+                });
         }
 
         public bool CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
@@ -146,8 +152,11 @@ namespace Klondike
             if (Status != GameStatus.LISTENING) return false;
             Status = GameStatus.PROCESSING;
 
-            return UpdateUIWithChanges(
-               _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition);
+            return RefreshView(
+               _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
+                {
+                    Status = GameStatus.LISTENING;
+                });
         }
 
         public bool IsRestockAvailable(PileKind pileKind)
@@ -164,22 +173,86 @@ namespace Klondike
 
         public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
         {
-            result = null;
-            PileData cardPileData = _game.State.GetCardPileOwnerData(card);
-            switch (cardPileData.Kind)
+            return _view.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+        }
+        #endregion
+
+        #region UI
+        public void OpenSettings()
+        {
+            _input.Pause(true);
+            _ui.OpenSettings();
+        }
+
+        public void CloseSettings()
+        {
+            _input.Pause(false);
+            _ui.CloseSettings();
+        }
+        #endregion
+
+        #region View
+        private bool RefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        {
+            Debug.Log("RefreshView.");
+            bool gameStateChanged = pilesToRefresh.Count > 0;
+            if (gameStateChanged)
             {
-                case PileKind.WASTE:
-                    return false;
-                case PileKind.STOCK:
-                    return false;
-                case PileKind.FOUNDATION:
-                    result = _foundations[cardPileData.Index];
-                    return true;
-                case PileKind.TABLEAU:
-                    result = _tableaus[cardPileData.Index];
-                    return true;
+                _ = RefreshViewTask(pilesToRefresh, cardMoved, originalCardPosition, onDone);
             }
-            return false;
+            else
+            {
+                onDone?.Invoke();
+            }
+            return gameStateChanged;
+        }
+
+        private async Task RefreshViewTask(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        {
+            Debug.Log("RefreshViewTask.");
+            List<Task> tasks = new();
+            foreach (PileKind kind in pilesToRefresh)
+            {
+                switch (kind)
+                {
+                    case PileKind.WASTE:
+                        tasks.Add(_view.RefreshWaste(CloneStack(_game.State.WastePile), cardMoved, originalCardPosition));
+                        break;
+
+                    case PileKind.STOCK:
+                        tasks.Add(_view.RefreshStock(CloneStack(_game.State.StockPile), cardMoved, originalCardPosition));
+                        break;
+
+                    case PileKind.FOUNDATION:
+                        tasks.Add(_view.RefreshFoundations(CardUtils.GetClonedStacks(_game.State.Foundations), cardMoved, originalCardPosition));
+                        break;
+
+                    case PileKind.TABLEAU:
+                        tasks.Add(_view.RefreshTableaus(CardUtils.GetClonedStacks(_game.State.Tableaus), cardMoved, originalCardPosition));
+                        break;
+                }
+            }
+            Debug.Log("Await...");
+            await Task.WhenAll(tasks);
+            Debug.Log("Done.");
+            onDone?.Invoke();
+        }
+
+        #endregion
+
+        #region Events
+        private void RegisterToEvents()
+        {
+            EventManager.OnResetGameEvent += OnResetGameEvent;
+            EventManager.OnDrawFromStockEvent += OnDrawFromStockEvent;
+            EventManager.OnGameWon += OnGameWon;
+        }
+
+        private void DeregisterFromEvents()
+        {
+            EventManager.OnResetGameEvent -= OnResetGameEvent;
+            EventManager.OnDrawFromStockEvent -= OnDrawFromStockEvent;
+            EventManager.OnGameWon -= OnGameWon;
         }
 
         private void OnResetGameEvent()
@@ -191,116 +264,11 @@ namespace Klondike
         {
             PileClicked(PileKind.STOCK, -1);
         }
-        #endregion
 
-        #region UI
-        public void RestartGame()
+        private void OnGameWon()
         {
-            StartNewGame();
-        }
-
-        public void OpenSettings()
-        {
-            _input.Pause(true);
-            _settingsScreen.SetActive(true);
-        }
-
-        public void CloseSettings()
-        {
-            _input.Pause(false);
-            _settingsScreen.SetActive(false);
-        }
-        #endregion
-
-        #region UIInternal
-        private bool UpdateUIWithChanges(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition)
-        {
-            bool moved = pilesToRefresh.Count > 0;
-            if (moved)
-            {
-                _ = FinishRefresh(pilesToRefresh, cardMoved, originalCardPosition);
-            }
-            else
-            {
-                Status = GameStatus.LISTENING;
-            }
-            return moved;
-        }
-
-        private async Task FinishRefresh(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition)
-        {
-            try
-            {
-                await RefreshPileUI(pilesToRefresh, cardMoved, originalCardPosition);
-            }
-            finally
-            {
-                Status = GameStatus.LISTENING;
-            }
-        }
-
-        private async Task RefreshPileUI(List<PileKind> toRefresh, Card cardMoved, Vector3 originalCardPosition)
-        {
-            List<Task> tasks = new();
-
-            foreach (PileKind kind in toRefresh)
-            {
-                switch (kind)
-                {
-                    case PileKind.WASTE:
-                        tasks.Add(RefreshWaste(cardMoved, originalCardPosition));
-                        break;
-
-                    case PileKind.STOCK:
-                        tasks.Add(RefreshStock(cardMoved, originalCardPosition));
-                        break;
-
-                    case PileKind.FOUNDATION:
-                        tasks.Add(RefreshFoundations(cardMoved, originalCardPosition));
-                        break;
-
-                    case PileKind.TABLEAU:
-                        tasks.Add(RefreshTableaus(cardMoved, originalCardPosition));
-                        break;
-                }
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
-        private Task RefreshStock(Card cardMoved, Vector3 originalCardPosition)
-        {
-            return _stock.Refresh(CloneStack(_game.State.StockPile), cardMoved, originalCardPosition);
-        }
-
-        private Task RefreshWaste(Card cardMoved, Vector3 originalCardPosition)
-        {
-            return _waste.Refresh(CloneStack(_game.State.WastePile), cardMoved, originalCardPosition);
-        }
-
-        private Task RefreshFoundations(Card cardMoved, Vector3 originalCardPosition)
-        {
-            List<Task> tasks = new();
-            for (int i = 0; i < _foundations.Length; i++)
-            {
-                tasks.Add(_foundations[i].Refresh(CloneStack(_game.State.Foundations[i].Stack), cardMoved, originalCardPosition));
-            }
-            return Task.WhenAll(tasks);
-        }
-
-        private Task RefreshTableaus(Card cardMoved, Vector3 originalCardPosition)
-        {
-            List<Task> tasks = new();
-            for (int i = 0; i < _tableaus.Length; i++)
-            {
-                tasks.Add(_tableaus[i].Refresh(CloneStack(_game.State.Tableaus[i]), cardMoved, originalCardPosition));
-            }
-            return Task.WhenAll(tasks);
-        }
-
-        public bool CardDraggedToPile(Card card, PileKind pileKind, int pileIndex, System.Numerics.Vector3 originalCardPosition)
-        {
-            throw new NotImplementedException();
+            KlondikeSettings.WinCount++;
+            _ui.OnGameWon();
         }
         #endregion
     }

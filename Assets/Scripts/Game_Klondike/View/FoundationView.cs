@@ -1,68 +1,27 @@
 using System.Collections.Generic;
+
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
+using Utils;
 
 namespace Klondike
 {
     public class FoundationView : TargetCardPileView
     {
-        [SerializeField] CardView _cardUI_top;
-        [SerializeField] CardView _cardUI_bottom;
+        protected override void OnInit(){}
 
-        private Vector3 _topPosition;
-        private Vector3 _bottomPosition;
-
-        void Awake()
+        public override async Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
         {
-            _topPosition = _cardUI_top.transform.position;
-            _bottomPosition = _cardUI_bottom.transform.position;
-        }
-
-        protected override void OnInit()
-        {
-            _cardUI_top.Init(_controller);
-            _cardUI_bottom.Init(_controller);
-        }
-
-        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
-        {
-            ResetCardPositions();
+            Debug.Log($"Foundation[{Index}] refreshing...");
             if (cards.Count == 0)
             {
-                _cardUI_top.gameObject.SetActive(false);
-                _cardUI_bottom.gameObject.SetActive(false);
-                return Task.CompletedTask;
+                Debug.Log($"Foundation[{Index}] refreshed.");
+                return;
             }
 
-            if (cards.Count > 0)
-            {
-                _cardUI_top.gameObject.SetActive(cards.Count > 0);
-                if (cards.Count > 0)
-                {
-                    _cardUI_top.LoadCardData(cards.Pop());
-                }
-                _cardUI_bottom.gameObject.SetActive(cards.Count > 0);
-                if (cards.Count > 0)
-                {
-                    _cardUI_bottom.LoadCardData(cards.Pop());
-                }
-            }
-            if (_cardUI_top.Card == cardMoved)
-            {
-                _cardUI_top.transform.position = originalCardPosition;
-                return _cardUI_top.AnimateCard(_topPosition,0.1f);
-            }
-            else
-                return Task.CompletedTask;
-        }
-
-
-
-        private void ResetCardPositions()
-        {
-            _cardUI_top.transform.position = _topPosition;
-            _cardUI_bottom.transform.position = _bottomPosition;
+            await StackCardsInPositionWithAnimation(cards, transform.position, transform, $"Card_F{Index}_", cardMoved, originalCardPosition);
+            Debug.Log($"Foundation[{Index}] refreshed.");
         }
     }
 }

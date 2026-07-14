@@ -5,8 +5,7 @@ namespace Klondike
 {
     public class KlondikeSettingsScreen : MonoBehaviour
     {
-        [SerializeField] KlondikeController _control;
-
+        [SerializeField] KlondikeUI _kUI;
         [SerializeField] ToggleGroup _drawOption;
         [SerializeField] Toggle _draw1Toggle;
         [SerializeField] Toggle _draw3Toggle;
@@ -47,13 +46,13 @@ namespace Klondike
         public void SaveAndClose()
         {
             Save();
-            _control.CloseSettings();
+            _kUI.CloseSettings();
         }
 
         public void SaveAndRestart()
         {
             SaveAndClose();
-            _control.RestartGame();
+            _kUI.RestartGame();
         }
     }
 }

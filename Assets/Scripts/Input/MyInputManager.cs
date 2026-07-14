@@ -75,13 +75,11 @@ namespace Common
 
       private void Action_ResetGame(InputAction.CallbackContext context)
       {
-         if (_paused) return;
          EventManager.ResetGameEvent();
       }
 
       private void Action_DrawFromStock(InputAction.CallbackContext context)
       {
-         if (_paused) return;
          EventManager.DrawFromStockEvent();
       }
 
@@ -140,9 +138,20 @@ namespace Common
             Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
-            if (hit.collider != null && hit.collider.gameObject == _clickingObject)
+            if (hit.collider != null)
             {
-              _clickingObject.GetComponent<IClick>()?.OnClick();
+               IClick c = hit.collider.gameObject.GetComponent<IClick>();
+               if (c != null && hit.collider.gameObject == _clickingObject)
+               {
+                  if (c.CanClick())
+                  {
+                     c.OnClick();
+                  }
+                  else
+                  {
+                     c.OnClickAttemptFailed();
+                  }
+               }
             }
             _clickingObject = null;
             Debug.Log("[InputManager] Click ended (happened)");

@@ -6,6 +6,7 @@ public static class EventManager
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public static Action OnResetGameEvent;
     public static Action OnDrawFromStockEvent;
+    public static Action OnGameWon;
 
     public static void ResetGameEvent()
     {
@@ -15,5 +16,10 @@ public static class EventManager
     public static void DrawFromStockEvent()
     {
         OnDrawFromStockEvent?.Invoke();
+    }
+
+    public static void GameWon()
+    {
+        OnGameWon?.Invoke();
     }
 }

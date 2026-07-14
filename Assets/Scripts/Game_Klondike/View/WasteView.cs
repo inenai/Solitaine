@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
+using Utils;
 
 namespace Klondike
 {
@@ -14,71 +16,36 @@ namespace Klondike
         /// <para>1 => 2nd card, middle</para>
         /// <para>2 => 3rd card, rightmost</para>
         /// </summary>
-        [SerializeField] CardView[] _cardUIs;
 
-        private Vector3[] _cardPositions;
+        [SerializeField] private Transform[] _cardPositions;
+        protected List<CardView> _cardViews;
 
-        void Awake()
-        {
-            _cardPositions = new Vector3[_cardUIs.Length];
-            for (int i = 0; i < _cardUIs.Length; i++)
-            {
-                _cardPositions[i] = _cardUIs[i].transform.position;
-            }
-        }
-
-        protected override void OnInit()
-        {
-            for (int i = 0; i < _cardUIs.Length; i++)
-            {
-                _cardUIs[i].Init(_controller);
-            }
-        }
-
-        private void ResetPositions()
-        {
-            for (int i = 0; i < _cardUIs.Length; i++)
-            {
-                _cardUIs[i].transform.position = _cardPositions[i];
-            }
-        }
+        protected override void OnInit() { }
 
         public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
         {
-            if (_cardUIs.Length < 1)
+            Debug.Log("WasteView refreshing...");
+            if (cards.Count == 0)
             {
-                throw new Exception("Waste has no card UI available in scene!");
+                Debug.Log("WasteView refreshed.");
+                return Task.CompletedTask;
             }
-            ResetPositions();
-            TurnOffUnusedCardUIs(cards.Count);
-            RefreshWasteCardUIs(cards);
 
+            _cardViews = StackCardsInPosition(cards, _cardPositions[0].position, transform, "Card_W_");
+
+            if (_cardViews.Count == 2)
+            {
+                _cardViews[^1].transform.position = new Vector3(_cardPositions[1].position.x, _cardPositions[1].position.y, _cardViews[^1].transform.position.z);
+            }
+
+            if (_cardViews.Count > 2)
+            {
+                _cardViews[^1].transform.position = new Vector3(_cardPositions[2].position.x, _cardPositions[2].position.y, _cardViews[^1].transform.position.z);
+                _cardViews[^2].transform.position = new Vector3(_cardPositions[1].position.x, _cardPositions[1].position.y, _cardViews[^2].transform.position.z);
+            }
+
+            Debug.Log("WasteView refreshed.");
             return Task.CompletedTask;
-        }
-
-        private void RefreshWasteCardUIs(Stack<Card> waste)
-        {
-            int j = waste.Count > 2 ? 2 : waste.Count - 1;
-            while (waste.Count > 0 && j >= 0)
-            {
-                CardView cardUI = _cardUIs[j];
-                Debug.Log($"Activating waste card index {j}.");
-                cardUI.gameObject.SetActive(true);
-                cardUI.LoadCardData(waste.Pop());
-                j--;
-            }
-        }
-
-        private void TurnOffUnusedCardUIs(int count)
-        {
-            if (count < _cardUIs.Length)
-            {
-                for (int i = count; i < _cardUIs.Length; i++)
-                {
-                    //Debug.Log($"Deactivating waste card index {i}.");
-                    _cardUIs[i].gameObject.SetActive(false);
-                }
-            }
         }
     }
 }

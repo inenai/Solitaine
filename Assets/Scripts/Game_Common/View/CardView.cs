@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,21 +8,27 @@ using Utils;
 
 public class CardView : MonoBehaviour, IDrag, IDoubleClick
 {
+    public static float DefaultCardFlyTime = 0.2f;
+
     [SerializeField] protected GameObject _rotationRoot;
     [SerializeField] protected GameObject _back;
     [SerializeField] protected GameObject _front;
     [SerializeField] GameObject _lockedGO;
 
     protected Card _card;
-    private IGameController _controller;
+    private GameView _view;
     private Vector3 _positionOnStartDrag;
     private List<Collider2D> _overlappingColliders;
     private SpriteRenderer _rend;
     private TargetCardPileView _targetPile;
     private bool _dragging;
     private bool _animating;
+    private float _fadeTime;
+    private Coroutine _fadeCoroutine;
+
 
     public Card Card => _card;
+    private bool ViewRevealed => Mathf.Approximately(_rotationRoot.transform.localRotation.eulerAngles.y, 180f);
 
     void Awake()
     {
@@ -31,9 +38,9 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         _rend = _front.GetComponent<SpriteRenderer>();
     }
 
-    public void Init(IGameController controller)
+    public void Init(GameView gameView)
     {
-        _controller = controller;
+        _view = gameView;
     }
 
     void Update()
@@ -53,17 +60,14 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         Refresh();
     }
 
-    public void Reveal(bool reveal)
+    public void UpdateRevealed()
     {
-        _card.Show(reveal);
-        _front.SetActive(_card.Revealed);
-        _back.SetActive(!_card.Revealed);
+        _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
     }
 
     public virtual void Refresh(){
         _rend.sprite = CardUtils.GetCardSprite(Card);
-        _front.SetActive(_card.Revealed);
-        _back.SetActive(!_card.Revealed);
+        UpdateRevealed();
     }
 
     public void RefreshDynamicOffset(float offsetY, float offsetZ)
@@ -74,29 +78,27 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     public void PlayLocked()
     {
-        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
+        if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
         _lockedGO.SetActive(true);
         _lockedGO.GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 0.5f);
-        fadeCoroutine = StartCoroutine(FadeLocked());
+        _fadeCoroutine = StartCoroutine(FadeLocked());
     }
 
-    float fadeTime;
-    Coroutine fadeCoroutine;
     private IEnumerator FadeLocked()
     {
         SpriteRenderer r = _lockedGO.GetComponent<SpriteRenderer>();
-        fadeTime = 0f;
-        while (fadeTime < 0.5f)
+        _fadeTime = 0f;
+        while (_fadeTime < 0.5f)
         {
-            float newAlpha = Mathf.Lerp(0.5f, 0f, fadeTime);
+            float newAlpha = Mathf.Lerp(0.5f, 0f, _fadeTime);
             Color newColor = r.color;
             newColor.a = newAlpha;
             r.color = newColor;
             yield return null;
-            fadeTime += Time.deltaTime;
+            _fadeTime += Time.deltaTime;
         }
         _lockedGO.SetActive(false);
-        fadeCoroutine = null;
+        _fadeCoroutine = null;
     }
 
     private void Log(string message)
@@ -116,10 +118,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         PlayLocked();
     }
 
-    public void OnDoubleClickAttemptFailed()
-    {
-        PlayLocked();
-    }
+
 
     public void OnStartDrag()
     {
@@ -133,7 +132,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         if (_targetPile != null)
         {
-            bool successfulMove = _controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
+            bool successfulMove = _view.Controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
             if (!successfulMove)
             {
                 Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
@@ -175,9 +174,9 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
             }
 
             CardView otherCard = col.gameObject.GetComponent<CardView>();
-            if (_controller != null && otherCard != null && otherCard.Card != null)
+            if (otherCard != null && otherCard.Card != null)
             {
-                if (_controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileView targetPile))
+                if (_view.Controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileView targetPile))
                 {
                     if (targetPile != null && !piles.Contains(targetPile))
                     {
@@ -268,8 +267,9 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     #endregion
 
     #region Animation
-    public async Task AnimateCard(Vector3 targetPosition, float duration, bool withRevealFlip = false)
+    public async Task AnimateCard(Vector3 targetPosition, float duration)
     {
+        Debug.Log($"Card {_card} animating...");
         _animating = true;
 
         Vector3 start = new Vector3(transform.position.x, transform.position.y, -MyInputManager.DragDepth);
@@ -281,12 +281,16 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
             transform.position = Vector3.Lerp(start, goal, t);
-            if (withRevealFlip) transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
+            if (!ViewRevealed && Card.Revealed)
+                _rotationRoot.transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
             await Task.Yield();
         }
 
         transform.position = targetPosition;
+        _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
+
         _animating = false;
+        Debug.Log($"Card {_card} animated.");
     }
     #endregion
 
@@ -296,12 +300,18 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         return !_animating && Card.Free;
     }
+    public void OnDoubleClickAttemptFailed()
+    {
+        PlayLocked();
+    }
 
     public void OnDoubleClick()
     {
-        Log("Double click!");
+        Log($"Card {_card} double clicked!");
         if (_card == null) return;
-        _controller.CardDoubleClicked(_card, transform.position);
+        if (!_card.Revealed) return; //Ignores double clicks on stock
+
+        _view.Controller.CardDoubleClicked(_card, transform.position);
         Log($"{_card} Double Clicked!");
     }
     #endregion

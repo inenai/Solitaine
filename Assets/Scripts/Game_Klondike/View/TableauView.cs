@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using UnityEngine;
-using Utils;
 
 namespace Klondike
 {
@@ -13,95 +12,77 @@ namespace Klondike
         private const float _offsetY = -0.3f;
         private const float _offsetZ = -0.1f;
 
-        private List<CardView> _cardUIs;
-        private float _cardHeight;
+        private List<CardView> _cardViews;
 
         protected override void OnInit()
         {
-            _cardUIs = new();
-            _cardHeight = 0f;
+            _cardViews = new();
         }
 
-        private async Task<CardView> CreateCardUI(Transform transform)
+        public override Task Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition)
         {
-            GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform);
-            CardView cardUI = go.GetComponent<CardView>();
-            cardUI.Init(_controller);
-            if (_cardHeight == 0f)
-                _cardHeight = cardUI.GetComponent<Collider2D>().bounds.size.y;
-            return cardUI;
-        }
+            Debug.Log($"TableauView[{Index}] refreshing...");
+            _cardViews.Clear();
 
-        public override async Task Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition)
-        {
-            Card[] cards = tableauCards.Reverse().ToArray();
-            RemoveExtraCardUIs(cards.Length);
-
-            List<Task<CardView>> tasks = new();
-
-            for (int i = _cardUIs.Count; i < cards.Length; i++)
+            if (tableauCards.Count == 0)
             {
-                tasks.Add(CreateCardUI(transform));
+                Debug.Log($"TableauView[{Index}] refreshed.");
+                return Task.CompletedTask;
             }
 
-            CardView[] newCards = await Task.WhenAll(tasks);
+            Card[] cards = tableauCards.Reverse().ToArray();
+            foreach (Card card in cards)
+            {
+                _cardViews.Add(_view.Deck.GetCardView(card));
+            }
 
-            _cardUIs.AddRange(newCards);
-
-            if (_cardUIs.Count != cards.Length)
-                throw new Exception("Missmatch in tableau cards amount after initializing new cards");
+            CardView cardViewToAnimate = null;
+            Vector3 cardViewToAnimateTargetPos = default;
 
             for (int i = 0; i < cards.Length; i++)
             {
-                Transform desiredParent = i == 0 ? transform : _cardUIs[i - 1].transform;
-                if (_cardUIs[i].transform.parent != desiredParent)
+                Transform desiredParent = i == 0 ? transform : _cardViews[i - 1].transform;
+                if (_cardViews[i].transform.parent != desiredParent)
                 {
-                    _cardUIs[i].transform.SetParent(_cardUIs[i - 1].transform);
+                    _cardViews[i].transform.SetParent(desiredParent);
                 }
                 float yOffset = i == 0 ? 0f : _offsetY;
-                _cardUIs[i].LoadCardData(cards[i], yOffset, _offsetZ);
-            }
-
-            foreach (CardView cardUi in _cardUIs)
-            {
-                if (cardMoved == cardUi.Card)
+                _cardViews[i].LoadCardData(cards[i], yOffset, _offsetZ);
+                _cardViews[i].gameObject.name = $"Card_T{Index}_{cards[i]}";
+                if (cards[i] == cardMoved)
                 {
-                    Vector3 finalPosition = cardUi.transform.position;
-                    cardUi.transform.position = originalCardPosition;
-                    await cardUi.AnimateCard(finalPosition, 0.1f);
+                    cardViewToAnimate = _cardViews[i];
+                    cardViewToAnimateTargetPos = _cardViews[i].transform.position;
                 }
             }
 
-            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardUIs.Count + 1));
-            triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(),1f);
+            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardViews.Count + 1));
+            triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(), 1f);
+
+            if (cardViewToAnimate == null)
+            {
+                Debug.Log($"TableauView[{Index}] refreshed.");
+                return Task.CompletedTask;
+            }
+
+            cardViewToAnimate.transform.position = originalCardPosition;
+            return cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime);
         }
 
         private float GetHighlightYPos()
         {
-            if (_cardUIs.Count <= 1)
+            if (_cardViews.Count <= 1)
             {
                 return transform.position.y;
             }
 
-            return transform.position.y + _offsetY * (_cardUIs.Count - 1) / 2f;
+            return transform.position.y + _offsetY * (_cardViews.Count - 1) / 2f;
         }
 
         private float GetHighlightYScale()
         {
-            if (_cardUIs.Count == 0) return _cardHeight;
-            return _cardHeight + (-_offsetY) * (_cardUIs.Count - 1);
-        }
-
-        private void RemoveExtraCardUIs(int amountNeeded)
-        {
-            if (_cardUIs.Count <= amountNeeded) return;
-
-            while (_cardUIs.Count > amountNeeded)
-            {
-                CardView last = _cardUIs[^1];
-                Destroy(last.gameObject);
-                _cardUIs.RemoveAt(_cardUIs.Count - 1);
-            }
+            if (_cardViews.Count == 0) return _view.Deck.CardHeight;
+            return _view.Deck.CardHeight + (-_offsetY) * (_cardViews.Count - 1);
         }
     }
 }

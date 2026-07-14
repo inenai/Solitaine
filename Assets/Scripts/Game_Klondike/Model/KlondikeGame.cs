@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Common;
 using static Utils.Utils;
 using Utils;
@@ -10,43 +9,19 @@ namespace Klondike
 {
     public class KlondikeGame
     {
-        public Action OnWin;
         public KlondikeState State => _state;
         KlondikeState _state;
 
         #region initialization
-        public KlondikeGame()
+        public KlondikeGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
             _state = new KlondikeState();
-            ShuffleAndDeal();
+            ShuffleAndDeal(deck);
             Log();
         }
 
-        private void ShuffleAndDeal()
-        {
-            Log("Shuffling and dealing...");
-            Stack<Card> deck = CreateDeck(shuffle: true);
-
-            for (int i = 0; i < 7; i++)
-            {
-                for (int j = 0; j < i + 1; j++)
-                {
-                    Card nextCard = deck.Pop();
-                    if (i == j)
-                    {
-                        nextCard.Show(true);
-                        nextCard.FreeCard(true);
-                    }
-                    _state.Tableaus[i].Push(nextCard);
-                }
-            }
-
-            _state.StockPile = deck;
-            _state.OnRestocked();
-        }
-
-        private Stack<Card> CreateDeck(bool shuffle = false)
+        public static List<Card> CreateGameDeck()
         {
             List<Card> deck = new();
 
@@ -66,13 +41,30 @@ namespace Klondike
             {
                 deck.Add(new Card(CardSuit.CLUBS, i));
             }
+            return deck;
+        }
 
-            if (shuffle)
+        private void ShuffleAndDeal(List<Card> deck)
+        {
+            Log("Shuffling and dealing...");
+            Stack<Card> deckStack = new Stack<Card>(Shuffle(deck.ToArray()));
+
+            for (int i = 0; i < 7; i++)
             {
-                deck = Shuffle(deck.ToArray()).ToList();
+                for (int j = 0; j < i + 1; j++)
+                {
+                    Card nextCard = deckStack.Pop();
+                    if (i == j)
+                    {
+                        nextCard.Show(true);
+                        nextCard.FreeCard(true);
+                    }
+                    _state.Tableaus[i].Push(nextCard);
+                }
             }
 
-            return new Stack<Card>(deck);
+            _state.StockPile = deckStack;
+            _state.OnRestocked();
         }
         #endregion
 
@@ -93,7 +85,7 @@ namespace Klondike
                 if (Won())
                 {
                     _state.OnWin();
-                    OnWin?.Invoke();
+                    EventManager.GameWon();
                 }
             }
             return moveMade;
