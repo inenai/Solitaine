@@ -18,10 +18,51 @@ namespace Klondike
             _cardViews = new();
         }
 
-        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+
+        private Card[] ReloadCards(Stack<Card> tableauCards)
+        {
+            _cardViews.Clear();
+            Card[] cards = tableauCards.Reverse().ToArray();
+            foreach (Card card in cards)
+            {
+                _cardViews.Add(_view.Deck.GetCardView(card));
+            }
+            return cards;
+        }
+
+        private void UpdateCardView(int index, bool initRefresh, bool isCardMoved, string cardGOName)
+        {
+            Transform desiredParent = index == 0 ? transform : _cardViews[index - 1].transform;
+            if (_cardViews[index].transform.parent != desiredParent)
+            {
+                _cardViews[index].transform.SetParent(desiredParent);
+            }
+            float yOffset = index == 0 ? 0f : _offsetY;
+            _cardViews[index].RefreshDynamicOffset(yOffset, _offsetZ);
+            if (initRefresh)
+                _cardViews[index].UpdateRevealedState();
+            else
+                _cardViews[index].PlayRevealIfNeeded();
+            _cardViews[index].gameObject.name = cardGOName;
+        }
+
+        private void UpdateTriggerHightlight()
+        {
+            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardViews.Count + 1));
+            triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(), 1f);
+        }
+
+        private void AnimateCardMoved(CardView cardViewToAnimate, Vector3 originalCardPosition, Vector3 cardViewToAnimateTargetPos, Action onDone)
+        {
+            cardViewToAnimate.transform.position = originalCardPosition;
+            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
+        }
+
+        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool initRefresh)
         {
             Debug.Log($"TableauView[{Index}] refreshing...");
-            _cardViews.Clear();
+
+            Card[] cards = ReloadCards(tableauCards);
 
             if (tableauCards.Count == 0)
             {
@@ -30,35 +71,22 @@ namespace Klondike
                 return;
             }
 
-            Card[] cards = tableauCards.Reverse().ToArray();
-            foreach (Card card in cards)
-            {
-                _cardViews.Add(_view.Deck.GetCardView(card));
-            }
-
             CardView cardViewToAnimate = null;
             Vector3 cardViewToAnimateTargetPos = default;
 
-            for (int i = 0; i < cards.Length; i++)
+            for (int index = 0; index < cards.Length; index++)
             {
-                Transform desiredParent = i == 0 ? transform : _cardViews[i - 1].transform;
-                if (_cardViews[i].transform.parent != desiredParent)
+                bool isCardMoved = cards[index] == cardMoved;
+                string cardGOName = _cardViews[index].gameObject.name = $"Card_T{Index}_{cards[index]}";
+                UpdateCardView(index, initRefresh, isCardMoved, cardGOName);
+                if (isCardMoved)
                 {
-                    _cardViews[i].transform.SetParent(desiredParent);
-                }
-                float yOffset = i == 0 ? 0f : _offsetY;
-                _cardViews[i].RefreshDynamicOffset(yOffset, _offsetZ);
-                _cardViews[i].PlayRevealIfNeeded();
-                _cardViews[i].gameObject.name = $"Card_T{Index}_{cards[i]}";
-                if (cards[i] == cardMoved)
-                {
-                    cardViewToAnimate = _cardViews[i];
-                    cardViewToAnimateTargetPos = _cardViews[i].transform.position;
+                    cardViewToAnimate = _cardViews[index];
+                    cardViewToAnimateTargetPos = _cardViews[index].transform.position;
                 }
             }
 
-            triggerHighlight.transform.position = new Vector3(triggerHighlight.transform.position.x, GetHighlightYPos(), -0.1f * (_cardViews.Count + 1));
-            triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(), 1f);
+            UpdateTriggerHightlight();
 
             if (cardViewToAnimate == null)
             {
@@ -67,8 +95,7 @@ namespace Klondike
                 return;
             }
 
-            cardViewToAnimate.transform.position = originalCardPosition;
-            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
+            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, onDone);
         }
 
         private float GetHighlightYPos()

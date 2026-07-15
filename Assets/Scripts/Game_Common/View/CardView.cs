@@ -285,6 +285,12 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     Coroutine _revealCoroutine;
     public void PlayRevealIfNeeded()
     {
+        if (ViewRevealed && !Card.Revealed)
+        {
+            UpdateRevealedState();
+            return;
+        }
+
         if (!ViewRevealed && Card.Revealed)
         {
             if (_revealCoroutine != null) StopCoroutine(_revealCoroutine);

@@ -88,6 +88,17 @@
                 },
                 {
                     "name": "",
+                    "id": "fed74b48-30d9-47fc-bb74-4a437b9894b0",
+                    "path": "<Keyboard>/#(C)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "DoubleTap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ff53e781-49af-4659-8391-2af6c7269623",
                     "path": "<Keyboard>/#(D)",
                     "interactions": "",

@@ -72,7 +72,7 @@ namespace Klondike
             _ui.OnStartNewGame();
             ResetDeck();
             _game = new KlondikeGame(_deck);
-            RefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone);
+            DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
         }
 
         private void ResetDeck()
@@ -125,7 +125,7 @@ namespace Klondike
                 return false;
             }
 
-            return RefreshView(
+            return CheckRefreshView(
                 action.Invoke(), null, default, () =>
                 {
                     Status = GameStatus.LISTENING;
@@ -139,7 +139,7 @@ namespace Klondike
             if (Status != GameStatus.LISTENING) return false;
             Status = GameStatus.PROCESSING;
 
-            return RefreshView(
+            return CheckRefreshView(
                 _game.Action_TryMoveCardAutomatic(card), card, originalCardPosition, () =>
                 {
                     Status = GameStatus.LISTENING;
@@ -152,7 +152,7 @@ namespace Klondike
             if (Status != GameStatus.LISTENING) return false;
             Status = GameStatus.PROCESSING;
 
-            return RefreshView(
+            return CheckRefreshView(
                _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
                 {
                     Status = GameStatus.LISTENING;
@@ -192,47 +192,67 @@ namespace Klondike
         #endregion
 
         #region View
-        private bool RefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        private bool CheckRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             Debug.Log("RefreshView.");
-            bool gameStateChanged = pilesToRefresh.Count > 0;
-            if (gameStateChanged)
+            bool refreshNeeded = pilesToRefresh.Count > 0;
+            if (refreshNeeded)
             {
-                RefreshViewTask(pilesToRefresh, cardMoved, originalCardPosition, onDone);
+                DoRefreshView(pilesToRefresh, cardMoved, originalCardPosition, onDone);
             }
             else
             {
                 onDone?.Invoke();
             }
-            return gameStateChanged;
+            return refreshNeeded;
         }
 
-        private void RefreshViewTask(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        private void DoRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool initRefresh = false)
         {
             Debug.Log("RefreshViewTask.");
             _viewsRefreshing = 0;
+
+            void RefreshDone() { _viewsRefreshing--; }
+
             foreach (PileKind kind in pilesToRefresh)
             {
                 switch (kind)
                 {
                     case PileKind.WASTE:
                         _viewsRefreshing++;
-                        _view.RefreshWaste(CloneStack(_game.State.WastePile), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
+                        _view.RefreshWaste(
+                            CloneStack(_game.State.WastePile),
+                            cardMoved,
+                            originalCardPosition,
+                            RefreshDone);
                         break;
 
                     case PileKind.STOCK:
                         _viewsRefreshing++;
-                        _view.RefreshStock(CloneStack(_game.State.StockPile), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
+                        _view.RefreshStock(
+                            CloneStack(_game.State.StockPile),
+                            cardMoved,
+                            originalCardPosition,
+                            RefreshDone);
                         break;
 
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
-                        _view.RefreshFoundations(CardUtils.GetClonedStacks(_game.State.Foundations), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
+                        _view.RefreshFoundations(
+                            CardUtils.GetClonedStacks(_game.State.Foundations),
+                            cardMoved,
+                            originalCardPosition,
+                            RefreshDone);
                         break;
 
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
-                        _view.RefreshTableaus(CardUtils.GetClonedStacks(_game.State.Tableaus), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
+                        _view.RefreshTableaus(
+                            CardUtils.GetClonedStacks(_game.State.Tableaus),
+                            cardMoved,
+                            originalCardPosition,
+                            initRefresh,
+                            RefreshDone);
                         break;
                 }
             }
