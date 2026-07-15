@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Common;
 using UnityEngine;
 
-namespace Klondike
+namespace Common
 {
     [RequireComponent(typeof(Collider2D))]
     public class StockView : CardPileView, IClick

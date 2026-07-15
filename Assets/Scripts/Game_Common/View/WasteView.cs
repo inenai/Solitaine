@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Common;
 using UnityEngine;
 
-namespace Klondike
+namespace Common
 {
     public class WasteView : CardPileView
     {
