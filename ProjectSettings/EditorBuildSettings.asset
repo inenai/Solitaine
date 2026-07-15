@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 45cbef24ffee31c4e970a0670981a97d
   - enabled: 1
-    path: Assets/Scenes/Klondike.unity
+    path: Assets/Scenes/Game_Klondike.unity
     guid: cfc2b0458e09f4a428779f0e1de46305
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: c1a954184bd52f245b8d71736c08bd83, type: 2}

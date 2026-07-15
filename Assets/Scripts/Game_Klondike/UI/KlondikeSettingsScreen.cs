@@ -1,24 +1,21 @@
-using TMPro;
+using Common;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.UI;
 
 namespace Klondike
 {
-    public class KlondikeSettingsScreen : MonoBehaviour
+    public class KlondikeSettingsScreen : GameSettingsScreen
     {
-        [SerializeField] GameNavigator _navi;
         [SerializeField] ToggleGroup _drawOption;
         [SerializeField] Toggle _draw1Toggle;
         [SerializeField] Toggle _draw3Toggle;
 
         [SerializeField] ToggleGroup _restockOption;
-        [SerializeField] Toggle _restock3Toggle;
         [SerializeField] Toggle _restockInfToggle;
+        [SerializeField] Toggle _restock3Toggle;
 
-        void OnEnable()
+        public override void OnEnabled()
         {
-            EventManager.OnMenuOpened?.Invoke();
             ResetToggles();
             InitToggleGroups();
         }
@@ -67,38 +64,13 @@ namespace Klondike
             }
         }
 
-        private void Save()
+        public override void Save()
         {
             if (_draw1Toggle.isOn) KlondikeSettings.DrawAmount = 1;
             if (_draw3Toggle.isOn) KlondikeSettings.DrawAmount = 3;
 
             if (_restock3Toggle.isOn) KlondikeSettings.AvailableRestocks = 3;
             if (_restockInfToggle.isOn) KlondikeSettings.AvailableRestocks = -1;
-        }
-
-        public void SaveAndClose()
-        {
-            Save();
-            Close();
-        }
-
-        public void SaveAndStart()
-        {
-            Save();
-            Close();
-            _navi.LoadKlokdike();
-        }
-
-        public void SaveAndRestart()
-        {
-            Save();
-            Close();
-            EventManager.OnResetGameEvent?.Invoke();
-        }
-
-        private void Close(){
-            gameObject.SetActive(false);
-            EventManager.OnMenuClosed?.Invoke();
         }
     }
 }

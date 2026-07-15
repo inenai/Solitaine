@@ -1,3 +1,4 @@
+using Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,8 +18,27 @@ public class GameNavigator : MonoBehaviour
 #endif
     }
 
-    public void LoadKlokdike()
+    public void LoadGame(SolitaireKind kind)
     {
-        SceneManager.LoadScene("Klondike");
+        switch (kind)
+        {
+            case SolitaireKind.KLONDIKE:
+                LoadKlondike();
+                return;
+            case SolitaireKind.SAWAYAMA:
+                LoadSawayama();
+                return;
+        }
+    }
+
+    public void LoadKlondike()
+    {
+        SceneManager.LoadScene("Game_Klondike");
+    }
+
+    public void LoadSawayama()
+    {
+        SceneManager.LoadScene("Game_Sawayama");
     }
 }
+

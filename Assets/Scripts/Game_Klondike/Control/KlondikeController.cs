@@ -13,7 +13,7 @@ namespace Klondike
         [SerializeField] MyInputManager _input;
         [SerializeField] KlondikeConfig _defaultConfig;
         [SerializeField] KlondikeView _view;
-        [SerializeField] KlondikeUI _ui;
+        [SerializeField] GameUI _ui;
 
         private List<Card> _deck;
         private KlondikeGame _game;

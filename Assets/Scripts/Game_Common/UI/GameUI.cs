@@ -1,47 +1,64 @@
+using Klondike;
 using TMPro;
 using UnityEngine;
 
 namespace Common
 {
-    public abstract class GameUI : MonoBehaviour
+    [RequireComponent(typeof(GameNavigator))]
+    public class GameUI : MonoBehaviour, ISettingsManager
     {
-        [SerializeField] protected TextMeshProUGUI _winsTxt;
-        [SerializeField] protected ParticleSystem _victoryParticles;
-        [SerializeField] protected GameObject _settingsScreen;
 
-        protected IGameController _controller;
+        [SerializeField] private TextMeshProUGUI _gameLabel;
+        [SerializeField] private SolitaireKind _solitaireKind;
+        [SerializeField] private TextMeshProUGUI _winsTxt;
+        [SerializeField] private ParticleSystem _victoryParticles;
+        [SerializeField] private BaseSettingsScreen _settingsScreen;
 
-        protected abstract void OnInit();
+        private GameNavigator _navi;
+        private IGameController _controller;
 
         public void Init(IGameController controller)
         {
             _controller = controller;
-            OnInit();
+            _navi = GetComponent<GameNavigator>();
+            _gameLabel.text = _solitaireKind.ToString();
+            UpdateWins();
         }
 
-        public virtual void OnStartNewGame()
+        public void OnStartNewGame()
         {
             _victoryParticles.Stop();
         }
 
-        public virtual void OnGameWon()
+        public void OnGameWon()
         {
+            UpdateWins();
             _victoryParticles.Play();
         }
 
         public void OpenSettings()
         {
-            _settingsScreen.SetActive(true);
-        }
-
-        public void CloseSettings()
-        {
-            _settingsScreen.SetActive(false);
+            _settingsScreen.gameObject.SetActive(true);
         }
 
         public void RestartGame()
         {
             _controller.RestartGame();
+        }
+
+        private void UpdateWins()
+        {
+            int wins = 0;
+            switch (_solitaireKind)
+            {
+                case SolitaireKind.KLONDIKE:
+                    wins = KlondikeSettings.WinCount;
+                    break;
+                case SolitaireKind.SAWAYAMA:
+                    wins = 99999; //TODO
+                    break;
+            }
+            _winsTxt.text = $"Wins: {wins}";
         }
     }
 }

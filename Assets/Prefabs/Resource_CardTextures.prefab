@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6445489504315779692}
   - component: {fileID: 5007300405669799121}
   m_Layer: 0
-  m_Name: CardTextures
+  m_Name: Resource_CardTextures
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
