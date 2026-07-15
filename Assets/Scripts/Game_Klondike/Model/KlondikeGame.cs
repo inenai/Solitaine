@@ -409,13 +409,15 @@ namespace Klondike
                 case PileKind.WASTE:
                     return false;
                 case PileKind.FOUNDATION:
+                    bool tableauCardStackParent = sourcePileData.Kind == PileKind.TABLEAU
+                        && _state.Tableaus[sourcePileData.Index].Peek() != card;
                     bool first = card.Value == 1
                         && _state.Foundations[targetPileIndex].Stack.Count == 0;
                     bool next = card.Value > 1
                         && _state.Foundations[targetPileIndex].Stack.Count > 0
                         && _state.Foundations[targetPileIndex].Suit == card.Suit
                         && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
-                    return first || next;
+                    return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
                     bool kingToEmpty = _state.Tableaus[targetPileIndex].Count == 0
                         && card.Value == 13;
