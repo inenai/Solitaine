@@ -9,7 +9,7 @@ namespace Klondike
     {
         protected override void OnInit(){}
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool initRefresh, Action onDone)
         {
             Debug.Log($"Foundation[{Index}] refreshing...");
             if (cards.Count == 0)

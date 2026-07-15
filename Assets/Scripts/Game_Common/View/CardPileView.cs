@@ -17,7 +17,7 @@ namespace Common
         protected int _index = -1;
         protected GameView _view;
 
-        public abstract void Refresh(Stack<Card> cards,Card cardMoved, Vector3 originalCardPosition, Action onDone, bool initRefresh = false);
+        public abstract void Refresh(Stack<Card> cards,Card cardMoved, Vector3 originalCardPosition, bool isInitRefresh, Action onDone);
 
         public void Init(GameView gameView, int index = -1)
         {

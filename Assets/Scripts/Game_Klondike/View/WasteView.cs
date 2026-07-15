@@ -12,7 +12,7 @@ namespace Klondike
 
         protected override void OnInit() { }
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool isInitRefresh, Action onDone)
         {
             Debug.Log("WasteView refreshing...");
             if (cards.Count == 0)

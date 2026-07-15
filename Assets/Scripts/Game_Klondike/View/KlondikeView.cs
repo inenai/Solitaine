@@ -51,23 +51,23 @@ namespace Klondike
             return false;
         }
 
-        public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, Action onDone)
+        public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
         {
-            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, onDone);
+            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, isInitRefresh, onDone);
         }
 
-        public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, Action onDone)
+        public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
         {
-            _waste.Refresh(wasteCards, cardMoved, movedCardOriginalPosition, onDone);
+            _waste.Refresh(wasteCards, cardMoved, movedCardOriginalPosition, isInitRefresh, onDone);
         }
 
-        public void RefreshFoundations(List<Stack<Card>> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, Action onDone)
+        public void RefreshFoundations(List<Stack<Card>> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
         {
             _refreshFoundationsCoroutinesRunning = 0;
             for (int i = 0; i < _foundations.Length; i++)
             {
                 _refreshFoundationsCoroutinesRunning++;
-                _foundations[i].Refresh(foundationsCards[i], cardMoved, movedCardOriginalPosition, () =>
+                _foundations[i].Refresh(foundationsCards[i], cardMoved, movedCardOriginalPosition, isInitRefresh, () =>
                 {
                     _refreshFoundationsCoroutinesRunning--;
                 });
@@ -87,10 +87,10 @@ namespace Klondike
             for (int i = 0; i < _tableaus.Length; i++)
             {
                 _refreshTableausCoroutinesRunning++;
-                _tableaus[i].Refresh(tableausCards[i], cardMoved, movedCardOriginalPosition, () =>
+                _tableaus[i].Refresh(tableausCards[i], cardMoved, movedCardOriginalPosition, isInitRefresh, () =>
                 {
                     _refreshTableausCoroutinesRunning--;
-                },isInitRefresh);
+                });
             }
             StartCoroutine(WaitForTableausRefreshedCR(onDone));
         }

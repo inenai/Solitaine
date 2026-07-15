@@ -30,7 +30,7 @@ namespace Klondike
             return cards;
         }
 
-        private void UpdateCardView(int index, bool initRefresh, bool isCardMoved, string cardGOName)
+        private void UpdateCardView(int index, bool initRefresh, string cardGOName)
         {
             Transform desiredParent = index == 0 ? transform : _cardViews[index - 1].transform;
             if (_cardViews[index].transform.parent != desiredParent)
@@ -58,7 +58,7 @@ namespace Klondike
             cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
         }
 
-        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool initRefresh)
+        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool initRefresh, Action onDone)
         {
             Debug.Log($"TableauView[{Index}] refreshing...");
 
@@ -78,7 +78,7 @@ namespace Klondike
             {
                 bool isCardMoved = cards[index] == cardMoved;
                 string cardGOName = _cardViews[index].gameObject.name = $"Card_T{Index}_{cards[index]}";
-                UpdateCardView(index, initRefresh, isCardMoved, cardGOName);
+                UpdateCardView(index, initRefresh, cardGOName);
                 if (isCardMoved)
                 {
                     cardViewToAnimate = _cardViews[index];

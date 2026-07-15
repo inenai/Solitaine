@@ -72,7 +72,7 @@ namespace Klondike
             _ui.OnStartNewGame();
             ResetDeck();
             _game = new KlondikeGame(_deck);
-            DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
+            DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, isInitRefresh: true);
         }
 
         private void ResetDeck()
@@ -198,7 +198,7 @@ namespace Klondike
             bool refreshNeeded = pilesToRefresh.Count > 0;
             if (refreshNeeded)
             {
-                DoRefreshView(pilesToRefresh, cardMoved, originalCardPosition, onDone);
+                DoRefreshView(pilesToRefresh, onDone, cardMoved, originalCardPosition);
             }
             else
             {
@@ -207,7 +207,7 @@ namespace Klondike
             return refreshNeeded;
         }
 
-        private void DoRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool initRefresh = false)
+        private void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool isInitRefresh = false)
         {
             Debug.Log("RefreshViewTask.");
             _viewsRefreshing = 0;
@@ -224,6 +224,7 @@ namespace Klondike
                             CloneStack(_game.State.WastePile),
                             cardMoved,
                             originalCardPosition,
+                            isInitRefresh,
                             RefreshDone);
                         break;
 
@@ -233,6 +234,7 @@ namespace Klondike
                             CloneStack(_game.State.StockPile),
                             cardMoved,
                             originalCardPosition,
+                            isInitRefresh,
                             RefreshDone);
                         break;
 
@@ -242,6 +244,7 @@ namespace Klondike
                             CardUtils.GetClonedStacks(_game.State.Foundations),
                             cardMoved,
                             originalCardPosition,
+                            isInitRefresh,
                             RefreshDone);
                         break;
 
@@ -251,7 +254,7 @@ namespace Klondike
                             CardUtils.GetClonedStacks(_game.State.Tableaus),
                             cardMoved,
                             originalCardPosition,
-                            initRefresh,
+                            isInitRefresh,
                             RefreshDone);
                         break;
                 }
