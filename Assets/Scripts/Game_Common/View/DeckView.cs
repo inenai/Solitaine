@@ -1,5 +1,6 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 using Utils;
@@ -11,6 +12,7 @@ public class DeckView
     private GameView _gameView;
     private Dictionary<Card, CardView> _deckView;
     private float _cardHeight;
+    private int _coroutinesRunning;
 
     public DeckView(GameView view)
     {
@@ -18,15 +20,24 @@ public class DeckView
         _gameView = view;
     }
 
-    public async Task Load(List<Card> cards)
+    public void Load(List<Card> cards, Action onDone)
     {
         Debug.Log($"Load. Creating {cards.Count} cards...");
-        List<Task> tasks = new();
+        _coroutinesRunning = 0;
         foreach (Card card in cards)
         {
-            tasks.Add(CreateCardUI(_gameView.transform, card));
+            _coroutinesRunning++;
+            CreateCardUI(_gameView.transform, card, ()=>{
+                _coroutinesRunning--;
+            });
         }
-        await Task.WhenAll(tasks);
+        _gameView.StartCoroutine(WaitForAllCoroutinesDone(onDone));
+    }
+
+    private IEnumerator WaitForAllCoroutinesDone(Action onDone)
+    {
+        while (_coroutinesRunning > 0) yield return null;
+        onDone?.Invoke();
     }
 
     public CardView GetCardView(Card card)
@@ -36,17 +47,30 @@ public class DeckView
         return _deckView[card];
     }
 
-    private async Task CreateCardUI(Transform transform, Card card)
+    private void CreateCardUI(Transform transform, Card card, Action onDone)
     {
         //Debug.Log($"Create card {card}...");
-        GameObject go = await AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform);
-        //Debug.Log($"Create card {card} done.");
-        CardView cardView = go.GetComponent<CardView>();
-        cardView.Init(_gameView);
-        if (_cardHeight == 0f)
+        AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
+        {
+            InitCardGameObject(gameObject, card);
+            onDone?.Invoke();
+            //Debug.Log($"Create card {card} done.");
+
+        }, (errorMessage) => {
+            Debug.LogError(errorMessage);
+            onDone?.Invoke();
+        });
+    }
+
+    private void InitCardGameObject(GameObject gameObject, Card card)
+    {
+        gameObject.name = $"Card_{card}";
+        CardView cardView = gameObject.GetComponent<CardView>();
+        cardView.Init(_gameView, card);
+        if (_cardHeight == default)
+        {
             _cardHeight = cardView.GetComponent<Collider2D>().bounds.size.y;
-        cardView.LoadCardData(card);
+        }
         _deckView.Add(card, cardView);
-        go.name = $"Card_{card}";
     }
 }

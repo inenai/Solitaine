@@ -2,17 +2,16 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
-using System.Threading.Tasks;
 
 namespace Utils
 {
     public static class AssetManager
     {
-        public static void InstantiateAsync(string reference, Transform parent, Action<GameObject> onInstantiated, Action onError)
+        public static void InstantiateAsync(string reference, Transform parent, Action<GameObject> onInstantiated, Action<string> onError)
         {
             if (reference == null)
             {
-                onError?.Invoke();
+                onError?.Invoke("Cannot instantiate asset, reference argument is null!");
                 return;
             }
 
@@ -25,28 +24,9 @@ namespace Utils
                 }
                 else
                 {
-                    Debug.LogError($"Failed to load asset at {reference}. Status: {op.Status}");
-                    onError?.Invoke();
+                    onError?.Invoke($"Failed to load asset at {reference}: {op.OperationException.Message}");
                 }
             };
-        }
-
-        public static async Task<GameObject> InstantiateAsync(string reference, Transform parent)
-        {
-            if (reference == null)
-                throw new ArgumentNullException(nameof(reference));
-
-            var handle = Addressables.InstantiateAsync(reference, parent);
-
-            await handle.Task;
-
-            if (handle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogError($"Failed to load asset at {reference}. Status: {handle.Status}");
-                throw new Exception($"Failed to instantiate {reference}");
-            }
-
-            return handle.Result;
         }
     }
 }

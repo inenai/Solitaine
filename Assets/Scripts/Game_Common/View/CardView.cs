@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 using Utils;
@@ -14,6 +14,8 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     [SerializeField] protected GameObject _front;
     [SerializeField] GameObject _lockedGO;
 
+    public Card Card => _card;
+
     protected Card _card;
     private GameView _view;
     private Vector3 _positionOnStartDrag;
@@ -24,9 +26,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     private bool _animating;
     private float _fadeTime;
     private Coroutine _fadeCoroutine;
-
-
-    public Card Card => _card;
+    private Coroutine _animateCardCR;
     private bool ViewRevealed => Mathf.Approximately(_rotationRoot.transform.localRotation.eulerAngles.y, 180f);
 
     void Awake()
@@ -37,67 +37,34 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         _rend = _front.GetComponent<SpriteRenderer>();
     }
 
-    public void Init(GameView gameView)
+    public void Init(GameView gameView, Card card)
     {
         _view = gameView;
-    }
-
-    void Update()
-    {
-        //RefreshDEBUG();
-    }
-
-    public void LoadCardData(Card card, float offsetY = 0f, float offsetZ = 0f)
-    {
         _card = card;
-        RefreshDynamicOffset(offsetY, offsetZ);
+        UpdateView();
     }
 
-    public void LoadCardData(Card card)
+    void LateUpdate()
     {
-        _card = card;
-        Refresh();
+        if (_dragging && _overlappingColliders.Count > 0)
+        {
+            UpdateClosestTarget();
+        }
     }
 
-    public void UpdateRevealed()
+    public virtual void UpdateView()
     {
-        _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
-    }
-
-    public virtual void Refresh(){
         _rend.sprite = CardUtils.GetCardSprite(Card);
-        UpdateRevealed();
+        UpdateRevealedState();
+    }
+
+    public void UpdateRevealedState(){
+        _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
     }
 
     public void RefreshDynamicOffset(float offsetY, float offsetZ)
     {
         gameObject.transform.localPosition = new Vector3(0f, offsetY, offsetZ);
-        Refresh();
-    }
-
-    public void PlayLocked()
-    {
-        if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
-        _lockedGO.SetActive(true);
-        _lockedGO.GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 0.5f);
-        _fadeCoroutine = StartCoroutine(FadeLocked());
-    }
-
-    private IEnumerator FadeLocked()
-    {
-        SpriteRenderer r = _lockedGO.GetComponent<SpriteRenderer>();
-        _fadeTime = 0f;
-        while (_fadeTime < 0.5f)
-        {
-            float newAlpha = Mathf.Lerp(0.5f, 0f, _fadeTime);
-            Color newColor = r.color;
-            newColor.a = newAlpha;
-            r.color = newColor;
-            yield return null;
-            _fadeTime += Time.deltaTime;
-        }
-        _lockedGO.SetActive(false);
-        _fadeCoroutine = null;
     }
 
     private void Log(string message)
@@ -116,8 +83,6 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         PlayLocked();
     }
-
-
 
     public void OnStartDrag()
     {
@@ -212,14 +177,6 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         UpdateClosestTarget();
     }
 
-    void LateUpdate()
-    {
-        if (_dragging && _overlappingColliders.Count > 0)
-        {
-            UpdateClosestTarget();
-        }
-    }
-
     private void UpdateClosestTarget()
     {
         _targetPile = null;
@@ -266,7 +223,13 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     #endregion
 
     #region Animation
-    public async Task AnimateCard(Vector3 targetPosition, float duration)
+    public void AnimateCard(Vector3 targetPosition, float duration, Action onDone)
+    {
+        if (_animateCardCR != null) StopCoroutine(_animateCardCR);
+        _animateCardCR = StartCoroutine(AnimateCardCR(targetPosition, duration, onDone));
+    }
+
+    public IEnumerator AnimateCardCR(Vector3 targetPosition, float duration, Action onDone)
     {
         Debug.Log($"Card {_card} animating...");
         _animating = true;
@@ -282,14 +245,67 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
             transform.position = Vector3.Lerp(start, goal, t);
             if (!ViewRevealed && Card.Revealed)
                 _rotationRoot.transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
-            await Task.Yield();
+            yield return null;
         }
 
         transform.position = targetPosition;
-        _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
+        UpdateRevealedState();
 
         _animating = false;
         Debug.Log($"Card {_card} animated.");
+        _animateCardCR = null;
+        onDone?.Invoke();
+    }
+
+    public void PlayLocked()
+    {
+        if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
+        _lockedGO.SetActive(true);
+        _lockedGO.GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 0.5f);
+        _fadeCoroutine = StartCoroutine(FadeLocked());
+    }
+
+    private IEnumerator FadeLocked()
+    {
+        SpriteRenderer r = _lockedGO.GetComponent<SpriteRenderer>();
+        _fadeTime = 0f;
+        while (_fadeTime < 0.5f)
+        {
+            float newAlpha = Mathf.Lerp(0.5f, 0f, _fadeTime);
+            Color newColor = r.color;
+            newColor.a = newAlpha;
+            r.color = newColor;
+            yield return null;
+            _fadeTime += Time.deltaTime;
+        }
+        _lockedGO.SetActive(false);
+        _fadeCoroutine = null;
+    }
+
+    Coroutine _revealCoroutine;
+    public void PlayRevealIfNeeded()
+    {
+        if (!ViewRevealed && Card.Revealed)
+        {
+            if (_revealCoroutine != null) StopCoroutine(_revealCoroutine);
+            _revealCoroutine = StartCoroutine(PlayRevealCR());
+        }
+    }
+
+    private IEnumerator PlayRevealCR()
+    {
+        float duration = 0.1f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            if (!ViewRevealed && Card.Revealed)
+                _rotationRoot.transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
+            yield return null;
+        }
+        UpdateRevealedState();
+        _revealCoroutine = null;
     }
     #endregion
 
@@ -312,13 +328,6 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
         _view.Controller.CardDoubleClicked(_card, transform.position);
         Log($"{_card} Double Clicked!");
-    }
-    #endregion
-
-    #region DEBUG
-    public void RefreshDEBUG()
-    {
-        _lockedGO.SetActive(Card != null ? !Card.Free : false);
     }
     #endregion
 }

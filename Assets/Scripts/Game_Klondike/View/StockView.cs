@@ -1,8 +1,7 @@
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
-using Utils;
 
 namespace Klondike
 {
@@ -14,20 +13,21 @@ namespace Klondike
 
         protected override void OnInit() {}
 
-        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             Debug.Log("StockView refreshing...");
             _restockLocked.SetActive(!_view.Controller.IsRestockAvailable(PileKind.STOCK));
             if (cards.Count == 0)
             {
                 Debug.Log("StockView refreshed.");
-                return Task.CompletedTask;
+                onDone?.Invoke();
+                return;
             }
 
             StackCardsInPosition(cards, _cardsRoot.position, transform, "Card_S_");
 
             Debug.Log("StockView refreshed.");
-            return Task.CompletedTask;
+            onDone?.Invoke();
         }
         public void OnClick()
         {

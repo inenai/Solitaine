@@ -1,7 +1,7 @@
 using Common;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using Utils;
 using static Utils.Utils;
@@ -18,6 +18,7 @@ namespace Klondike
         private List<Card> _deck;
         private KlondikeGame _game;
         private GameStatus _status = GameStatus.INITIALIZING;
+        private int _viewsRefreshing = 0;
 
         GameStatus Status
         {
@@ -83,11 +84,10 @@ namespace Klondike
             }
         }
 
-        private async void LoadDeckView(Action onDone)
+        private void LoadDeckView(Action onDone)
         {
             Debug.Log("LoadDeckView.");
-            await _view.Deck.Load(_deck);
-            onDone?.Invoke();
+            _view.Deck.Load(_deck,onDone);
         }
         #endregion
 
@@ -198,7 +198,7 @@ namespace Klondike
             bool gameStateChanged = pilesToRefresh.Count > 0;
             if (gameStateChanged)
             {
-                _ = RefreshViewTask(pilesToRefresh, cardMoved, originalCardPosition, onDone);
+                RefreshViewTask(pilesToRefresh, cardMoved, originalCardPosition, onDone);
             }
             else
             {
@@ -207,33 +207,42 @@ namespace Klondike
             return gameStateChanged;
         }
 
-        private async Task RefreshViewTask(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        private void RefreshViewTask(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             Debug.Log("RefreshViewTask.");
-            List<Task> tasks = new();
+            _viewsRefreshing = 0;
             foreach (PileKind kind in pilesToRefresh)
             {
                 switch (kind)
                 {
                     case PileKind.WASTE:
-                        tasks.Add(_view.RefreshWaste(CloneStack(_game.State.WastePile), cardMoved, originalCardPosition));
+                        _viewsRefreshing++;
+                        _view.RefreshWaste(CloneStack(_game.State.WastePile), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
                         break;
 
                     case PileKind.STOCK:
-                        tasks.Add(_view.RefreshStock(CloneStack(_game.State.StockPile), cardMoved, originalCardPosition));
+                        _viewsRefreshing++;
+                        _view.RefreshStock(CloneStack(_game.State.StockPile), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
                         break;
 
                     case PileKind.FOUNDATION:
-                        tasks.Add(_view.RefreshFoundations(CardUtils.GetClonedStacks(_game.State.Foundations), cardMoved, originalCardPosition));
+                        _viewsRefreshing++;
+                        _view.RefreshFoundations(CardUtils.GetClonedStacks(_game.State.Foundations), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
                         break;
 
                     case PileKind.TABLEAU:
-                        tasks.Add(_view.RefreshTableaus(CardUtils.GetClonedStacks(_game.State.Tableaus), cardMoved, originalCardPosition));
+                        _viewsRefreshing++;
+                        _view.RefreshTableaus(CardUtils.GetClonedStacks(_game.State.Tableaus), cardMoved, originalCardPosition, () => { _viewsRefreshing--; });
                         break;
                 }
             }
             Debug.Log("Await...");
-            await Task.WhenAll(tasks);
+            StartCoroutine(WaitForViewsToBeRefreshed(onDone));
+        }
+
+        private IEnumerator WaitForViewsToBeRefreshed(Action onDone)
+        {
+            while (_viewsRefreshing > 0) yield return null;
             Debug.Log("Done.");
             onDone?.Invoke();
         }

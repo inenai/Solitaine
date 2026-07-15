@@ -1,5 +1,6 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ namespace Klondike
         [SerializeField] WasteView _waste;
         [SerializeField] FoundationView[] _foundations;
         [SerializeField] TableauView[] _tableaus;
+
+        private int _refreshFoundationsCoroutinesRunning;
+        private int _refreshTableausCoroutinesRunning;
 
         protected override void OnInit()
         {
@@ -47,34 +51,54 @@ namespace Klondike
             return false;
         }
 
-        public Task RefreshStock(Stack<Card> stock, Card cardMoved, Vector3 originalCardPosition)
+        public void RefreshStock(Stack<Card> stock, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
-            return _stock.Refresh(stock, cardMoved, originalCardPosition);
+            _stock.Refresh(stock, cardMoved, originalCardPosition, onDone);
         }
 
-        public Task RefreshWaste(Stack<Card> waste, Card cardMoved, Vector3 originalCardPosition)
+        public void RefreshWaste(Stack<Card> waste, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
-            return _waste.Refresh(waste, cardMoved, originalCardPosition);
+            _waste.Refresh(waste, cardMoved, originalCardPosition, onDone);
         }
 
-        public Task RefreshFoundations(List<Stack<Card>> foundations, Card cardMoved, Vector3 originalCardPosition)
+        public void RefreshFoundations(List<Stack<Card>> foundations, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
-            List<Task> tasks = new();
+            _refreshFoundationsCoroutinesRunning = 0;
             for (int i = 0; i < _foundations.Length; i++)
             {
-                tasks.Add(_foundations[i].Refresh(foundations[i], cardMoved, originalCardPosition));
+                _refreshFoundationsCoroutinesRunning++;
+                _foundations[i].Refresh(foundations[i], cardMoved, originalCardPosition, () =>
+                {
+                    _refreshFoundationsCoroutinesRunning--;
+                });
             }
-            return Task.WhenAll(tasks);
+            StartCoroutine(WaitForFoundationsRefreshedCR(onDone));
         }
 
-        public Task RefreshTableaus(List<Stack<Card>> tableaus, Card cardMoved, Vector3 originalCardPosition)
+        private IEnumerator WaitForFoundationsRefreshedCR(Action onDone)
         {
-            List<Task> tasks = new();
+            while (_refreshFoundationsCoroutinesRunning > 0) yield return null;
+            onDone?.Invoke();
+        }
+
+        public void RefreshTableaus(List<Stack<Card>> tableaus, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        {
+            _refreshTableausCoroutinesRunning = 0;
             for (int i = 0; i < _tableaus.Length; i++)
             {
-                tasks.Add(_tableaus[i].Refresh(tableaus[i], cardMoved, originalCardPosition));
+                _refreshTableausCoroutinesRunning++;
+                _tableaus[i].Refresh(tableaus[i], cardMoved, originalCardPosition, () =>
+                {
+                    _refreshTableausCoroutinesRunning--;
+                });
             }
-            return Task.WhenAll(tasks);
+            StartCoroutine(WaitForTableausRefreshedCR(onDone));
+        }
+
+        private IEnumerator WaitForTableausRefreshedCR(Action onDone)
+        {
+            while (_refreshTableausCoroutinesRunning > 0) yield return null;
+            onDone?.Invoke();
         }
     }
 }

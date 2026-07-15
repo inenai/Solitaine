@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace Klondike
             _cardViews = new();
         }
 
-        public override Task Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition)
+        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             Debug.Log($"TableauView[{Index}] refreshing...");
             _cardViews.Clear();
@@ -27,7 +26,8 @@ namespace Klondike
             if (tableauCards.Count == 0)
             {
                 Debug.Log($"TableauView[{Index}] refreshed.");
-                return Task.CompletedTask;
+                onDone?.Invoke();
+                return;
             }
 
             Card[] cards = tableauCards.Reverse().ToArray();
@@ -47,7 +47,8 @@ namespace Klondike
                     _cardViews[i].transform.SetParent(desiredParent);
                 }
                 float yOffset = i == 0 ? 0f : _offsetY;
-                _cardViews[i].LoadCardData(cards[i], yOffset, _offsetZ);
+                _cardViews[i].RefreshDynamicOffset(yOffset, _offsetZ);
+                _cardViews[i].PlayRevealIfNeeded();
                 _cardViews[i].gameObject.name = $"Card_T{Index}_{cards[i]}";
                 if (cards[i] == cardMoved)
                 {
@@ -62,11 +63,12 @@ namespace Klondike
             if (cardViewToAnimate == null)
             {
                 Debug.Log($"TableauView[{Index}] refreshed.");
-                return Task.CompletedTask;
+                onDone?.Invoke();
+                return;
             }
 
             cardViewToAnimate.transform.position = originalCardPosition;
-            return cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime);
+            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
         }
 
         private float GetHighlightYPos()

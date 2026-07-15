@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using Utils;
 
@@ -18,7 +17,7 @@ namespace Common
         protected int _index = -1;
         protected GameView _view;
 
-        public abstract Task Refresh(Stack<Card> cards,Card cardMoved, Vector3 originalCardPosition);
+        public abstract void Refresh(Stack<Card> cards,Card cardMoved, Vector3 originalCardPosition, Action onDone);
 
         public void Init(GameView gameView, int index = -1)
         {
@@ -41,13 +40,13 @@ namespace Common
                 cv.transform.position = new Vector3(position.x, position.y, position.z + zOffset);
                 zOffset += CardUtils.CardStackZOffset;
                 cv.gameObject.name = $"{cardPrefix}{card}";
-                cv.UpdateRevealed();
+                cv.UpdateRevealedState();
                 result.Add(cv);
             }
             return result;
         }
 
-        protected Task StackCardsInPositionWithAnimation(Stack<Card> cards, Vector3 position, Transform parent, string cardPrefix, Card cardMoved, Vector3 originalCardPosition)
+        protected void StackCardsInPositionWithAnimation(Stack<Card> cards, Vector3 position, Transform parent, string cardPrefix, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             float zOffset = CardUtils.CardStackZOffset;
             CardView cardViewToAnimate = null;
@@ -59,7 +58,7 @@ namespace Common
                 cv.transform.position = new Vector3(position.x, position.y, position.z + zOffset);
                 zOffset += CardUtils.CardStackZOffset;
                 cv.gameObject.name = $"{cardPrefix}{card}";
-                cv.UpdateRevealed();
+                cv.PlayRevealIfNeeded();
                 if (card == cardMoved)
                 {
                     cardViewToAnimate = cv;
@@ -69,11 +68,12 @@ namespace Common
 
             if (cardViewToAnimate == null)
             {
-                return Task.CompletedTask;
+                onDone?.Invoke();
+                return;
             }
 
             cardViewToAnimate.transform.position = originalCardPosition;
-            return cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime);
+            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
         }
     }
 }

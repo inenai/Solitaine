@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common;
 using UnityEngine;
 
@@ -12,13 +12,14 @@ namespace Klondike
 
         protected override void OnInit() { }
 
-        public override Task Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             Debug.Log("WasteView refreshing...");
             if (cards.Count == 0)
             {
                 Debug.Log("WasteView refreshed.");
-                return Task.CompletedTask;
+                onDone?.Invoke();
+                return;
             }
 
             _cardViews = StackCardsInPosition(cards, _cardPositions[0].position, transform, "Card_W_");
@@ -35,7 +36,7 @@ namespace Klondike
             }
 
             Debug.Log("WasteView refreshed.");
-            return Task.CompletedTask;
+            onDone?.Invoke();
         }
     }
 }
