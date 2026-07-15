@@ -38,5 +38,10 @@ namespace Common
         {
             _settingsScreen.SetActive(false);
         }
+
+        public void RestartGame()
+        {
+            _controller.RestartGame();
+        }
     }
 }

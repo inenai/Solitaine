@@ -19,10 +19,5 @@ namespace Klondike
         {
             _winsTxt.text = $"Wins: {KlondikeSettings.WinCount}";
         }
-        public void RestartGame()
-        {
-            _controller.RestartGame();
-        }
-
     }
 }
