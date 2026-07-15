@@ -17,4 +17,5 @@ public abstract class GameView : MonoBehaviour
     }
 
     protected abstract void OnInit();
+    public abstract bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result);
 }

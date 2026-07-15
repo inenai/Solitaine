@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Common;
 
 namespace Utils
 {
-    public static class Utils
+    public static class CommonUtils
     {
         public static IList<T> Shuffle<T>(IList<T> list)
         {

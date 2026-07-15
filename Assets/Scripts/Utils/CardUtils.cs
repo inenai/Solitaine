@@ -90,7 +90,7 @@ namespace Utils
             List<Stack<Card>> stacks = new();
             foreach (Foundation f in foundations)
             {
-                stacks.Add(Utils.CloneStack(f.Stack));
+                stacks.Add(CommonUtils.CloneStack(f.Stack));
             }
             return stacks;
         }
@@ -100,7 +100,7 @@ namespace Utils
             List<Stack<Card>> result = new();
             foreach (Stack<Card> s in stacks)
             {
-                result.Add(Utils.CloneStack(s));
+                result.Add(CommonUtils.CloneStack(s));
             }
             return result;
         }

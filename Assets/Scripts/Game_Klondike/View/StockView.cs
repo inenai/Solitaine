@@ -16,7 +16,7 @@ namespace Klondike
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool isInitRefresh, Action onDone)
         {
             Debug.Log("StockView refreshing...");
-            _restockLocked.SetActive(!_view.Controller.IsRestockAvailable(PileKind.STOCK));
+            _restockLocked.SetActive(!_view.Controller.IsRestockAvailable());
             if (cards.Count == 0)
             {
                 Debug.Log("StockView refreshed.");

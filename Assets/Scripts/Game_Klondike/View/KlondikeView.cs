@@ -32,7 +32,7 @@ namespace Klondike
             }
         }
 
-        public bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
+        public override bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
         {
             result = null;
             switch (cardOwnerData.Kind)
