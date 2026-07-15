@@ -7,19 +7,6 @@ public static class EventManager
     public static Action OnResetGameEvent;
     public static Action OnDrawFromStockEvent;
     public static Action OnGameWon;
-
-    public static void ResetGameEvent()
-    {
-        OnResetGameEvent?.Invoke();
-    }
-
-    public static void DrawFromStockEvent()
-    {
-        OnDrawFromStockEvent?.Invoke();
-    }
-
-    public static void GameWon()
-    {
-        OnGameWon?.Invoke();
-    }
+    public static Action OnMenuOpened;
+    public static Action OnMenuClosed;
 }

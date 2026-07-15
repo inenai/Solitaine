@@ -85,7 +85,7 @@ namespace Klondike
                 if (Won())
                 {
                     _state.OnWin();
-                    EventManager.GameWon();
+                    EventManager.OnGameWon?.Invoke();
                 }
             }
             return moveMade;

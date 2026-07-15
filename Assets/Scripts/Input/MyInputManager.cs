@@ -75,12 +75,12 @@ namespace Common
 
       private void Action_ResetGame(InputAction.CallbackContext context)
       {
-         EventManager.ResetGameEvent();
+         EventManager.OnResetGameEvent?.Invoke();
       }
 
       private void Action_DrawFromStock(InputAction.CallbackContext context)
       {
-         EventManager.DrawFromStockEvent();
+         EventManager.OnDrawFromStockEvent?.Invoke();
       }
 
       private void Action_PointerPressed(InputAction.CallbackContext context)

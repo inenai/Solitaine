@@ -177,20 +177,6 @@ namespace Klondike
         }
         #endregion
 
-        #region UI
-        public void OpenSettings()
-        {
-            _input.Pause(true);
-            _ui.OpenSettings();
-        }
-
-        public void CloseSettings()
-        {
-            _input.Pause(false);
-            _ui.CloseSettings();
-        }
-        #endregion
-
         #region View
         private bool CheckRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
@@ -278,6 +264,8 @@ namespace Klondike
             EventManager.OnResetGameEvent += OnResetGameEvent;
             EventManager.OnDrawFromStockEvent += OnDrawFromStockEvent;
             EventManager.OnGameWon += OnGameWon;
+            EventManager.OnMenuClosed += OnMenuClosed;
+            EventManager.OnMenuOpened += OnMenuOpened;
         }
 
         private void DeregisterFromEvents()
@@ -285,6 +273,8 @@ namespace Klondike
             EventManager.OnResetGameEvent -= OnResetGameEvent;
             EventManager.OnDrawFromStockEvent -= OnDrawFromStockEvent;
             EventManager.OnGameWon -= OnGameWon;
+            EventManager.OnMenuClosed -= OnMenuClosed;
+            EventManager.OnMenuOpened -= OnMenuOpened;
         }
 
         private void OnResetGameEvent()
@@ -301,6 +291,16 @@ namespace Klondike
         {
             KlondikeSettings.WinCount++;
             _ui.OnGameWon();
+        }
+
+        private void OnMenuOpened()
+        {
+            _input.Pause(true);
+        }
+
+        private void OnMenuClosed()
+        {
+            _input.Pause(false);
         }
         #endregion
     }
