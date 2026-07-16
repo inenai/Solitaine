@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using NUnit.Framework.Constraints;
+using Unity.Collections;
 using UnityEngine;
 using Utils;
 
@@ -12,7 +14,7 @@ namespace Sawayama
         public SawayamaState SState => _state;
         protected override string DebugTag => "Sawayama";
         public int DrawCount => 3;
-        private bool _dealt;
+        private bool _drewAllCardsFromStock;
 
         SawayamaState _state;
 
@@ -21,7 +23,7 @@ namespace Sawayama
         {
             Log("Starting a Klondike game.");
             _state = new SawayamaState();
-            ShuffleDeck(deck);
+            ShuffleAndDealDeck(deck);
             Log();
         }
 
@@ -48,11 +50,49 @@ namespace Sawayama
             return deck;
         }
 
-        private void ShuffleDeck(List<Card> deck)
+        private void ShuffleAndDealDeck(List<Card> deck)
         {
             Log("Shuffling and dealing...");
             Stack<Card> deckStack = new Stack<Card>(CommonUtils.Shuffle(deck.ToArray()));
             _state.StockPile = deckStack;
+            Deal();
+        }
+
+        private void Deal()
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < i + 1; j++)
+                {
+                    Card nextCard = _state.StockPile.Pop();
+                    nextCard.Show(true);
+                    if (i == j)
+                    {
+                        nextCard.FreeCard(true);
+                    }
+                    _state.Tableaus[i].Push(nextCard);
+                }
+            }
+            UpdateFreeCards();
+        }
+
+        private void UpdateFreeCards()
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < _state.Tableaus[i].Count; j++)
+                {
+                    if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                    if (j > 0)
+                    {
+                        if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
+                        {
+                            _state.Tableaus[i].ElementAt(j).FreeCard(true);
+                        }
+                        else break;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -71,19 +111,7 @@ namespace Sawayama
         {
             List<PileKind> affectedPiles = new List<PileKind>();
 
-            bool uiRefreshNeeded = ExecuteAction(() =>
-            {
-                return TryDealCards();
-            });
-
-            if (uiRefreshNeeded)
-            {
-                affectedPiles.Add(PileKind.STOCK);
-                affectedPiles.Add(PileKind.TABLEAU);
-                return affectedPiles;
-            }
-
-            uiRefreshNeeded = ExecuteAction(() =>
+           bool uiRefreshNeeded = ExecuteAction(() =>
             {
                 return TryDrawCardsFromStock();
             });
@@ -120,6 +148,9 @@ namespace Sawayama
                     case PileKind.TABLEAU:
                         cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
                         break;
+                    case PileKind.STOCK:
+                        cardMoved = TryMoveCardToStock(card);
+                        break;
                 }
 
                 if (cardMoved)
@@ -138,50 +169,10 @@ namespace Sawayama
 
         #region InnerActions
         // DEAL
-        private bool TryDealCards()
-        {
-            Log("INNER TryDealCards");
-            if (!_dealt)
-            {
-                for (int i = 0; i < 7; i++)
-                {
-                    for (int j = 0; j < i + 1; j++)
-                    {
-                        Card nextCard = _state.StockPile.Pop();
-                        nextCard.Show(true);
-                        if (i == j)
-                        {
-                            nextCard.FreeCard(true);
-                        }
-                        _state.Tableaus[i].Push(nextCard);
-                    }
-                }
-                //REFRESH WHICH CARDS ARE FREE
-                for (int i = 0; i < 7; i++)
-                {
-                    for (int j = 0; j < _state.Tableaus[i].Count; j++)
-                    {
-                        if (_state.Tableaus[i].ElementAt(j).Free) continue;
-                        if (j > 0)
-                        {
-                            if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
-                            {
-                                _state.Tableaus[i].ElementAt(j).FreeCard(true);
-                            }
-                            else break;
-                        }
-                    }
-                }
-                _dealt = true;
-                return true;
-            }
-            return false;
-        }
-
         private bool TryDrawCardsFromStock()
         {
             Log("INNER TryDrawCardsFromStock");
-            if (_state.StockPile.Count == 0)
+            if (_drewAllCardsFromStock || _state.StockPile.Count == 0)
             {
                 return false;
             }
@@ -198,6 +189,12 @@ namespace Sawayama
                     _state.WastePile.Push(nextCard);
                 }
                 else break;
+            }
+
+            if (_state.StockPile.Count == 0)
+            {
+                _drewAllCardsFromStock = true;
+                EventManager.OnStockEmpty?.Invoke();
             }
 
             if (_state.WastePile.TryPeek(out topCard))
@@ -260,21 +257,33 @@ namespace Sawayama
                         {
                             fromTableau.Peek().Show(true);
                             fromTableau.Peek().FreeCard(true);
+                            UpdateFreeCards();
                         }
                         while (tempStack.Count > 0)
                         {
                             _state.Tableaus[index].Push(tempStack.Pop());
                         }
                         break;
-                    case PileKind.FOUNDATION:
-                        RemoveCardFromPile(card);
-                        _state.Tableaus[index].Push(card);
-                        break;
                     case PileKind.WASTE:
                         RemoveCardFromPile(card);
                         _state.Tableaus[index].Push(card);
                         break;
+                    case PileKind.STOCK:
+                        RemoveCardFromPile(card);
+                        _state.Tableaus[index].Push(card);
+                        break;
                 }
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryMoveCardToStock(Card card)
+        {
+            if (CanAddCardToPile(card, PileKind.STOCK, -1))
+            {
+                RemoveCardFromPile(card);
+                _state.StockPile.Push(card);
                 return true;
             }
             return false;
@@ -305,6 +314,9 @@ namespace Sawayama
                         }
                     }
                     break;
+                case PileKind.STOCK:
+                    _state.StockPile.Pop();
+                    break;
             }
         }
         #endregion
@@ -313,7 +325,7 @@ namespace Sawayama
         private bool ValidTableauCardStack(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
-            Debug.Log($"Valid Tableau Stack {child} > {parent}?");
+            //Debug.Log($"Valid Tableau Stack {child} > {parent}?");
             bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
             return !sameColor && child.Value == parent.Value - 1;
         }

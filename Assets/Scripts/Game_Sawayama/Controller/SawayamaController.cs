@@ -138,5 +138,10 @@ namespace Sawayama
         {
             SawayamaSettings.WinCount++;
         }
+
+        protected override void ResetView()
+        {
+            _view.Reset();
+        }
     }
 }

@@ -150,5 +150,10 @@ namespace Klondike
             Debug.Log("Done.");
             onDone?.Invoke();
         }
+
+        protected override void ResetView()
+        {
+
+        }
     }
 }

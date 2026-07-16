@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Common
 {
     [RequireComponent(typeof(Collider2D))]
-    public class StockView : CardPileView, IClick
+    public class StockView : TargetCardPileView, IClick
     {
         [SerializeField] GameObject _restockLocked;
         [SerializeField] Transform _cardsRoot;

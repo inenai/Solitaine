@@ -29,6 +29,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     protected abstract void InitView();
     protected abstract void CreateDeck();
     protected abstract void CreateGame();
+    protected abstract void ResetView();
     protected abstract void InitConfig();
     protected abstract void UpdateWinsCount();
     protected abstract void LoadDeckView(Action onDone);
@@ -70,6 +71,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     {
         _ui.OnStartNewGame();
         ResetDeck();
+        ResetView();
         CreateGame();
         DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
     }
