@@ -5,11 +5,15 @@ namespace Common
 {
    public class MyInputManager : MonoBehaviour
    {
+      [Header("Settings")]
+      [SerializeField] private bool dragEnabled;
+      [SerializeField] private bool pickUpEnabled;
+      [SerializeField] private bool doubleClickEnabled;
+
       [Header("Input References")]
       [SerializeField] private InputActionReference pointerMovedAction;
       [SerializeField] private InputActionReference pointerDownAction;
       [SerializeField] private InputActionReference doublePressAction;
-
       [SerializeField] private InputActionReference resetGameAction;
       [SerializeField] private InputActionReference drawFromStockAction;
 
@@ -40,32 +44,40 @@ namespace Common
       {
          pointerMovedAction.action.Enable();
          pointerDownAction.action.Enable();
-         doublePressAction.action.Enable();
          resetGameAction.action.Enable();
          drawFromStockAction.action.Enable();
 
          pointerDownAction.action.performed += Action_PointerPressed;
          pointerMovedAction.action.performed += Action_PointerMoved;
          pointerDownAction.action.canceled += Action_PointerReleased;
-         doublePressAction.action.performed += Action_DoublePressed;
          resetGameAction.action.performed += Action_ResetGame;
          drawFromStockAction.action.performed += Action_DrawFromStock;
+
+         if (doubleClickEnabled)
+         {
+            doublePressAction.action.Enable();
+            doublePressAction.action.performed += Action_DoublePressed;
+         }
       }
 
       private void OnDisable()
       {
          pointerMovedAction.action.Disable();
          pointerDownAction.action.Disable();
-         doublePressAction.action.Disable();
          resetGameAction.action.Disable();
          drawFromStockAction.action.Disable();
 
          pointerDownAction.action.performed -= Action_PointerPressed;
          pointerMovedAction.action.performed -= Action_PointerMoved;
          pointerDownAction.action.canceled -= Action_PointerReleased;
-         doublePressAction.action.performed -= Action_DoublePressed;
          resetGameAction.action.performed -= Action_ResetGame;
          drawFromStockAction.action.performed -= Action_DrawFromStock;
+
+         if (doubleClickEnabled)
+         {
+            doublePressAction.action.Disable();
+            doublePressAction.action.performed -= Action_DoublePressed;
+         }
       }
 
       public void Pause(bool pause)
@@ -75,11 +87,13 @@ namespace Common
 
       private void Action_ResetGame(InputAction.CallbackContext context)
       {
+         if (dragging) return;
          EventManager.OnResetGameEvent?.Invoke();
       }
 
       private void Action_DrawFromStock(InputAction.CallbackContext context)
       {
+         if (dragging) return;
          EventManager.OnDrawFromStockEvent?.Invoke();
       }
 
@@ -96,7 +110,19 @@ namespace Common
             // Debug.Log("[InputManager] Collider hit!");
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
-            TryBeginDrag(hit.collider);
+
+            if (dragging && pickUpEnabled)
+            {
+               _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
+               _draggingObject = null;
+               Debug.Log("[InputManager] Drag ended");
+               return;
+            }
+
+            if (dragEnabled)
+            {
+               TryBeginDrag(hit.collider);
+            }
             TryBeginClick(hit.collider);
          }
       }
@@ -126,7 +152,7 @@ namespace Common
          // Debug.Log("[InputManager] Pointer released");
          if (_paused) return;
 
-         if (dragging)
+         if (dragging && !pickUpEnabled)
          {
             _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
             _draggingObject = null;
@@ -141,16 +167,25 @@ namespace Common
             if (hit.collider != null)
             {
                IClick c = hit.collider.gameObject.GetComponent<IClick>();
-               if (c != null && hit.collider.gameObject == _clickingObject)
+               bool clickable = c != null;
+
+               if (clickable)
                {
-                  if (c.CanClick())
+                  //ICLICK
+                  if (hit.collider.gameObject == _clickingObject)
                   {
-                     c.OnClick();
+                     if (c.CanClick())
+                     {
+                        c.OnClick();
+                     }
+                     else
+                     {
+                        c.OnClickAttemptFailed();
+                     }
                   }
-                  else
-                  {
-                     c.OnClickAttemptFailed();
-                  }
+               } else if (pickUpEnabled)
+               {
+                  TryBeginDrag(hit.collider);
                }
             }
             _clickingObject = null;
@@ -213,10 +248,18 @@ namespace Common
       private void TryBeginClick(Collider2D collider)
       {
          IClick click = collider.gameObject.GetComponent<IClick>();
-         if (click != null)
+         if (click != null && !pickUpEnabled)
          {
             _clickingObject = collider.gameObject;
             Debug.Log("[InputManager] Click started");
+            return;
+         }
+
+         IDrag drag = collider.gameObject.GetComponent<IDrag>();
+         if (drag != null && pickUpEnabled)
+         {
+            TryBeginDrag(collider);
+            Debug.Log("[InputManager] Picked up something!");
          }
       }
    }

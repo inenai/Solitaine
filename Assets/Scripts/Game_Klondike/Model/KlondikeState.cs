@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Common;
+using UnityEngine;
 
 namespace Klondike
 {
-    public class KlondikeState
+    public class KlondikeState : IGameState
     {
         public Stack<Card> Deck;
         public Stack<Card> StockPile;
@@ -122,6 +123,28 @@ namespace Klondike
                 {
                     card.FreeCard(false);
                 }
+            }
+        }
+
+        public void LogState()
+        {
+            Debug.Log($"Stock ({StockPile.Count}): {string.Join(" ", StockPile)}");
+            if (StockPile.Count > 0) Debug.Log($"Top card in stock is: {StockPile.Peek()}");
+            Debug.Log($"Waste ({WastePile.Count}): {string.Join(" ", WastePile)}");
+            if (WastePile.Count > 0) Debug.Log($"Top card in waste is: {WastePile.Peek()}");
+
+            Debug.Log("Foundations:");
+            for (int i = 0; i < Foundations.Length; i++)
+            {
+                Debug.Log($"  F{i}: {string.Join(" ", Foundations[i].Stack)}");
+                if (Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {Foundations[i].Stack.Peek()}");
+            }
+
+            Debug.Log("Tableaus:");
+            for (int i = 0; i < Tableaus.Length; i++)
+            {
+                Debug.Log($"  T{i}: {string.Join(" ", Tableaus[i])}");
+                if (Tableaus[i].Count > 0) Debug.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
             }
         }
     }

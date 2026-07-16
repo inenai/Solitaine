@@ -51,23 +51,23 @@ namespace Klondike
             return false;
         }
 
-        public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
+        public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
-            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, isInitRefresh, onDone);
+            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
         }
 
-        public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
+        public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
-            _waste.Refresh(wasteCards, cardMoved, movedCardOriginalPosition, isInitRefresh, onDone);
+            _waste.Refresh(wasteCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
         }
 
-        public void RefreshFoundations(List<Stack<Card>> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
+        public void RefreshFoundations(List<Stack<Card>> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _refreshFoundationsCoroutinesRunning = 0;
             for (int i = 0; i < _foundations.Length; i++)
             {
                 _refreshFoundationsCoroutinesRunning++;
-                _foundations[i].Refresh(foundationsCards[i], cardMoved, movedCardOriginalPosition, isInitRefresh, () =>
+                _foundations[i].Refresh(foundationsCards[i], cardMoved, movedCardOriginalPosition, immediate, () =>
                 {
                     _refreshFoundationsCoroutinesRunning--;
                 });
@@ -81,13 +81,13 @@ namespace Klondike
             onDone?.Invoke();
         }
 
-        public void RefreshTableaus(List<Stack<Card>> tableausCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool isInitRefresh, Action onDone)
+        public void RefreshTableaus(List<Stack<Card>> tableausCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _refreshTableausCoroutinesRunning = 0;
             for (int i = 0; i < _tableaus.Length; i++)
             {
                 _refreshTableausCoroutinesRunning++;
-                _tableaus[i].Refresh(tableausCards[i], cardMoved, movedCardOriginalPosition, isInitRefresh, () =>
+                _tableaus[i].Refresh(tableausCards[i], cardMoved, movedCardOriginalPosition, immediate, () =>
                 {
                     _refreshTableausCoroutinesRunning--;
                 });

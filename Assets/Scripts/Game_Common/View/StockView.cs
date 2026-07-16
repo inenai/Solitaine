@@ -12,10 +12,12 @@ namespace Common
 
         protected override void OnInit() {}
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool isInitRefresh, Action onDone)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             Debug.Log("StockView refreshing...");
-            _restockLocked.SetActive(!_view.Controller.IsRestockAvailable());
+            if (_restockLocked != null)
+                _restockLocked.SetActive(!_view.Controller.IsRestockAvailable());
+
             if (cards.Count == 0)
             {
                 Debug.Log("StockView refreshed.");
@@ -28,11 +30,13 @@ namespace Common
             Debug.Log("StockView refreshed.");
             onDone?.Invoke();
         }
+
         public void OnClick()
         {
             Debug.Log($"Stock pile clicked!");
             _view.Controller.PileClicked(PileKind.STOCK, -1);
         }
+
         public bool CanClick()
         {
             return true;

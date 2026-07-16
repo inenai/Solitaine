@@ -1,11 +1,358 @@
+using System.Collections.Generic;
+using System.Linq;
+using Common;
+using UnityEngine;
+using Utils;
+
 namespace Sawayama
 {
-    public class SawayamaGame
+    public class SawayamaGame : Game
     {
-        public SawayamaState State => _state;
+        public override IGameState State => _state;
+        public SawayamaState SState => _state;
+        protected override string DebugTag => "Sawayama";
         public int DrawCount => 3;
+        private bool _dealt;
 
         SawayamaState _state;
 
+        #region initialization
+        public SawayamaGame(List<Card> deck)
+        {
+            Log("Starting a Klondike game.");
+            _state = new SawayamaState();
+            ShuffleDeck(deck);
+            Log();
+        }
+
+        public static List<Card> CreateGameDeck()
+        {
+            List<Card> deck = new();
+
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(CardSuit.HEARTS, i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(CardSuit.DIAMONDS, i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(CardSuit.SPADES, i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(CardSuit.CLUBS, i));
+            }
+            return deck;
+        }
+
+        private void ShuffleDeck(List<Card> deck)
+        {
+            Log("Shuffling and dealing...");
+            Stack<Card> deckStack = new Stack<Card>(CommonUtils.Shuffle(deck.ToArray()));
+            _state.StockPile = deckStack;
+        }
+        #endregion
+
+        protected override bool Won()
+        {
+            int total = 0;
+            foreach (Foundation f in _state.Foundations)
+            {
+                total += f.Stack.Count;
+            }
+            return total == 13 * 4;
+        }
+
+        #region UserInteraction
+        public List<PileKind> Action_TryDrawCardsFromStock()
+        {
+            List<PileKind> affectedPiles = new List<PileKind>();
+
+            bool uiRefreshNeeded = ExecuteAction(() =>
+            {
+                return TryDealCards();
+            });
+
+            if (uiRefreshNeeded)
+            {
+                affectedPiles.Add(PileKind.STOCK);
+                affectedPiles.Add(PileKind.TABLEAU);
+                return affectedPiles;
+            }
+
+            uiRefreshNeeded = ExecuteAction(() =>
+            {
+                return TryDrawCardsFromStock();
+            });
+
+            if (uiRefreshNeeded)
+            {
+                affectedPiles.Add(PileKind.WASTE);
+                affectedPiles.Add(PileKind.STOCK);
+            }
+            return affectedPiles;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="card"></param>
+        /// <param name="targetPileKind"></param>
+        /// <param name="targetPileIndex"></param>
+        /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
+        /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
+        public List<PileKind> Action_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
+        {
+            Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
+            List<PileKind> affectedPiles = new List<PileKind>();
+            PileData sourcePileData = _state.GetCardPileOwnerData(card);
+
+            ExecuteAction(() =>
+            {
+                bool cardMoved = false;
+                switch (targetPileKind)
+                {
+                    case PileKind.FOUNDATION:
+                        cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
+                        break;
+                    case PileKind.TABLEAU:
+                        cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
+                        break;
+                }
+
+                if (cardMoved)
+                {
+                    affectedPiles.Add(sourcePileData.Kind);
+                    if (sourcePileData.Kind != targetPileKind)
+                        affectedPiles.Add(targetPileKind);
+                }
+
+                return cardMoved;
+            });
+
+            return affectedPiles;
+        }
+        #endregion
+
+        #region InnerActions
+        // DEAL
+
+        private bool TryDealCards()
+        {
+            Log("INNER TryDealCards");
+            if (!_dealt)
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    for (int j = 0; j < i + 1; j++)
+                    {
+                        Card nextCard = _state.StockPile.Pop();
+                        nextCard.Show(true);
+                        if (i == j)
+                        {
+                            nextCard.FreeCard(true);
+                        }
+                        _state.Tableaus[i].Push(nextCard);
+                    }
+                }
+                //REFRESH WHICH CARDS ARE FREE
+                for (int i = 0; i < 7; i++)
+                {
+                    for (int j = 0; j < _state.Tableaus[i].Count; j++)
+                    {
+                        if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                        if (j > 0)
+                        {
+                            if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
+                            {
+                                _state.Tableaus[i].ElementAt(j).FreeCard(true);
+                            }
+                            else break;
+                        }
+                    }
+                }
+                _dealt = true;
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryDrawCardsFromStock()
+        {
+            Log("INNER TryDrawCardsFromStock");
+            if (_state.StockPile.Count == 0)
+            {
+                return false;
+            }
+
+            if (_state.WastePile.TryPeek(out var topCard))
+                topCard.FreeCard(false);
+
+            for (int i = 0; i < DrawCount; i++)
+            {
+                if (_state.StockPile.Count > 0)
+                {
+                    Card nextCard = _state.StockPile.Pop();
+                    nextCard.Show(true);
+                    _state.WastePile.Push(nextCard);
+                }
+                else break;
+            }
+
+            if (_state.WastePile.TryPeek(out topCard))
+                topCard.FreeCard(true);
+
+            return true;
+        }
+
+
+        //ADD TO ANY
+        private bool TryMoveCardToAnyFoundation(Card card)
+        {
+            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
+            for (int i = 0; i < _state.Foundations.Length; i++)
+            {
+                if (TryMoveCardToFoundationIndex(card, i))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //ADD TO INDEX
+        private bool TryMoveCardToFoundationIndex(Card card, int index)
+        {
+            Foundation foundation = _state.Foundations[index];
+            Log($"INNER TryMoveCardToFoundationIndex{card} > {foundation}]");
+            if (CanAddCardToPile(card, PileKind.FOUNDATION, index))
+            {
+                RemoveCardFromPile(card);
+                if (foundation.Stack.Count == 0)
+                    foundation.Suit = card.Suit;
+                else
+                    foundation.Stack.Peek().FreeCard(false);
+                foundation.Stack.Push(card);
+                card.FreeCard(false);
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryMoveCardsToTableauIndex(Card card, int index)
+        {
+            Log($"INNER TryMoveCardsToTableauIndex {card} > T[{index}]");
+            if (CanAddCardToPile(card, PileKind.TABLEAU, index)) //VALIDATION DONE
+            {
+                PileData sourcePileData = _state.GetCardPileOwnerData(card);
+                switch (sourcePileData.Kind)
+                {
+                    case PileKind.TABLEAU:
+                        Stack<Card> fromTableau = _state.Tableaus[sourcePileData.Index];
+
+                        Stack<Card> tempStack = new Stack<Card>();
+                        while (tempStack.Count == 0 || tempStack.Peek() != card)
+                        {
+                            tempStack.Push(fromTableau.Pop());
+                        }
+                        if (fromTableau.Count > 0)
+                        {
+                            fromTableau.Peek().Show(true);
+                            fromTableau.Peek().FreeCard(true);
+                        }
+                        while (tempStack.Count > 0)
+                        {
+                            _state.Tableaus[index].Push(tempStack.Pop());
+                        }
+                        break;
+                    case PileKind.FOUNDATION:
+                        RemoveCardFromPile(card);
+                        _state.Tableaus[index].Push(card);
+                        break;
+                    case PileKind.WASTE:
+                        RemoveCardFromPile(card);
+                        _state.Tableaus[index].Push(card);
+                        break;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        // REMOVE
+        private void RemoveCardFromPile(Card card)
+        {
+            Log($"INNER RemoveCardFromPile {card}");
+            PileData pileData = _state.GetCardPileOwnerData(card);
+            switch (pileData.Kind)
+            {
+                case PileKind.WASTE:
+                    _state.WastePile.Pop();
+                    if (_state.WastePile.Count > 0)
+                    {
+                        _state.WastePile.Peek().FreeCard(true);
+                    }
+                    break;
+                case PileKind.TABLEAU:
+                    if (_state.Tableaus[pileData.Index].Peek() == card)
+                    {
+                        _state.Tableaus[pileData.Index].Pop();
+                        if (_state.Tableaus[pileData.Index].Count > 0)
+                        {
+                            _state.Tableaus[pileData.Index].Peek().FreeCard(true);
+                            _state.Tableaus[pileData.Index].Peek().Show(true);
+                        }
+                    }
+                    break;
+            }
+        }
+        #endregion
+
+        #region Checks
+        private bool ValidTableauCardStack(Card child, Card parent)
+        {
+            if (child == null || parent == null) return false;
+            Debug.Log($"Valid Tableau Stack {child} > {parent}?");
+            bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
+            return !sameColor && child.Value == parent.Value - 1;
+        }
+
+        public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
+        {
+            PileData sourcePileData = State.GetCardPileOwnerData(card);
+            if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
+                return false;
+            if (sourcePileData.Kind == PileKind.FOUNDATION)
+                return false;
+
+            bool tableauCardStackParent = sourcePileData.Kind == PileKind.TABLEAU
+                                       && _state.Tableaus[sourcePileData.Index].Peek() != card;
+
+            switch (targetPile)
+            {
+                case PileKind.STOCK:
+                    bool stockEmpty = _state.StockPile.Count == 0;
+                    return stockEmpty && !tableauCardStackParent;
+                case PileKind.WASTE:
+                    return false;
+                case PileKind.FOUNDATION:
+                    bool first = card.Value == 1
+                        && _state.Foundations[targetPileIndex].Stack.Count == 0;
+                    bool next = card.Value > 1
+                        && _state.Foundations[targetPileIndex].Stack.Count > 0
+                        && _state.Foundations[targetPileIndex].Suit == card.Suit
+                        && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
+                    return !tableauCardStackParent && (first || next);
+                case PileKind.TABLEAU:
+                    bool toEmpty = _state.Tableaus[targetPileIndex].Count == 0;
+                    bool validMove = _state.Tableaus[targetPileIndex].Count > 0 &&
+                        ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                    return toEmpty || validMove;
+            }
+            return false;
+        }
+        #endregion
     }
 }

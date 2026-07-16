@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using Common;
 using static Utils.CommonUtils;
 using Utils;
-using UnityEngine;
 
 namespace Klondike
 {
-    public class KlondikeGame
+    public class KlondikeGame : Game
     {
-        public KlondikeState State => _state;
+        public override IGameState State => _state;
+        protected override string DebugTag => "Klondike";
+        public KlondikeState KState => _state;
         KlondikeState _state;
 
         #region initialization
@@ -66,32 +67,8 @@ namespace Klondike
             _state.StockPile = deckStack;
             _state.OnRestocked();
         }
-        #endregion
 
-        #region userInteraction
-
-        /// <summary>
-        /// Command Wrapper!
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns>Whether a UI refresh is needed</returns>
-        private bool ExecuteAction(Func<bool> action)
-        {
-            bool moveMade = action();
-
-            if (moveMade)
-            {
-                Log();
-                if (Won())
-                {
-                    _state.OnWin();
-                    EventManager.OnGameWon?.Invoke();
-                }
-            }
-            return moveMade;
-        }
-
-        public bool Won()
+        protected override bool Won()
         {
             int total = 0;
             foreach (Foundation f in _state.Foundations)
@@ -100,7 +77,9 @@ namespace Klondike
             }
             return total == 13 * 4;
         }
+        #endregion
 
+        #region userInteraction
         public List<PileKind> Action_TryDrawCardsFromStock()
         {
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -129,7 +108,7 @@ namespace Klondike
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
-            bool uiRefreshPending = ExecuteAction(() =>
+            ExecuteAction(() =>
             {
                 bool cardMoved = false;
 
@@ -186,7 +165,7 @@ namespace Klondike
             List<PileKind> affectedPiles = new List<PileKind>();
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
 
-            bool uiRefreshPending = ExecuteAction(() =>
+            ExecuteAction(() =>
             {
                 bool cardMoved = false;
                 switch (targetPileKind)
@@ -353,7 +332,7 @@ namespace Klondike
         private void RemoveCardFromPile(Card card)
         {
             Log($"INNER RemoveCardFromPile {card}");
-            PileData pileData = State.GetCardPileOwnerData(card);
+            PileData pileData = _state.GetCardPileOwnerData(card);
             switch (pileData.Kind)
             {
                 case PileKind.WASTE:
@@ -396,10 +375,10 @@ namespace Klondike
 
         public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
-            PileData sourcePileData = State.GetCardPileOwnerData(card);
+            PileData sourcePileData = _state.GetCardPileOwnerData(card);
             if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
                 return false;
-            if (sourcePileData.Kind == PileKind.FOUNDATION && !State.FoundationCardsFree)
+            if (sourcePileData.Kind == PileKind.FOUNDATION && !_state.FoundationCardsFree)
                 return false;
 
             switch (targetPile)
@@ -429,35 +408,6 @@ namespace Klondike
         }
         #endregion
 
-        #region utils
-        public void Log()
-        {
-            Debug.Log("=== SOLITAIRE STATE ===");
 
-            Debug.Log($"Stock ({_state.StockPile.Count}): {string.Join(" ", _state.StockPile)}");
-            if (_state.StockPile.Count > 0) Debug.Log($"Top card in stock is: {_state.StockPile.Peek()}");
-            Debug.Log($"Waste ({_state.WastePile.Count}): {string.Join(" ", _state.WastePile)}");
-            if (_state.WastePile.Count > 0) Debug.Log($"Top card in waste is: {_state.WastePile.Peek()}");
-
-            Debug.Log("Foundations:");
-            for (int i = 0; i < _state.Foundations.Length; i++)
-            {
-                Debug.Log($"  F{i}: {string.Join(" ", _state.Foundations[i].Stack)}");
-                if (_state.Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {_state.Foundations[i].Stack.Peek()}");
-            }
-
-            Debug.Log("Tableaus:");
-            for (int i = 0; i < _state.Tableaus.Length; i++)
-            {
-                Debug.Log($"  T{i}: {string.Join(" ", _state.Tableaus[i])}");
-                if (_state.Tableaus[i].Count > 0) Debug.Log($"Top card in T{i} is: {_state.Tableaus[i].Peek()}");
-            }
-        }
-
-        private void Log(string message)
-        {
-            Debug.Log($"[Klondike] {message}");
-        }
-        #endregion
     }
 }

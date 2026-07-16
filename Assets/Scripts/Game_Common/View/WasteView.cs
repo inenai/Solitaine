@@ -1,17 +1,27 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 namespace Common
 {
     public class WasteView : CardPileView
     {
-        [SerializeField] private Transform[] _cardPositions;
+        [SerializeField] private int _maxCardsInView = 1;
+        [SerializeField] private float _xOffset = 0.3f;
         protected List<CardView> _cardViews;
 
         protected override void OnInit() { }
+        private Vector3 GetPosition(int cardIndex, int slotIndex)
+        {
+            Vector3 position = new Vector3(
+                transform.position.x + _xOffset * slotIndex,
+                transform.position.y,
+                transform.position.z + CardUtils.CardStackZOffset * (cardIndex + 1));
+            return position;
+        }
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool isInitRefresh, Action onDone)
+        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             Debug.Log("WasteView refreshing...");
             if (cards.Count == 0)
@@ -21,17 +31,25 @@ namespace Common
                 return;
             }
 
-            _cardViews = StackCardsInPosition(cards, _cardPositions[0].position, transform, "Card_W_");
+            _cardViews = StackCardsInPosition(cards, GetPosition(0,0), transform, "Card_W_");
 
-            if (_cardViews.Count == 2)
+            int amount = _cardViews.Count;
+            for (int i = amount - 1; i >= amount - _maxCardsInView; i--)
             {
-                _cardViews[^1].transform.position = new Vector3(_cardPositions[1].position.x, _cardPositions[1].position.y, _cardViews[^1].transform.position.z);
-            }
+                if (i < 0) break;
+                int cardSlotIndex;
+                if (amount > _maxCardsInView)
+                {
+                    cardSlotIndex = i - (amount - _maxCardsInView);
+                }
+                else
+                {
+                    cardSlotIndex = i;
+                }
 
-            if (_cardViews.Count > 2)
-            {
-                _cardViews[^1].transform.position = new Vector3(_cardPositions[2].position.x, _cardPositions[2].position.y, _cardViews[^1].transform.position.z);
-                _cardViews[^2].transform.position = new Vector3(_cardPositions[1].position.x, _cardPositions[1].position.y, _cardViews[^2].transform.position.z);
+                _cardViews[i].transform.position = GetPosition(i, cardSlotIndex);
+
+                Debug.Log($"Card {_cardViews[i].Card} index {i} to card slot {cardSlotIndex}");
             }
 
             Debug.Log("WasteView refreshed.");

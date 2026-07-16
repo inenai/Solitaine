@@ -5,9 +5,9 @@ using UnityEngine;
 
 public abstract class GameController : MonoBehaviour, IGameController
 {
-    [SerializeField] private MyInputManager _input;
+    [SerializeField] protected MyInputManager _input;
+    [SerializeField] protected GameUI _ui;
 
-    [SerializeField] private GameUI _ui;
 
     protected List<Card> _deck;
     private GameStatus _status = GameStatus.INITIALIZING;
@@ -27,12 +27,12 @@ public abstract class GameController : MonoBehaviour, IGameController
     public abstract bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex);
     public abstract bool IsCardInTargetPile(Card card, out TargetCardPileView result);
     protected abstract void CreateGame();
-    protected abstract void InitView();
     protected abstract void InitConfig();
+    protected abstract void InitView();
     protected abstract void CreateDeck();
     protected abstract void UpdateWinsCount();
     protected abstract void LoadDeckView(Action onDone);
-    protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool isInitRefresh = false);
+    protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false);
 
     protected abstract Func<List<PileKind>> Action_PileClicked(PileKind kind);
     protected abstract List<PileKind> Action_DoubleClickedCard(Card card);
@@ -66,12 +66,14 @@ public abstract class GameController : MonoBehaviour, IGameController
         LoadDeckView(onDone);
     }
 
+
+
     private void StartNewGame(Action onDone)
     {
         _ui.OnStartNewGame();
         ResetDeck();
         CreateGame();
-        DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, isInitRefresh: true);
+        DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
     }
 
     private void ResetDeck()
@@ -140,18 +142,18 @@ public abstract class GameController : MonoBehaviour, IGameController
             Action_DragCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
-            });
+            }, true);
     }
     #endregion
 
     #region View
-    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool immediate = false)
     {
         Debug.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;
         if (refreshNeeded)
         {
-            DoRefreshView(pilesToRefresh, onDone, cardMoved, originalCardPosition);
+            DoRefreshView(pilesToRefresh, onDone, cardMoved, originalCardPosition, immediate);
         }
         else
         {
