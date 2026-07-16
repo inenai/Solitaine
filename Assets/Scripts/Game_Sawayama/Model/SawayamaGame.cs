@@ -138,7 +138,6 @@ namespace Sawayama
 
         #region InnerActions
         // DEAL
-
         private bool TryDealCards()
         {
             Log("INNER TryDealCards");

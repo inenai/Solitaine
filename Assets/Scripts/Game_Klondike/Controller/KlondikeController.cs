@@ -55,7 +55,7 @@ namespace Klondike
         protected override void LoadDeckView(Action onDone)
         {
             Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, onDone);
+            _view.Deck.Load(_deck, _view.StockTransform, onDone);
         }
 
         protected override void CreateDeck()

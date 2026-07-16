@@ -26,10 +26,10 @@ public abstract class GameController : MonoBehaviour, IGameController
     public abstract bool IsRestockAvailable();
     public abstract bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex);
     public abstract bool IsCardInTargetPile(Card card, out TargetCardPileView result);
-    protected abstract void CreateGame();
-    protected abstract void InitConfig();
     protected abstract void InitView();
     protected abstract void CreateDeck();
+    protected abstract void CreateGame();
+    protected abstract void InitConfig();
     protected abstract void UpdateWinsCount();
     protected abstract void LoadDeckView(Action onDone);
     protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false);
@@ -65,8 +65,6 @@ public abstract class GameController : MonoBehaviour, IGameController
         InitView();
         LoadDeckView(onDone);
     }
-
-
 
     private void StartNewGame(Action onDone)
     {

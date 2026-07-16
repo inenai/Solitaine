@@ -248,7 +248,7 @@ namespace Common
       private void TryBeginClick(Collider2D collider)
       {
          IClick click = collider.gameObject.GetComponent<IClick>();
-         if (click != null && !pickUpEnabled)
+         if (click != null)
          {
             _clickingObject = collider.gameObject;
             Debug.Log("[InputManager] Click started");

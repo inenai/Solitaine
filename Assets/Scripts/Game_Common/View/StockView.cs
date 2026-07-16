@@ -10,7 +10,8 @@ namespace Common
         [SerializeField] GameObject _restockLocked;
         [SerializeField] Transform _cardsRoot;
 
-        protected override void OnInit() {}
+        public Transform CardsRootTr => _cardsRoot;
+        protected override void OnInit() { }
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
