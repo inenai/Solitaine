@@ -16,10 +16,12 @@ namespace Klondike
         public int DrawCount => _drawAmount;
         public int AvailableRestocks => _availableRestocks;
         public bool FoundationCardsFree => _foundationCardsFree;
+        public bool AutoMovesEnabled => _autoMovesEnabled;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
         bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
+        bool _autoMovesEnabled = KlondikeSettings.DEFAULT_AUTO_MOVES_ENABLED;
 
         public KlondikeState()
         {
@@ -53,6 +55,7 @@ namespace Klondike
             _drawAmount = KlondikeSettings.DrawAmount;
             _availableRestocks = KlondikeSettings.AvailableRestocks;
             _foundationCardsFree = KlondikeSettings.FoundationCardsFree;
+            _autoMovesEnabled = KlondikeSettings.AutoMovesEnabled;
         }
 
         public PileData GetCardPileOwnerData(Card card)

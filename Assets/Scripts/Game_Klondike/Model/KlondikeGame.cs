@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Common;
 using static Utils.CommonUtils;
 using Utils;
+using UnityEngine;
 
 namespace Klondike
 {
@@ -362,6 +363,56 @@ namespace Klondike
                     break;
             }
         }
+
+        public Card GetSolvableCard()
+        {
+            Debug.Log("Looking for automatic move");
+
+            Card card;
+            _state.WastePile.TryPeek(out card);
+
+            if (card != null && IsSafeToMoveCardToFoundation(card))
+            {
+                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                if (CanMoveCardToAnyFoundation(card))
+                {
+                    Debug.Log($"{card} can be moved from waste to foundation.");
+                    return card;
+                }
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                _state.Tableaus[i].TryPeek(out card);
+                if (card != null && IsSafeToMoveCardToFoundation(card))
+                {
+                    Debug.Log($"Safe to move {card} to foundation. Can move?");
+                    if (CanMoveCardToAnyFoundation(card))
+                    {
+                        Debug.Log($"{card} can be moved from tableau[{i}] to foundation.");
+
+                        return card;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private bool CanMoveCardToAnyFoundation(Card card)
+        {
+            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
+            if (card.Value == 1) return true;
+
+            for (int i = 0; i < _state.Foundations.Length; i++)
+            {
+                if (_state.Foundations[i].Suit != card.Suit)
+                    continue;
+
+                return CanAddCardToPile(card, PileKind.FOUNDATION, i);
+            }
+            return false;
+        }
         #endregion
 
         #region Checks
@@ -405,6 +456,46 @@ namespace Klondike
                     return kingToEmpty || validMove;
             }
             return false;
+        }
+
+        private bool IsSafeToMoveCardToFoundation(Card card)
+        {
+            if (card.Value < 3) return true;
+            CardSuit[] oppositeColorSuites = CardUtils.GetOppositeColorSuits(card.Suit);
+
+            bool card1Found = false;
+            foreach (Foundation f in _state.Foundations)
+            {
+                if (f.Suit == oppositeColorSuites[0])
+                {
+                    foreach (Card c in f.Stack)
+                    {
+                        if (c.Value == card.Value - 2)
+                        {
+                            card1Found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!card1Found) return false;
+
+            bool card2found = false;
+            foreach (Foundation f in _state.Foundations)
+            {
+                if (f.Suit == oppositeColorSuites[1])
+                {
+                    foreach (Card c in f.Stack)
+                    {
+                        if (c.Value == card.Value - 2)
+                        {
+                            card2found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return card2found;
         }
         #endregion
 

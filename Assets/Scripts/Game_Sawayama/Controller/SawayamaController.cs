@@ -28,6 +28,11 @@ namespace Sawayama
             return false;
         }
 
+        public override bool IsAutoMovesEnabled()
+        {
+            return true;
+        }
+
         public override void ResetSettingsToDefault() {}
 
         protected override List<PileKind> Action_DoubleClickedCard(Card card)
@@ -48,6 +53,11 @@ namespace Sawayama
                 _ => null
             };
             return action;
+        }
+
+        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
+        {
+            return _game.Auto_MoveCardAutomatically(card);
         }
 
         protected override void CreateDeck()
@@ -142,6 +152,16 @@ namespace Sawayama
         protected override void ResetView()
         {
             _view.Reset();
+        }
+
+        protected override Card GetSolvableCard()
+        {
+           return _game.GetSolvableCard();
+        }
+
+        protected override Vector3 GetCardViewPosition(Card card)
+        {
+            return _view.GetCardViewPosition(card);
         }
     }
 }

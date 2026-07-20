@@ -45,6 +45,11 @@ public class DeckView
 
     public CardView GetCardView(Card card)
     {
+        if (_deckView == null)
+            throw new System.Exception($"DeckView is null!");
+        if (card == null)
+            throw new System.Exception($"Asked for a card view that is null!");
+
         if (!_deckView.ContainsKey(card))
             throw new System.Exception($"Asked for a card view that is not available in DeckView: {card}");
         return _deckView[card];

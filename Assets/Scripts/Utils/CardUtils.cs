@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Common;
 using UnityEngine;
@@ -105,5 +106,10 @@ namespace Utils
             return result;
         }
 
+        public static CardSuit[] GetOppositeColorSuits(CardSuit suit)
+        {
+            if (suit == CardSuit.HEARTS || suit == CardSuit.DIAMONDS) return new CardSuit[] { CardSuit.SPADES, CardSuit.CLUBS };
+            return new CardSuit[] { CardSuit.HEARTS, CardSuit.DIAMONDS };
+        }
     }
 }

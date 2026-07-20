@@ -34,6 +34,11 @@ namespace Klondike
             return _game.KState.AvailableRestocks != 0;
         }
 
+        public override bool IsAutoMovesEnabled()
+        {
+            return _game.KState.AutoMovesEnabled;
+        }
+
         protected override void CreateGame()
         {
             _game = new KlondikeGame(_deck);
@@ -154,6 +159,21 @@ namespace Klondike
         protected override void ResetView()
         {
 
+        }
+
+        protected override Card GetSolvableCard()
+        {
+            return _game.GetSolvableCard();
+        }
+
+        protected override Vector3 GetCardViewPosition(Card card)
+        {
+            return _view.GetCardViewPosition(card);
+        }
+
+        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
+        {
+            return _game.Action_TryMoveCardAutomatic(card);
         }
     }
 }

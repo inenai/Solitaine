@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Common;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public abstract class GameController : MonoBehaviour, IGameController
@@ -24,6 +25,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     public abstract void ResetSettingsToDefault();
     public abstract bool IsRestockAvailable();
+    public abstract bool IsAutoMovesEnabled();
     public abstract bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex);
     public abstract bool IsCardInTargetPile(Card card, out TargetCardPileView result);
     protected abstract void InitView();
@@ -32,12 +34,15 @@ public abstract class GameController : MonoBehaviour, IGameController
     protected abstract void ResetView();
     protected abstract void InitConfig();
     protected abstract void UpdateWinsCount();
+    protected abstract Card GetSolvableCard();
+    protected abstract Vector3 GetCardViewPosition(Card card);
     protected abstract void LoadDeckView(Action onDone);
     protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false);
 
     protected abstract Func<List<PileKind>> Action_PileClicked(PileKind kind);
     protected abstract List<PileKind> Action_DoubleClickedCard(Card card);
     protected abstract List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex);
+    protected abstract List<PileKind> Auto_MoveCardAutomatically(Card card);
 
     #region Initialization
     void Start()
@@ -73,7 +78,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         ResetDeck();
         ResetView();
         CreateGame();
-        DoRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
+        CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
     }
 
     private void ResetDeck()
@@ -153,7 +158,29 @@ public abstract class GameController : MonoBehaviour, IGameController
         bool refreshNeeded = pilesToRefresh.Count > 0;
         if (refreshNeeded)
         {
-            DoRefreshView(pilesToRefresh, onDone, cardMoved, originalCardPosition, immediate);
+            DoRefreshView(pilesToRefresh, () =>
+            {
+                if (IsAutoMovesEnabled())
+                {
+                    Card solvableCard = GetSolvableCard();
+                    if (solvableCard == null)
+                    {
+                        Debug.Log("No auto moves availables.");
+                        onDone?.Invoke();
+                        return;
+                    }
+
+                    Vector3 originalSolvableCardPosition = GetCardViewPosition(solvableCard);
+                    Debug.Log("Auto moves enabled. Solving automatic move.");
+                    CheckRefreshView(
+                        Auto_MoveCardAutomatically(solvableCard), solvableCard, originalSolvableCardPosition, onDone, false);
+                }
+                else
+                {
+                    Debug.Log("Auto moves not enabled.");
+                    onDone?.Invoke();
+                }
+            }, cardMoved, originalCardPosition, immediate);
         }
         else
         {
