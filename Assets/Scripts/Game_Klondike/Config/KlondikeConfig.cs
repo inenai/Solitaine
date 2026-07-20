@@ -11,10 +11,12 @@ namespace Klondike
         /// </summary>
         [SerializeField] int _availableRestocks = -1;
         [SerializeField] bool _foundationCardsFree = false;
+        [SerializeField] bool _autoMovesEnabled = false;
 
         public int DrawAmount => _drawAmount;
         public int AvailableRestocks => _availableRestocks;
         public bool FoundationCardsFree => _foundationCardsFree;
+        public bool AutoMovesEnabled => _autoMovesEnabled;
 
         [ContextMenu("Apply default Klondike settings")]
         public void ApplyDefaultSettings()

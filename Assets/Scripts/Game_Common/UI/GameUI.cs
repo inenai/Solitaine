@@ -1,4 +1,5 @@
 using Klondike;
+using Sawayama;
 using TMPro;
 using UnityEngine;
 
@@ -55,7 +56,7 @@ namespace Common
                     wins = KlondikeSettings.WinCount;
                     break;
                 case SolitaireKind.SAWAYAMA:
-                    wins = 99999; //TODO
+                    wins = SawayamaSettings.WinCount;
                     break;
             }
             _winsTxt.text = $"Wins: {wins}";

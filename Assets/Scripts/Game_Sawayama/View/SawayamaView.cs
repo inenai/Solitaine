@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Common;
 using UnityEngine;
 
-namespace Klondike
+namespace Sawayama
 {
-    public class KlondikeView : GameView
+    public class SawayamaView : GameView
     {
         //View
         [SerializeField] StockView _stock;
@@ -18,6 +18,12 @@ namespace Klondike
 
         private int _refreshFoundationsCoroutinesRunning;
         private int _refreshTableausCoroutinesRunning;
+        private bool _stockEmptied;
+
+        void Awake()
+        {
+            EventManager.OnStockEmpty += OnStockEmpty;
+        }
 
         protected override void OnInit()
         {
@@ -32,6 +38,11 @@ namespace Klondike
             {
                 _tableaus[i].Init(this, i);
             }
+        }
+
+        void OnDestroy()
+        {
+            EventManager.OnStockEmpty -= OnStockEmpty;
         }
 
         public override bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
@@ -101,6 +112,19 @@ namespace Klondike
         {
             while (_refreshTableausCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
+        }
+
+        private void OnStockEmpty()
+        {
+            if (_stockEmptied) return;
+            _stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, 0f);
+            _stockEmptied = true;
+        }
+
+        public void Reset()
+        {
+            _stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, -6f);
+            _stockEmptied = false;
         }
     }
 }

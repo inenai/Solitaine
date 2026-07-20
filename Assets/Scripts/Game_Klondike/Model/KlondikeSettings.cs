@@ -8,11 +8,13 @@ namespace Klondike
         const string DrawAmountKey = "KL_DRAW_AMOUNT";
         const string AvailableRestocksKey = "KL_AVAILABLE_RESTOCKS";
         const string FoundationCardsFreeKey = "KL_FOUNDATION_CARDS_FREE";
+        const string AutoMovesEnabledKey = "KL_AUTO_MOVES_ENABLED";
         const string KlondikeWinCountKey = "KL_WIN_COUNT";
 
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
         public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;
+        public const bool DEFAULT_AUTO_MOVES_ENABLED = false;
 
         public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(SavedSettingsFlag, 0) != 0;
 
@@ -72,6 +74,20 @@ namespace Klondike
             }
         }
 
+        public static bool AutoMovesEnabled
+        {
+            get
+            {
+                return PlayerPrefs.GetInt(AutoMovesEnabledKey, DEFAULT_AUTO_MOVES_ENABLED ? 1 : 0) != 0;
+            }
+            set
+            {
+                Log($"Auto moves enabled set to {value}");
+                PlayerPrefs.SetInt(AutoMovesEnabledKey, value ? 1 : 0);
+                Save();
+            }
+        }
+
         private static void Save()
         {
             PlayerPrefs.SetInt(SavedSettingsFlag, 1);
@@ -83,6 +99,7 @@ namespace Klondike
             PlayerPrefs.SetInt(DrawAmountKey, defaultConfig.DrawAmount);
             PlayerPrefs.SetInt(AvailableRestocksKey, defaultConfig.AvailableRestocks);
             PlayerPrefs.SetInt(FoundationCardsFreeKey, defaultConfig.FoundationCardsFree ? 1 : 0);
+            PlayerPrefs.SetInt(AutoMovesEnabledKey, defaultConfig.AutoMovesEnabled ? 1 : 0);
             Save();
         }
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Common;
 using UnityEngine;
 
-namespace Klondike
+namespace Sawayama
 {
-    public class KlondikeState : IGameState
+    public class SawayamaState : IGameState
     {
         public Stack<Card> Deck;
         public Stack<Card> StockPile;
@@ -13,19 +13,8 @@ namespace Klondike
         public Stack<Card>[] Tableaus;
         public Foundation[] Foundations;
 
-        public int DrawCount => _drawAmount;
-        public int AvailableRestocks => _availableRestocks;
-        public bool FoundationCardsFree => _foundationCardsFree;
-        public bool AutoMovesEnabled => _autoMovesEnabled;
-
-        int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
-        int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
-        bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
-        bool _autoMovesEnabled = KlondikeSettings.DEFAULT_AUTO_MOVES_ENABLED;
-
-        public KlondikeState()
+        public SawayamaState()
         {
-            ApplyConfig();
             InitFoundations();
             InitTableau();
             StockPile = new Stack<Card>();
@@ -48,14 +37,6 @@ namespace Klondike
             {
                 Tableaus[i] = new Stack<Card>();
             }
-        }
-
-        private void ApplyConfig()
-        {
-            _drawAmount = KlondikeSettings.DrawAmount;
-            _availableRestocks = KlondikeSettings.AvailableRestocks;
-            _foundationCardsFree = KlondikeSettings.FoundationCardsFree;
-            _autoMovesEnabled = KlondikeSettings.AutoMovesEnabled;
         }
 
         public PileData GetCardPileOwnerData(Card card)
@@ -110,12 +91,6 @@ namespace Klondike
             }
             //Debug.Log($"Card {card} found in {kind}[{index}]");
             return new PileData(kind, index);
-        }
-
-        public void OnRestocked()
-        {
-            if (_availableRestocks > 0)
-                _availableRestocks--;
         }
 
         public void OnWin()

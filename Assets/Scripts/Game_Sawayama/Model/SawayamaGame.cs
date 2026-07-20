@@ -1,25 +1,27 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using Common;
-using static Utils.CommonUtils;
-using Utils;
 using UnityEngine;
+using Utils;
 
-namespace Klondike
+namespace Sawayama
 {
-    public class KlondikeGame : Game
+    public class SawayamaGame : Game
     {
         public override IGameState State => _state;
-        protected override string DebugTag => "Klondike";
-        public KlondikeState KState => _state;
-        KlondikeState _state;
+        public SawayamaState SState => _state;
+        protected override string DebugTag => "Sawayama";
+        public int DrawCount => 3;
+        private bool _drewAllCardsFromStock;
+
+        SawayamaState _state;
 
         #region initialization
-        public KlondikeGame(List<Card> deck)
+        public SawayamaGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
-            _state = new KlondikeState();
-            ShuffleAndDeal(deck);
+            _state = new SawayamaState();
+            ShuffleAndDealDeck(deck);
             Log();
         }
 
@@ -46,28 +48,51 @@ namespace Klondike
             return deck;
         }
 
-        private void ShuffleAndDeal(List<Card> deck)
+        private void ShuffleAndDealDeck(List<Card> deck)
         {
             Log("Shuffling and dealing...");
-            Stack<Card> deckStack = new Stack<Card>(Shuffle(deck.ToArray()));
+            Stack<Card> deckStack = new Stack<Card>(CommonUtils.Shuffle(deck.ToArray()));
+            _state.StockPile = deckStack;
+            Deal();
+        }
 
+        private void Deal()
+        {
             for (int i = 0; i < 7; i++)
             {
                 for (int j = 0; j < i + 1; j++)
                 {
-                    Card nextCard = deckStack.Pop();
+                    Card nextCard = _state.StockPile.Pop();
+                    nextCard.Show(true);
                     if (i == j)
                     {
-                        nextCard.Show(true);
                         nextCard.FreeCard(true);
                     }
                     _state.Tableaus[i].Push(nextCard);
                 }
             }
-
-            _state.StockPile = deckStack;
-            _state.OnRestocked();
+            UpdateFreeCards();
         }
+
+        private void UpdateFreeCards()
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < _state.Tableaus[i].Count; j++)
+                {
+                    if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                    if (j > 0)
+                    {
+                        if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
+                        {
+                            _state.Tableaus[i].ElementAt(j).FreeCard(true);
+                        }
+                        else break;
+                    }
+                }
+            }
+        }
+        #endregion
 
         protected override bool Won()
         {
@@ -78,13 +103,13 @@ namespace Klondike
             }
             return total == 13 * 4;
         }
-        #endregion
 
-        #region userInteraction
+        #region UserInteraction
         public List<PileKind> Action_TryDrawCardsFromStock()
         {
             List<PileKind> affectedPiles = new List<PileKind>();
-            bool uiRefreshNeeded = ExecuteAction(() =>
+
+           bool uiRefreshNeeded = ExecuteAction(() =>
             {
                 return TryDrawCardsFromStock();
             });
@@ -94,62 +119,6 @@ namespace Klondike
                 affectedPiles.Add(PileKind.WASTE);
                 affectedPiles.Add(PileKind.STOCK);
             }
-            return affectedPiles;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="card"></param>
-        /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
-        /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public List<PileKind> Action_TryMoveCardAutomatic(Card card)
-        {
-            Log($"USER Action_TryMoveCardAutomatic {card}");
-            List<PileKind> affectedPiles = new List<PileKind>();
-            PileData sourcePileData = _state.GetCardPileOwnerData(card);
-            PileKind targetPileKind = default;
-
-            ExecuteAction(() =>
-            {
-                bool cardMoved = false;
-
-                switch (sourcePileData.Kind)
-                {
-                    case PileKind.WASTE:
-                        cardMoved = TryMoveCardToAnyFoundation(card);
-                        if (cardMoved) targetPileKind = PileKind.FOUNDATION;
-
-                        if (!cardMoved)
-                        {
-                            cardMoved = TryMoveCardToAnyTableau(card);
-                            if (cardMoved) targetPileKind = PileKind.TABLEAU;
-                        }
-                        break;
-                    case PileKind.FOUNDATION:
-                        cardMoved = TryMoveCardToAnyTableau(card);
-                        if (cardMoved) targetPileKind = PileKind.TABLEAU;
-                        break;
-                    case PileKind.TABLEAU:
-                        cardMoved = TryMoveCardToAnyFoundation(card);
-                        if (cardMoved) targetPileKind = PileKind.FOUNDATION;
-                        if (!cardMoved)
-                        {
-                            cardMoved = TryMoveCardToAnyTableau(card, sourcePileData.Index);
-                            if (cardMoved) targetPileKind = PileKind.TABLEAU;
-                        }
-                        break;
-                }
-
-                if (cardMoved)
-                {
-                    affectedPiles.Add(sourcePileData.Kind);
-                    if (sourcePileData.Kind != targetPileKind)
-                        affectedPiles.Add(targetPileKind);
-                }
-
-                return cardMoved;
-            });
-
             return affectedPiles;
         }
 
@@ -177,6 +146,9 @@ namespace Klondike
                     case PileKind.TABLEAU:
                         cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
                         break;
+                    case PileKind.STOCK:
+                        cardMoved = TryMoveCardToStock(card);
+                        break;
                 }
 
                 if (cardMoved)
@@ -193,22 +165,40 @@ namespace Klondike
         }
         #endregion
 
+        #region AutomaticActions
+        public List<PileKind> Auto_MoveCardAutomatically(Card card)
+        {
+            Log($"INNER MoveCardAutomatically {card}");
+            PileData sourcePileData = _state.GetCardPileOwnerData(card);
+            List<PileKind> affectedPiles = new();
+            ExecuteAction(() =>
+            {
+                if (TryMoveCardToAnyFoundation(card))
+                {
+                    affectedPiles.Add(PileKind.FOUNDATION);
+                    affectedPiles.Add(sourcePileData.Kind);
+                    return true;
+                }
+                return false;
+            });
+            return affectedPiles;
+        }
+        #endregion
 
-        #region innerActions
-
+        #region InnerActions
         // DEAL
         private bool TryDrawCardsFromStock()
         {
             Log("INNER TryDrawCardsFromStock");
-            if (_state.StockPile.Count == 0)
+            if (_drewAllCardsFromStock || _state.StockPile.Count == 0)
             {
-                return TryRestock();
+                return false;
             }
 
             if (_state.WastePile.TryPeek(out var topCard))
                 topCard.FreeCard(false);
 
-            for (int i = 0; i < _state.DrawCount; i++)
+            for (int i = 0; i < DrawCount; i++)
             {
                 if (_state.StockPile.Count > 0)
                 {
@@ -219,28 +209,18 @@ namespace Klondike
                 else break;
             }
 
+            if (_state.StockPile.Count == 0)
+            {
+                _drewAllCardsFromStock = true;
+                EventManager.OnStockEmpty?.Invoke();
+            }
+
             if (_state.WastePile.TryPeek(out topCard))
                 topCard.FreeCard(true);
 
             return true;
         }
 
-        private bool TryRestock()
-        {
-            Log("INNER AttemptRestock");
-            if (_state.WastePile.Count > 0 && _state.AvailableRestocks != 0)
-            {
-                while (_state.WastePile.Count > 0)
-                {
-                    Card nextCard = _state.WastePile.Pop();
-                    nextCard.Show(false);
-                    _state.StockPile.Push(nextCard);
-                }
-                _state.OnRestocked();
-                return true;
-            }
-            return false;
-        }
 
         //ADD TO ANY
         private bool TryMoveCardToAnyFoundation(Card card)
@@ -248,26 +228,15 @@ namespace Klondike
             Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
+                if (card.Value > 1 && _state.Foundations[i].Suit != card.Suit)
+                    continue;
+
                 if (TryMoveCardToFoundationIndex(card, i))
                 {
                     return true;
                 }
             }
             return false;
-        }
-
-        private bool TryMoveCardToAnyTableau(Card card, int excludeIndex = -1)
-        {
-            Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
-            bool success = false;
-            for (int i = 0; i < _state.Tableaus.Length; i++)
-            {
-                if (i == excludeIndex) continue;
-
-                success = TryMoveCardsToTableauIndex(card, i);
-                if (success) break;
-            }
-            return success;
         }
 
         //ADD TO INDEX
@@ -283,7 +252,7 @@ namespace Klondike
                 else
                     foundation.Stack.Peek().FreeCard(false);
                 foundation.Stack.Push(card);
-                card.FreeCard(_state.FoundationCardsFree);
+                card.FreeCard(false);
                 return true;
             }
             return false;
@@ -309,21 +278,33 @@ namespace Klondike
                         {
                             fromTableau.Peek().Show(true);
                             fromTableau.Peek().FreeCard(true);
+                            UpdateFreeCards();
                         }
                         while (tempStack.Count > 0)
                         {
                             _state.Tableaus[index].Push(tempStack.Pop());
                         }
                         break;
-                    case PileKind.FOUNDATION:
-                        RemoveCardFromPile(card);
-                        _state.Tableaus[index].Push(card);
-                        break;
                     case PileKind.WASTE:
                         RemoveCardFromPile(card);
                         _state.Tableaus[index].Push(card);
                         break;
+                    case PileKind.STOCK:
+                        RemoveCardFromPile(card);
+                        _state.Tableaus[index].Push(card);
+                        break;
                 }
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryMoveCardToStock(Card card)
+        {
+            if (CanAddCardToPile(card, PileKind.STOCK, -1))
+            {
+                RemoveCardFromPile(card);
+                _state.StockPile.Push(card);
                 return true;
             }
             return false;
@@ -343,13 +324,6 @@ namespace Klondike
                         _state.WastePile.Peek().FreeCard(true);
                     }
                     break;
-                case PileKind.FOUNDATION:
-                    _state.Foundations[pileData.Index].Stack.Pop();
-                    if (_state.FoundationCardsFree && _state.Foundations[pileData.Index].Stack.Count > 0)
-                    {
-                        _state.Foundations[pileData.Index].Stack.Peek().FreeCard(true);
-                    }
-                    break;
                 case PileKind.TABLEAU:
                     if (_state.Tableaus[pileData.Index].Peek() == card)
                     {
@@ -361,42 +335,22 @@ namespace Klondike
                         }
                     }
                     break;
+                case PileKind.STOCK:
+                    _state.StockPile.Pop();
+                    break;
             }
         }
 
-        public Card GetSolvableCard()
+
+        #endregion
+
+        #region Checks
+        private bool ValidTableauCardStack(Card child, Card parent)
         {
-            Debug.Log("Looking for automatic move");
-
-            Card card;
-            _state.WastePile.TryPeek(out card);
-
-            if (card != null && IsSafeToMoveCardToFoundation(card))
-            {
-                Debug.Log($"Safe to move {card} to foundation. Can move?");
-                if (CanMoveCardToAnyFoundation(card))
-                {
-                    Debug.Log($"{card} can be moved from waste to foundation.");
-                    return card;
-                }
-            }
-
-            for (int i = 0; i < 7; i++)
-            {
-                _state.Tableaus[i].TryPeek(out card);
-                if (card != null && IsSafeToMoveCardToFoundation(card))
-                {
-                    Debug.Log($"Safe to move {card} to foundation. Can move?");
-                    if (CanMoveCardToAnyFoundation(card))
-                    {
-                        Debug.Log($"{card} can be moved from tableau[{i}] to foundation.");
-
-                        return card;
-                    }
-                }
-            }
-
-            return null;
+            if (child == null || parent == null) return false;
+            //Debug.Log($"Valid Tableau Stack {child} > {parent}?");
+            bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
+            return !sameColor && child.Value == parent.Value - 1;
         }
 
         private bool CanMoveCardToAnyFoundation(Card card)
@@ -413,34 +367,26 @@ namespace Klondike
             }
             return false;
         }
-        #endregion
-
-        #region Checks
-        private bool ValidTableauCardStack(Card child, Card parent)
-        {
-            if (child == null || parent == null) return false;
-
-            bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
-            return !sameColor && child.Value == parent.Value - 1;
-        }
 
         public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
-            PileData sourcePileData = _state.GetCardPileOwnerData(card);
+            PileData sourcePileData = State.GetCardPileOwnerData(card);
             if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
                 return false;
-            if (sourcePileData.Kind == PileKind.FOUNDATION && !_state.FoundationCardsFree)
+            if (sourcePileData.Kind == PileKind.FOUNDATION)
                 return false;
+
+            bool tableauCardStackParent = sourcePileData.Kind == PileKind.TABLEAU
+                                       && _state.Tableaus[sourcePileData.Index].Peek() != card;
 
             switch (targetPile)
             {
                 case PileKind.STOCK:
-                    return false;
+                    bool stockEmpty = _state.StockPile.Count == 0;
+                    return stockEmpty && !tableauCardStackParent;
                 case PileKind.WASTE:
                     return false;
                 case PileKind.FOUNDATION:
-                    bool tableauCardStackParent = sourcePileData.Kind == PileKind.TABLEAU
-                        && _state.Tableaus[sourcePileData.Index].Peek() != card;
                     bool first = card.Value == 1
                         && _state.Foundations[targetPileIndex].Stack.Count == 0;
                     bool next = card.Value > 1
@@ -449,11 +395,10 @@ namespace Klondike
                         && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
                     return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
-                    bool kingToEmpty = _state.Tableaus[targetPileIndex].Count == 0
-                        && card.Value == 13;
+                    bool toEmpty = _state.Tableaus[targetPileIndex].Count == 0;
                     bool validMove = _state.Tableaus[targetPileIndex].Count > 0 &&
                         ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
-                    return kingToEmpty || validMove;
+                    return toEmpty || validMove;
             }
             return false;
         }
@@ -497,8 +442,41 @@ namespace Klondike
             }
             return card2found;
         }
+
+        public Card GetSolvableCard()
+        {
+            Debug.Log("Looking for automatic move");
+
+            Card card;
+            _state.WastePile.TryPeek(out card);
+
+            if (card != null && IsSafeToMoveCardToFoundation(card))
+            {
+                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                if (CanMoveCardToAnyFoundation(card))
+                {
+                    Debug.Log($"{card} can be moved from waste to foundation.");
+                    return card;
+                }
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                _state.Tableaus[i].TryPeek(out card);
+                if (card != null && IsSafeToMoveCardToFoundation(card))
+                {
+                    Debug.Log($"Safe to move {card} to foundation. Can move?");
+                    if (CanMoveCardToAnyFoundation(card))
+                    {
+                        Debug.Log($"{card} can be moved from tableau[{i}] to foundation.");
+
+                        return card;
+                    }
+                }
+            }
+
+            return null;
+        }
         #endregion
-
-
     }
 }

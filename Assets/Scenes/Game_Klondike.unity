@@ -1334,9 +1334,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeController
   _input: {fileID: 1568374718}
+  _ui: {fileID: 8029994113569653976}
   _defaultConfig: {fileID: 11400000, guid: c7b5101364730fb44a56f08c800279b4, type: 2}
   _view: {fileID: 4588662690070100733}
-  _ui: {fileID: 8029994113569653976}
 --- !u!4 &1806870792979596492
 Transform:
   m_ObjectHideFlags: 0
@@ -1441,10 +1441,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WasteUI
   _pileKind: 0
-  _cardPositions:
-  - {fileID: 1207023346}
-  - {fileID: 1111715682}
-  - {fileID: 119913115}
+  _maxCardsInView: 3
+  _xOffset: 0.4
 --- !u!1001 &1996419849492538444
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3227,6 +3225,14 @@ PrefabInstance:
     - target: {fileID: 4521249559697025245, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
       propertyPath: m_Name
       value: InputManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
+      propertyPath: dragEnabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
+      propertyPath: doubleClickEnabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

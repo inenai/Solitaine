@@ -13,7 +13,7 @@ public abstract class TargetCardPileView : CardPileView
 
     public void EnableHighlight(bool value)
     {
-        triggerHighlight.SetActive(value);
+        if (triggerHighlight != null) triggerHighlight.SetActive(value);
     }
 
 /// <summary>

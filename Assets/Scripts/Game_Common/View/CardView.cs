@@ -55,10 +55,10 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     public virtual void UpdateView()
     {
         _rend.sprite = CardUtils.GetCardSprite(Card);
-        UpdateRevealedState();
+        RefreshRevealedState();
     }
 
-    public void UpdateRevealedState(){
+    public void RefreshRevealedState(){
         _rotationRoot.transform.localRotation = Quaternion.Euler(0f, Card.Revealed ? 180f : 0f, 0f);
     }
 
@@ -249,7 +249,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         }
 
         transform.position = targetPosition;
-        UpdateRevealedState();
+        RefreshRevealedState();
 
         _animating = false;
         Debug.Log($"Card {_card} animated.");
@@ -287,7 +287,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         if (ViewRevealed && !Card.Revealed)
         {
-            UpdateRevealedState();
+            RefreshRevealedState();
             return;
         }
 
@@ -310,7 +310,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
                 _rotationRoot.transform.localRotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0f, 180f, 0f), t);
             yield return null;
         }
-        UpdateRevealedState();
+        RefreshRevealedState();
         _revealCoroutine = null;
     }
     #endregion

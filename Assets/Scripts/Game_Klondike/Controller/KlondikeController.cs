@@ -21,7 +21,7 @@ namespace Klondike
 
         public override bool IsCardInTargetPile(Card card, out TargetCardPileView result)
         {
-            return _view.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+            return _view.IsCardInTargetPile(_game.KState.GetCardPileOwnerData(card), out result);
         }
 
         public override void ResetSettingsToDefault()
@@ -31,7 +31,12 @@ namespace Klondike
 
         public override bool IsRestockAvailable()
         {
-            return _game.State.AvailableRestocks != 0;
+            return _game.KState.AvailableRestocks != 0;
+        }
+
+        public override bool IsAutoMovesEnabled()
+        {
+            return _game.KState.AutoMovesEnabled;
         }
 
         protected override void CreateGame()
@@ -52,15 +57,15 @@ namespace Klondike
             _view.Init(this);
         }
 
-        protected override void CreateDeck()
-        {
-            _deck = KlondikeGame.CreateGameDeck();
-        }
-
         protected override void LoadDeckView(Action onDone)
         {
             Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, onDone);
+            _view.Deck.Load(_deck, _view.StockTransform, onDone);
+        }
+
+        protected override void CreateDeck()
+        {
+            _deck = KlondikeGame.CreateGameDeck();
         }
 
         protected override void UpdateWinsCount()
@@ -88,7 +93,7 @@ namespace Klondike
             return _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
         }
 
-        protected override void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool isInitRefresh = false)
+        protected override void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
         {
             Debug.Log("RefreshViewTask.");
             _viewsRefreshing = 0;
@@ -102,40 +107,40 @@ namespace Klondike
                     case PileKind.WASTE:
                         _viewsRefreshing++;
                         _view.RefreshWaste(
-                            CommonUtils.CloneStack(_game.State.WastePile),
+                            CommonUtils.CloneStack(_game.KState.WastePile),
                             cardMoved,
                             originalCardPosition,
-                            isInitRefresh,
+                            immediate,
                             RefreshDone);
                         break;
 
                     case PileKind.STOCK:
                         _viewsRefreshing++;
                         _view.RefreshStock(
-                            CommonUtils.CloneStack(_game.State.StockPile),
+                            CommonUtils.CloneStack(_game.KState.StockPile),
                             cardMoved,
                             originalCardPosition,
-                            isInitRefresh,
+                            immediate,
                             RefreshDone);
                         break;
 
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
                         _view.RefreshFoundations(
-                            CardUtils.GetClonedStacks(_game.State.Foundations),
+                            CardUtils.GetClonedStacks(_game.KState.Foundations),
                             cardMoved,
                             originalCardPosition,
-                            isInitRefresh,
+                            immediate,
                             RefreshDone);
                         break;
 
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
                         _view.RefreshTableaus(
-                            CardUtils.GetClonedStacks(_game.State.Tableaus),
+                            CardUtils.GetClonedStacks(_game.KState.Tableaus),
                             cardMoved,
                             originalCardPosition,
-                            isInitRefresh,
+                            immediate,
                             RefreshDone);
                         break;
                 }
@@ -149,6 +154,26 @@ namespace Klondike
             while (_viewsRefreshing > 0) yield return null;
             Debug.Log("Done.");
             onDone?.Invoke();
+        }
+
+        protected override void ResetView()
+        {
+
+        }
+
+        protected override Card GetSolvableCard()
+        {
+            return _game.GetSolvableCard();
+        }
+
+        protected override Vector3 GetCardViewPosition(Card card)
+        {
+            return _view.GetCardViewPosition(card);
+        }
+
+        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
+        {
+            return _game.Action_TryMoveCardAutomatic(card);
         }
     }
 }

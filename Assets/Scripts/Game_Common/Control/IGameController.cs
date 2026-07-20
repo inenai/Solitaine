@@ -9,6 +9,7 @@ namespace Common
         bool CardDoubleClicked(Card card, Vector3 originalCardPosition);
         bool PileClicked(PileKind pileKind, int pileIndex);
         bool IsRestockAvailable();
+        bool IsAutoMovesEnabled();
         bool IsCardAllowedInPile(Card card, PileKind pileKind, int pileIndex);
         void ResetSettingsToDefault();
         bool IsCardInTargetPile(Card card, out TargetCardPileView targetPile);

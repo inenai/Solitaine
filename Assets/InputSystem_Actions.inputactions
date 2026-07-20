@@ -66,6 +66,17 @@
                 },
                 {
                     "name": "",
+                    "id": "a29a49c1-1b7f-4e99-9bf2-91ab491b5b61",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "PointerDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "d71a81ef-febf-4894-8172-8adf53396c3f",
                     "path": "<Pointer>/position",
                     "interactions": "",

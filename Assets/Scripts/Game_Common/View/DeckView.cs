@@ -20,16 +20,19 @@ public class DeckView
         _gameView = view;
     }
 
-    public void Load(List<Card> cards, Action onDone)
+    public void Load(List<Card> cards, Transform parent, Action onDone)
     {
         Debug.Log($"Load. Creating {cards.Count} cards...");
         _coroutinesRunning = 0;
+        float zOffset = CardUtils.CardStackZOffset;
         foreach (Card card in cards)
         {
             _coroutinesRunning++;
-            CreateCardUI(_gameView.transform, card, ()=>{
+            CreateCardUI(parent, card, zOffset, () =>
+            {
                 _coroutinesRunning--;
             });
+            zOffset += CardUtils.CardStackZOffset;
         }
         _gameView.StartCoroutine(WaitForAllCoroutinesDone(onDone));
     }
@@ -42,29 +45,34 @@ public class DeckView
 
     public CardView GetCardView(Card card)
     {
+        if (_deckView == null)
+            throw new System.Exception($"DeckView is null!");
+        if (card == null)
+            throw new System.Exception($"Asked for a card view that is null!");
+
         if (!_deckView.ContainsKey(card))
             throw new System.Exception($"Asked for a card view that is not available in DeckView: {card}");
         return _deckView[card];
     }
 
-    private void CreateCardUI(Transform transform, Card card, Action onDone)
+    private void CreateCardUI(Transform transform, Card card, float zOffset, Action onDone)
     {
         //Debug.Log($"Create card {card}...");
         AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
         {
-            InitCardGameObject(gameObject, card);
+            InitCardGameObject(gameObject, card, zOffset);
             onDone?.Invoke();
             //Debug.Log($"Create card {card} done.");
-
         }, (errorMessage) => {
             Debug.LogError(errorMessage);
             onDone?.Invoke();
         });
     }
 
-    private void InitCardGameObject(GameObject gameObject, Card card)
+    private void InitCardGameObject(GameObject gameObject, Card card, float zOffset)
     {
         gameObject.name = $"Card_{card}";
+        gameObject.transform.localPosition = new Vector3(0f, 0f, zOffset);
         CardView cardView = gameObject.GetComponent<CardView>();
         cardView.Init(_gameView, card);
         if (_cardHeight == default)

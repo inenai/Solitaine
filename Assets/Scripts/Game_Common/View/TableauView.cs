@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common;
 using UnityEngine;
+using Utils;
 
-namespace Klondike
+namespace Common
 {
     public class TableauView : TargetCardPileView
     {
         private const float _offsetY = -0.3f;
-        private const float _offsetZ = -0.1f;
 
         private List<CardView> _cardViews;
 
@@ -30,7 +29,7 @@ namespace Klondike
             return cards;
         }
 
-        private void UpdateCardView(int index, bool initRefresh, string cardGOName)
+        private void UpdateCardView(int index, bool immediate, string cardGOName)
         {
             Transform desiredParent = index == 0 ? transform : _cardViews[index - 1].transform;
             if (_cardViews[index].transform.parent != desiredParent)
@@ -38,9 +37,9 @@ namespace Klondike
                 _cardViews[index].transform.SetParent(desiredParent);
             }
             float yOffset = index == 0 ? 0f : _offsetY;
-            _cardViews[index].RefreshDynamicOffset(yOffset, _offsetZ);
-            if (initRefresh)
-                _cardViews[index].UpdateRevealedState();
+            _cardViews[index].RefreshDynamicOffset(yOffset, CardUtils.CardStackZOffset);
+            if (immediate)
+                _cardViews[index].RefreshRevealedState();
             else
                 _cardViews[index].PlayRevealIfNeeded();
             _cardViews[index].gameObject.name = cardGOName;
@@ -58,7 +57,7 @@ namespace Klondike
             cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
         }
 
-        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool initRefresh, Action onDone)
+        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             Debug.Log($"TableauView[{Index}] refreshing...");
 
@@ -78,8 +77,8 @@ namespace Klondike
             {
                 bool isCardMoved = cards[index] == cardMoved;
                 string cardGOName = _cardViews[index].gameObject.name = $"Card_T{Index}_{cards[index]}";
-                UpdateCardView(index, initRefresh, cardGOName);
-                if (isCardMoved)
+                UpdateCardView(index, immediate, cardGOName);
+                if (isCardMoved && !immediate)
                 {
                     cardViewToAnimate = _cardViews[index];
                     cardViewToAnimateTargetPos = _cardViews[index].transform.position;
