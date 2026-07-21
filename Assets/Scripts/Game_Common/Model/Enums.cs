@@ -30,4 +30,10 @@ namespace Common
         FOUNDATION,
         TABLEAU
     }
+
+    public enum DragMode
+    {
+        DRAG,
+        PICKUP
+    }
 }

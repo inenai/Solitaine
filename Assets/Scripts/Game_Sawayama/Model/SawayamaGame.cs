@@ -422,8 +422,6 @@ namespace Sawayama
                     break;
             }
         }
-
-
         #endregion
 
         #region Checks

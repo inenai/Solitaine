@@ -6,9 +6,8 @@ namespace Common
    public class MyInputManager : MonoBehaviour
    {
       [Header("Settings")]
-      [SerializeField] private bool dragEnabled;
-      [SerializeField] private bool pickUpEnabled;
       [SerializeField] private bool doubleClickEnabled;
+      [SerializeField] private DragMode dragMode;
 
       [Header("Input References")]
       [SerializeField] private InputActionReference pointerMovedAction;
@@ -61,6 +60,10 @@ namespace Common
             doublePressAction.action.Enable();
             doublePressAction.action.performed += Action_DoublePressed;
          }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+         dragMode = DragMode.DRAG;
+#endif
       }
 
       private void OnDisable()
@@ -116,7 +119,7 @@ namespace Common
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
 
-            if (dragging && pickUpEnabled)
+            if (dragging && dragMode == DragMode.PICKUP)
             {
                _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
                _draggingObject = null;
@@ -124,7 +127,7 @@ namespace Common
                return;
             }
 
-            if (dragEnabled)
+            if (dragMode == DragMode.DRAG)
             {
                TryBeginDrag(hit.collider);
             }
@@ -166,7 +169,7 @@ namespace Common
          // Debug.Log("[InputManager] Pointer released");
          if (_paused) return;
 
-         if (dragging && !pickUpEnabled)
+         if (dragging && dragMode == DragMode.DRAG)
          {
             _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
             _draggingObject = null;
@@ -197,7 +200,7 @@ namespace Common
                         c.OnClickAttemptFailed();
                      }
                   }
-               } else if (pickUpEnabled)
+               } else if (dragMode == DragMode.PICKUP)
                {
                   TryBeginDrag(hit.collider);
                }
@@ -270,7 +273,7 @@ namespace Common
          }
 
          IDrag drag = collider.gameObject.GetComponent<IDrag>();
-         if (drag != null && pickUpEnabled)
+         if (drag != null && dragMode == DragMode.PICKUP)
          {
             TryBeginDrag(collider);
             Debug.Log("[InputManager] Picked up something!");

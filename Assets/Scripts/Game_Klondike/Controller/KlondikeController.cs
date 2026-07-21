@@ -36,7 +36,7 @@ namespace Klondike
 
         public override bool IsAutoMovesEnabled()
         {
-            return _game.KState.AutoMovesEnabled;
+            return KlondikeSettings.AutoMovesEnabled;
         }
 
         protected override void CreateGame()
