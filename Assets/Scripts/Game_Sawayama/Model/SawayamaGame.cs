@@ -384,6 +384,7 @@ namespace Sawayama
                         {
                             _state.Tableaus[pileData.Index].Peek().FreeCard(true);
                             _state.Tableaus[pileData.Index].Peek().Show(true);
+                            UpdateFreeCards();
                         }
                     }
                     break;
