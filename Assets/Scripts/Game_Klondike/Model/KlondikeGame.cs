@@ -116,10 +116,16 @@ namespace Klondike
                 switch (sourcePileData.Kind)
                 {
                     case PileKind.WASTE:
-                        cardMoved = TryMoveCardToAnyFoundation(card);
-                        if (cardMoved) targetPileKind = PileKind.FOUNDATION;
+                        if (IsSafeToMoveCardToFoundation(card))
+                        {
+                            cardMoved = TryMoveCardToAnyFoundation(card);
+                        }
 
-                        if (!cardMoved)
+                        if (cardMoved)
+                        {
+                            targetPileKind = PileKind.FOUNDATION;
+                        }
+                        else
                         {
                             cardMoved = TryMoveCardToAnyTableau(card);
                             if (cardMoved) targetPileKind = PileKind.TABLEAU;
