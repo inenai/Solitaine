@@ -15,11 +15,16 @@ namespace Common
         [SerializeField] private ParticleSystem _victoryParticles;
         [SerializeField] private BaseSettingsScreen _settingsScreen;
 
+        [SerializeField] private GameObject _controlsTxt;
+
         private GameNavigator _navi;
         private IGameController _controller;
 
         public void Init(IGameController controller)
         {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            _controlsTxt.SetActive(false);
+#endif
             _controller = controller;
             _navi = GetComponent<GameNavigator>();
             _gameLabel.text = _solitaireKind.ToString();
