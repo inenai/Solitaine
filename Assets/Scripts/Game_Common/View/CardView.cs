@@ -330,7 +330,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         Log($"Card {_card} double clicked!");
         if (_card == null) return;
-        if (!_card.Revealed) return; //Ignores double clicks on stock
+        if (!_card.Revealed) return; //Ignores double clicks on hidden cards
 
         _view.Controller.CardDoubleClicked(_card, transform.position);
         Log($"{_card} Double Clicked!");

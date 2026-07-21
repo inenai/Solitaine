@@ -179,6 +179,18 @@ namespace Sawayama
                 if (cardMoved)
                 {
                     targetPileKind = PileKind.TABLEAU;
+                }
+                else
+                {
+                    cardMoved = TryMoveCardToStock(card);
+                    if (cardMoved)
+                    {
+                        targetPileKind = PileKind.STOCK;
+                    }
+                }
+
+                if (cardMoved)
+                {
                     affectedPiles.Add(sourcePileData.Kind);
                     if (sourcePileData.Kind != targetPileKind)
                         affectedPiles.Add(targetPileKind);

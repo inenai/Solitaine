@@ -26,10 +26,15 @@ namespace Common
                 return;
             }
 
-            StackCardsInPosition(cards, _cardsRoot.position, transform, "Card_S_");
+            if (cardMoved == null)
+            {
+                StackCardsInPosition(cards, _cardsRoot.position, transform, "Card_S_");
+                Debug.Log("StockView refreshed.");
+                onDone?.Invoke();
+                return;
+            }
 
-            Debug.Log("StockView refreshed.");
-            onDone?.Invoke();
+            StackCardsInPositionWithAnimation(cards, _cardsRoot.position, transform, "Card_S_", cardMoved, originalCardPosition, onDone);
         }
 
         public void OnClick()
