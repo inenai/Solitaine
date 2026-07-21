@@ -109,6 +109,7 @@ namespace Common
       {
          // Debug.Log("[InputManager] Pointer pressed");
          if (_paused) return;
+         _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
 
          Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);

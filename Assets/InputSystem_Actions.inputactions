@@ -68,7 +68,7 @@
                     "path": "<Pointer>/press",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse;Touch",
+                    "groups": ";Keyboard&Mouse",
                     "action": "PointerDown",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -86,11 +86,33 @@
                 },
                 {
                     "name": "",
-                    "id": "d71a81ef-febf-4894-8172-8adf53396c3f",
-                    "path": "<Pointer>/position",
+                    "id": "3765f1c6-2490-45cf-b84c-56cb1048ccce",
+                    "path": "<Touchscreen>/Press",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse;Touch",
+                    "groups": ";Touch",
+                    "action": "PointerDown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d71a81ef-febf-4894-8172-8adf53396c3f",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Touch",
+                    "action": "PointerMoved",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73045a66-9f8b-4db1-a8a2-0c3b3d85bebb",
+                    "path": "<Touchscreen>/primaryTouch/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Touch",
                     "action": "PointerMoved",
                     "isComposite": false,
                     "isPartOfComposite": false
