@@ -1,4 +1,3 @@
-
 using Common;
 
 public interface IGameState
