@@ -37,7 +37,7 @@ namespace Sawayama
 
         protected override List<PileKind> Action_DoubleClickedCard(Card card)
         {
-            return new List<PileKind>();
+            return _game.Action_TryMoveCardAutomatic(card);
         }
 
         protected override List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
@@ -57,7 +57,7 @@ namespace Sawayama
 
         protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
         {
-            return _game.Auto_MoveCardAutomatically(card);
+            return _game.Auto_TryMoveCardToFoundationAutomatic(card);
         }
 
         protected override void CreateDeck()

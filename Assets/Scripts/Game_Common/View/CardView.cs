@@ -92,9 +92,9 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         gameObject.layer = LayerMask.NameToLayer("DraggingCard");
     }
 
-    public void OnEndDrag()
+    public void OnEndDrag(bool cancelled)
     {
-        if (_targetPile != null)
+        if (_targetPile != null && !cancelled)
         {
             bool successfulMove = _view.Controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
             if (!successfulMove)

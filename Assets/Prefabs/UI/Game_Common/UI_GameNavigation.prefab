@@ -67,10 +67,12 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Controls:
 
-    Left click / Space: Pick up / drag
+    Left-click / Space: Pick up / drag
 
-    Double click /
-    C: Auto-move
+    Right-click: Cancel
+    drag
+
+    Double click / C: Auto-move
 
     D: Draw
 

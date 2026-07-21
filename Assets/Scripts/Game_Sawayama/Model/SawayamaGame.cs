@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
@@ -163,10 +164,35 @@ namespace Sawayama
 
             return affectedPiles;
         }
+
+        public List<PileKind> Action_TryMoveCardAutomatic(Card card)
+        {
+            Log($"USER Action_TryMoveCardAutomatic {card}");
+            List<PileKind> affectedPiles = new List<PileKind>();
+            PileData sourcePileData = _state.GetCardPileOwnerData(card);
+            PileKind targetPileKind = default;
+
+            ExecuteAction(() =>
+            {
+                bool cardMoved = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+
+                if (cardMoved)
+                {
+                    targetPileKind = PileKind.TABLEAU;
+                    affectedPiles.Add(sourcePileData.Kind);
+                    if (sourcePileData.Kind != targetPileKind)
+                        affectedPiles.Add(targetPileKind);
+                }
+
+                return cardMoved;
+            });
+
+            return affectedPiles;
+        }
         #endregion
 
         #region AutomaticActions
-        public List<PileKind> Auto_MoveCardAutomatically(Card card)
+        public List<PileKind> Auto_TryMoveCardToFoundationAutomatic(Card card)
         {
             Log($"INNER MoveCardAutomatically {card}");
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
@@ -256,6 +282,20 @@ namespace Sawayama
                 return true;
             }
             return false;
+        }
+
+        private bool TryMoveCardToAnyTableau(Card card, int excludeIndex = -1)
+        {
+            Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
+            bool success = false;
+            for (int i = 0; i < _state.Tableaus.Length; i++)
+            {
+                if (i == excludeIndex) continue;
+
+                success = TryMoveCardsToTableauIndex(card, i);
+                if (success) break;
+            }
+            return success;
         }
 
         private bool TryMoveCardsToTableauIndex(Card card, int index)

@@ -16,6 +16,7 @@ namespace Common
       [SerializeField] private InputActionReference doublePressAction;
       [SerializeField] private InputActionReference resetGameAction;
       [SerializeField] private InputActionReference drawFromStockAction;
+      [SerializeField] private InputActionReference cancelDrag;
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
@@ -46,12 +47,14 @@ namespace Common
          pointerDownAction.action.Enable();
          resetGameAction.action.Enable();
          drawFromStockAction.action.Enable();
+         cancelDrag.action.Enable();
 
          pointerDownAction.action.performed += Action_PointerPressed;
          pointerMovedAction.action.performed += Action_PointerMoved;
          pointerDownAction.action.canceled += Action_PointerReleased;
          resetGameAction.action.performed += Action_ResetGame;
          drawFromStockAction.action.performed += Action_DrawFromStock;
+         cancelDrag.action.performed += Action_CancelDrag;
 
          if (doubleClickEnabled)
          {
@@ -66,12 +69,14 @@ namespace Common
          pointerDownAction.action.Disable();
          resetGameAction.action.Disable();
          drawFromStockAction.action.Disable();
+         cancelDrag.action.Disable();
 
          pointerDownAction.action.performed -= Action_PointerPressed;
          pointerMovedAction.action.performed -= Action_PointerMoved;
          pointerDownAction.action.canceled -= Action_PointerReleased;
          resetGameAction.action.performed -= Action_ResetGame;
          drawFromStockAction.action.performed -= Action_DrawFromStock;
+         cancelDrag.action.performed -= Action_CancelDrag;
 
          if (doubleClickEnabled)
          {
@@ -113,7 +118,7 @@ namespace Common
 
             if (dragging && pickUpEnabled)
             {
-               _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
+               _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
                _draggingObject = null;
                Debug.Log("[InputManager] Drag ended");
                return;
@@ -124,6 +129,15 @@ namespace Common
                TryBeginDrag(hit.collider);
             }
             TryBeginClick(hit.collider);
+         }
+      }
+
+      private void Action_CancelDrag(InputAction.CallbackContext context)
+      {
+         if (dragging)
+         {
+            _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: true);
+            _draggingObject = null;
          }
       }
 
@@ -154,7 +168,7 @@ namespace Common
 
          if (dragging && !pickUpEnabled)
          {
-            _draggingObject.GetComponent<IDrag>()?.OnEndDrag();
+            _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
             _draggingObject = null;
             Debug.Log("[InputManager] Drag ended");
          }

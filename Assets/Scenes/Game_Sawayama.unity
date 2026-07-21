@@ -3093,6 +3093,10 @@ PrefabInstance:
       propertyPath: pickUpEnabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
+      propertyPath: doubleClickEnabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
