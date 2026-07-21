@@ -121,9 +121,7 @@ namespace Common
 
             if (dragging && dragMode == DragMode.PICKUP)
             {
-               _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
-               _draggingObject = null;
-               Debug.Log("[InputManager] Drag ended");
+               EndDrag(cancelled: false);
                return;
             }
 
@@ -137,11 +135,20 @@ namespace Common
 
       private void Action_CancelDrag(InputAction.CallbackContext context)
       {
-         if (dragging)
-         {
-            _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: true);
-            _draggingObject = null;
-         }
+         EndDrag(cancelled: true);
+      }
+
+      private void EndDrag(bool cancelled)
+      {
+         if (!dragging)
+            return;
+
+         _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled);
+         _draggingObject = null;
+         _dragOffset = Vector3.zero;
+         _velocity = Vector3.zero;
+
+         Debug.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
       }
 
       private void Action_PointerMoved(InputAction.CallbackContext context)
@@ -167,12 +174,16 @@ namespace Common
       private void Action_PointerReleased(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer released");
-         if (_paused) return;
+         if (_paused)
+         {
+            EndDrag(cancelled: true);
+            _clickingObject = null;
+            return;
+         }
 
          if (dragging && dragMode == DragMode.DRAG)
          {
-            _draggingObject.GetComponent<IDrag>()?.OnEndDrag(cancelled: false);
-            _draggingObject = null;
+            EndDrag(cancelled: false);
             Debug.Log("[InputManager] Drag ended");
          }
 
@@ -215,7 +226,7 @@ namespace Common
          Debug.Log("[InputManager] Pointer double pressed");
          if (_paused) return;
 
-         _draggingObject = null; //Cancel drag
+         EndDrag(cancelled: true);
 
          Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
