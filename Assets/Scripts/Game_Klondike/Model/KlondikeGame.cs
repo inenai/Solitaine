@@ -127,7 +127,18 @@ namespace Klondike
                         else
                         {
                             cardMoved = TryMoveCardToAnyTableau(card);
-                            if (cardMoved) targetPileKind = PileKind.TABLEAU;
+                            if (cardMoved)
+                            {
+                                targetPileKind = PileKind.TABLEAU;
+                            }
+                            else
+                            {
+                                cardMoved = TryMoveCardToAnyFoundation(card);
+                                if (cardMoved)
+                                {
+                                    targetPileKind = PileKind.FOUNDATION;
+                                }
+                            }
                         }
                         break;
                     case PileKind.FOUNDATION:
