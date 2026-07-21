@@ -51,12 +51,6 @@ namespace Common
             triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(), 1f);
         }
 
-        private void AnimateCardMoved(CardView cardViewToAnimate, Vector3 originalCardPosition, Vector3 cardViewToAnimateTargetPos, Action onDone)
-        {
-            cardViewToAnimate.transform.position = originalCardPosition;
-            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
-        }
-
         public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             Debug.Log($"TableauView[{Index}] refreshing...");

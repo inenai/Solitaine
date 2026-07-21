@@ -56,9 +56,14 @@ namespace Common
                 return result;
             }
 
-            cardViewToAnimate.transform.position = originalCardPosition;
-            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.DefaultCardFlyTime, onDone);
+            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, onDone);
             return result;
+        }
+
+        protected void AnimateCardMoved(CardView cardViewToAnimate, Vector3 originalCardPosition, Vector3 cardViewToAnimateTargetPos, Action onDone)
+        {
+            cardViewToAnimate.transform.position = originalCardPosition;
+            cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.GetFlightTime(originalCardPosition, cardViewToAnimateTargetPos), onDone);
         }
 
         protected List<CardView> StackCardsInPosition(Stack<Card> cards, Vector3 position, Transform parent, string cardPrefix)

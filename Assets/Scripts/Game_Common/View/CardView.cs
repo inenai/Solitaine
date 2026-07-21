@@ -7,7 +7,7 @@ using Utils;
 
 public class CardView : MonoBehaviour, IDrag, IDoubleClick
 {
-    public static float DefaultCardFlyTime = 0.2f;
+    private static float CardFlightSpeed = 30f;
 
     [SerializeField] protected GameObject _rotationRoot;
     [SerializeField] protected GameObject _back;
@@ -312,6 +312,14 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         }
         RefreshRevealedState();
         _revealCoroutine = null;
+    }
+
+    public static float GetFlightTime(Vector3 origin, Vector3 destiny)
+    {
+        float distance = Vector3.Distance(origin, destiny);
+        if (Mathf.Approximately(distance, 0f))
+            return 0.01f;
+        return distance / CardFlightSpeed;
     }
     #endregion
 
