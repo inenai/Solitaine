@@ -300,13 +300,42 @@ namespace Sawayama
         {
             Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
             bool success = false;
+
+            List<int> emptyCandidates = new();
+            List<int> compatibleFullCandidates = new();
+
             for (int i = 0; i < _state.Tableaus.Length; i++)
             {
                 if (i == excludeIndex) continue;
 
-                success = TryMoveCardsToTableauIndex(card, i);
+                if (CanAddCardToPile(card, PileKind.TABLEAU, i))
+                {
+                    if (_state.Tableaus[i].Count > 0)
+                    {
+                        compatibleFullCandidates.Add(i);
+                    }
+                    else
+                    {
+                        emptyCandidates.Add(i);
+                    }
+                }
+            }
+
+            for (int i = 0; i < compatibleFullCandidates.Count; i++)
+            {
+                success = TryMoveCardsToTableauIndex(card, compatibleFullCandidates[i]);
                 if (success) break;
             }
+
+            if (!success)
+            {
+                for (int i = 0; i < emptyCandidates.Count; i++)
+                {
+                    success = TryMoveCardsToTableauIndex(card, emptyCandidates[i]);
+                    if (success) break;
+                }
+            }
+
             return success;
         }
 
