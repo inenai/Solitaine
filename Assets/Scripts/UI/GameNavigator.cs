@@ -28,6 +28,9 @@ public class GameNavigator : MonoBehaviour
             case SolitaireKind.SAWAYAMA:
                 LoadSawayama();
                 return;
+            case SolitaireKind.FREECELL:
+                LoadFreeCell();
+                return;
         }
     }
 
@@ -39,6 +42,11 @@ public class GameNavigator : MonoBehaviour
     public void LoadSawayama()
     {
         SceneManager.LoadScene("Game_Sawayama");
+    }
+
+    public void LoadFreeCell()
+    {
+        SceneManager.LoadScene("Game_FreeCell");
     }
 }
 
