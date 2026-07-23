@@ -4,13 +4,16 @@ using System.Collections.Generic;
 using Common;
 using UnityEngine;
 using Utils;
-
-namespace Sawayama
+namespace FreeCell
 {
-    public class SawayamaController : GameController
+    public class FreeCellGameController : GameController
     {
-        [SerializeField] private SawayamaView _view;
-        private SawayamaGame _game;
+        [SerializeField] private FreeCellGameView _view;
+        private FreeCellGameGame _game;
+        public override bool IsAutoMovesEnabled()
+        {
+            return true;
+        }
 
         public override bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
         {
@@ -19,7 +22,7 @@ namespace Sawayama
 
         public override bool IsCardInTargetPile(Card card, out TargetCardPileView result)
         {
-            return _view.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+            return _view.IsCardInTargetPile(_game.FCState.GetCardPileOwnerData(card), out result);
         }
 
         public override bool IsRestockAvailable()
@@ -27,12 +30,7 @@ namespace Sawayama
             return false;
         }
 
-        public override bool IsAutoMovesEnabled()
-        {
-            return true;
-        }
-
-        public override void ResetSettingsToDefault() {}
+        public override void ResetSettingsToDefault() { }
 
         protected override List<PileKind> Action_DoubleClickedCard(Card card)
         {
@@ -44,14 +42,9 @@ namespace Sawayama
             return _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
         }
 
-        protected override Func<List<PileKind>> Action_PileClicked(PileKind pileKind)
+        protected override Func<List<PileKind>> Action_PileClicked(PileKind kind)
         {
-            Func<List<PileKind>> action = pileKind switch
-            {
-                PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
-                _ => null
-            };
-            return action;
+            return null;
         }
 
         protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
@@ -61,11 +54,12 @@ namespace Sawayama
 
         protected override void CreateDeck()
         {
-            _deck = SawayamaGame.CreateGameDeck();
+            _deck = FreeCellGameGame.CreateGameDeck();
         }
+
         protected override void CreateGame()
         {
-            _game = new SawayamaGame(_deck);
+            _game = new FreeCellGameGame(_deck);
         }
 
         protected override void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
@@ -79,30 +73,10 @@ namespace Sawayama
             {
                 switch (kind)
                 {
-                    case PileKind.WASTE:
-                        _viewsRefreshing++;
-                        _view.RefreshWaste(
-                            CommonUtils.CloneStack(_game.SState.WastePile),
-                            cardMoved,
-                            originalCardPosition,
-                            immediate,
-                            RefreshDone);
-                        break;
-
-                    case PileKind.STOCK:
-                        _viewsRefreshing++;
-                        _view.RefreshStock(
-                            CommonUtils.CloneStack(_game.SState.StockPile),
-                            cardMoved,
-                            originalCardPosition,
-                            immediate,
-                            RefreshDone);
-                        break;
-
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
                         _view.RefreshFoundations(
-                            CardUtils.GetClonedStacks(_game.SState.Foundations),
+                            CardUtils.GetClonedStacks(_game.FCState.Foundations),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -112,7 +86,17 @@ namespace Sawayama
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
                         _view.RefreshTableaus(
-                            CardUtils.GetClonedStacks(_game.SState.Tableaus),
+                            CardUtils.GetClonedStacks(_game.FCState.Tableaus),
+                            cardMoved,
+                            originalCardPosition,
+                            immediate,
+                            RefreshDone);
+                        break;
+
+                    case PileKind.FREECELL:
+                        _viewsRefreshing++;
+                        _view.RefreshFreeCells(
+                            CardUtils.GetClonedStacks(_game.FCState.FreeCells),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -131,7 +115,18 @@ namespace Sawayama
             onDone?.Invoke();
         }
 
+        protected override Vector3 GetCardViewPosition(Card card)
+        {
+            return _view.GetCardViewPosition(card);
+        }
+
+        protected override Card GetSolvableCard()
+        {
+            return _game.GetSolvableCard();
+        }
+
         protected override void InitConfig() { }
+
         protected override void InitView()
         {
             _view.Init(this);
@@ -140,27 +135,14 @@ namespace Sawayama
         protected override void LoadDeckView(Action onDone)
         {
             Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, _view.StockTransform, onDone);
+            _view.Deck.Load(_deck, _view.FirstTableauTransform, onDone);
         }
+
+        protected override void ResetView() { }
 
         protected override void UpdateWinsCount()
         {
-            SawayamaSettings.WinCount++;
-        }
-
-        protected override void ResetView()
-        {
-            _view.Reset();
-        }
-
-        protected override Card GetSolvableCard()
-        {
-           return _game.GetSolvableCard();
-        }
-
-        protected override Vector3 GetCardViewPosition(Card card)
-        {
-            return _view.GetCardViewPosition(card);
+            FreeCellGameSettings.WinCount++;
         }
     }
 }

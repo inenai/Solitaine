@@ -28,7 +28,8 @@ namespace Common
         WASTE,
         STOCK,
         FOUNDATION,
-        TABLEAU
+        TABLEAU,
+        FREECELL
     }
 
     public enum DragMode

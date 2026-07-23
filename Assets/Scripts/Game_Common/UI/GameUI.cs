@@ -1,3 +1,4 @@
+using FreeCell;
 using Klondike;
 using Sawayama;
 using TMPro;
@@ -17,7 +18,6 @@ namespace Common
 
         [SerializeField] private GameObject _controlsTxt;
 
-        private GameNavigator _navi;
         private IGameController _controller;
 
         public void Init(IGameController controller)
@@ -26,7 +26,6 @@ namespace Common
             _controlsTxt.SetActive(false);
 #endif
             _controller = controller;
-            _navi = GetComponent<GameNavigator>();
             _gameLabel.text = _solitaireKind.ToString();
             UpdateWins();
         }
@@ -62,6 +61,9 @@ namespace Common
                     break;
                 case SolitaireKind.SAWAYAMA:
                     wins = SawayamaSettings.WinCount;
+                    break;
+                case SolitaireKind.FREECELL:
+                    wins = FreeCellGameSettings.WinCount;
                     break;
             }
             _winsTxt.text = $"Wins: {wins}";

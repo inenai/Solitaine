@@ -11,7 +11,6 @@ namespace Klondike
     {
         [SerializeField] private KlondikeConfig _defaultConfig;
         [SerializeField] private KlondikeView _view;
-        private int _viewsRefreshing = 0;
         private KlondikeGame _game;
 
         public override bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)

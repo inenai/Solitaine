@@ -8,7 +8,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     [SerializeField] protected MyInputManager _input;
     [SerializeField] protected GameUI _ui;
 
-
+    protected int _viewsRefreshing = 0;
     protected List<Card> _deck;
     private GameStatus _status = GameStatus.INITIALIZING;
 
