@@ -186,6 +186,14 @@ namespace Sawayama
                     {
                         targetPileKind = PileKind.STOCK;
                     }
+                    else
+                    {
+                        cardMoved = TryMoveCardToAnyFoundation(card);
+                        if (cardMoved)
+                        {
+                            targetPileKind = PileKind.FOUNDATION;
+                        }
+                    }
                 }
 
                 if (cardMoved)

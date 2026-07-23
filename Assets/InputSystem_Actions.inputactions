@@ -101,7 +101,7 @@
                     "path": "<Mouse>/position",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Touch",
+                    "groups": ";Keyboard&Mouse",
                     "action": "PointerMoved",
                     "isComposite": false,
                     "isPartOfComposite": false
