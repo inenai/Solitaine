@@ -261,9 +261,11 @@ namespace FreeCell
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
+            int targetIndexExclude = sourcePileData.Kind == PileKind.TABLEAU ? sourcePileData.Index : -1;
+
             ExecuteAction(() =>
             {
-                bool cardMoved = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+                bool cardMoved = TryMoveCardToAnyTableau(card, targetIndexExclude);
 
                 if (cardMoved)
                 {
