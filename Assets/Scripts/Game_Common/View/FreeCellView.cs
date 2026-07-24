@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 namespace Common
 {
     public class FreeCellView : TargetCardPileView
     {
-
         private CardView _cardView;
+        private Vector3 _cardPosition;
 
-        protected override void OnInit() { }
+        protected override void OnInit()
+        {
+            _cardPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z + CardUtils.CardStackZOffset);
+        }
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
@@ -21,7 +25,7 @@ namespace Common
                 return;
             }
 
-            _cardView = StackCardsInPosition(cards, transform.position, transform, "Card_FC_")[0];
+            _cardView = StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_")[0];
 
             if (cardMoved != cards.Peek())
             {
@@ -30,7 +34,7 @@ namespace Common
                 return;
             }
 
-            AnimateCardMoved(_cardView, originalCardPosition, transform.position, onDone);
+            AnimateCardMoved(_cardView, originalCardPosition, _cardPosition, onDone);
         }
 
 
