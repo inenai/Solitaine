@@ -95,11 +95,16 @@ namespace FreeCell
                         && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
                     return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
-                    bool toEmpty = _state.Tableaus[targetPileIndex].Count == 0;
-                    bool validMove = _state.Tableaus[targetPileIndex].Count > 0 &&
-                        ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
-                    bool enoughSpace = sourcePileData.Kind != PileKind.TABLEAU || GetMovingStackSize(card, sourcePileData) <= _state.FreeMovingSpaces + 1;
-                    return enoughSpace && (toEmpty || validMove);
+                    bool toEmptyTableau = _state.Tableaus[targetPileIndex].Count == 0;
+
+                    bool validStack = ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                    bool fromTableau = sourcePileData.Kind == PileKind.TABLEAU;
+                    bool hasRoom = GetMovingStackSize(card, sourcePileData) <= _state.FreeMovingSpaces + (toEmptyTableau ? 0 : 1);
+
+                    bool validMove = !toEmptyTableau && validStack;
+                    bool hasSpaceToMove = !fromTableau || hasRoom;
+                    Log($"Can add card {card} to tableau? {hasSpaceToMove && (toEmptyTableau || validMove)}. toEmptyTableau {toEmptyTableau}, validStack {validStack}, fromTableau {fromTableau}, hasRoom {hasRoom}, validMove {validMove}, hasSpaceToMove {hasSpaceToMove}, should be hasSpaceToMove && (toEmptyTableau || validMove)");
+                    return hasSpaceToMove && (toEmptyTableau || validMove);
                 case PileKind.FREECELL:
                     bool cellEmpty = _state.FreeCells[targetPileIndex].Count == 0;
                     return cellEmpty && !tableauCardStackParent;
