@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Common;
 using UnityEngine;
@@ -12,35 +11,43 @@ public class DeckView
     private GameView _gameView;
     private Dictionary<Card, CardView> _deckView;
     private float _cardHeight;
-    private int _coroutinesRunning;
+    // private int _coroutinesRunning;
+    private CardView[] _cardViews;
 
-    public DeckView(GameView view)
+    public DeckView(GameView view, CardView[] cardViews)
     {
         _deckView = new();
         _gameView = view;
+        _cardViews = cardViews;
     }
 
-    public void Load(List<Card> cards, Transform parent, Action onDone)
+    public void Load(List<Card> cards, Action onDone)
     {
-        Debug.Log($"Load. Creating {cards.Count} cards...");
-        _coroutinesRunning = 0;
-        float zOffset = CardUtils.CardStackZOffset;
-        foreach (Card card in cards)
+        Debug.Log($"Load. Loading {cards.Count} cards...");
+        if (cards.Count != _cardViews.Length)
         {
-            _coroutinesRunning++;
-            CreateCardUI(parent, card, zOffset, () =>
-            {
-                _coroutinesRunning--;
-            });
+            throw new Exception("Scene has not enough pre-loaded cards!!!");
+        }
+
+        float zOffset = CardUtils.CardStackZOffset;
+        for (int i = 0; i < cards.Count; i++)
+        {
+            InitCard(_cardViews[i], cards[i], zOffset);
             zOffset += CardUtils.CardStackZOffset;
         }
-        _gameView.StartCoroutine(WaitForAllCoroutinesDone(onDone));
+        onDone?.Invoke();
     }
 
-    private IEnumerator WaitForAllCoroutinesDone(Action onDone)
+    private void InitCard(CardView cardView, Card card, float zOffset)
     {
-        while (_coroutinesRunning > 0) yield return null;
-        onDone?.Invoke();
+        cardView.gameObject.name = $"Card_{card}";
+        cardView.transform.localPosition = new Vector3(0f, 0f, zOffset);
+        cardView.Init(_gameView, card);
+        if (_cardHeight == default)
+        {
+            _cardHeight = cardView.GetComponent<Collider2D>().bounds.size.y;
+        }
+        _deckView.Add(card, cardView);
     }
 
     public CardView GetCardView(Card card)
@@ -55,30 +62,29 @@ public class DeckView
         return _deckView[card];
     }
 
-    private void CreateCardUI(Transform transform, Card card, float zOffset, Action onDone)
-    {
-        //Debug.Log($"Create card {card}...");
-        AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
-        {
-            InitCardGameObject(gameObject, card, zOffset);
-            onDone?.Invoke();
-            //Debug.Log($"Create card {card} done.");
-        }, (errorMessage) => {
-            Debug.LogError(errorMessage);
-            onDone?.Invoke();
-        });
-    }
+    // private void CreateCardUI(Transform transform, Card card, float zOffset, Action onDone)
+    // {
+    //     //Debug.Log($"Create card {card}...");
+    //     AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
+    //     {
+    //         InitCardGameObject(gameObject, card, zOffset);
+    //         onDone?.Invoke();
+    //         //Debug.Log($"Create card {card} done.");
+    //     }, (errorMessage) =>
+    //     {
+    //         Debug.LogError(errorMessage);
+    //         onDone?.Invoke();
+    //     });
+    // }
 
-    private void InitCardGameObject(GameObject gameObject, Card card, float zOffset)
-    {
-        gameObject.name = $"Card_{card}";
-        gameObject.transform.localPosition = new Vector3(0f, 0f, zOffset);
-        CardView cardView = gameObject.GetComponent<CardView>();
-        cardView.Init(_gameView, card);
-        if (_cardHeight == default)
-        {
-            _cardHeight = cardView.GetComponent<Collider2D>().bounds.size.y;
-        }
-        _deckView.Add(card, cardView);
-    }
+    // private IEnumerator WaitForAllCoroutinesDone(Action onDone)
+    // {
+    //     while (_coroutinesRunning > 0) yield return null;
+    //     onDone?.Invoke();
+    // }
+
+    // private void InitCardGameObject(GameObject gameObject, Card card, float zOffset)
+    // {
+    //     InitCard(gameObject.GetComponent<CardView>(), card, zOffset);
+    // }
 }

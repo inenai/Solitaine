@@ -13,8 +13,6 @@ namespace FreeCell
         [SerializeField] FoundationView[] _foundations;
         [SerializeField] TableauView[] _tableaus;
 
-        public Transform FirstTableauTransform => _tableaus[0].transform;
-
         private int _refreshFoundationsCoroutinesRunning;
         private int _refreshTableausCoroutinesRunning;
         private int _refreshFreeCellsCoroutinesRunning;

@@ -14,8 +14,6 @@ namespace Klondike
         [SerializeField] FoundationView[] _foundations;
         [SerializeField] TableauView[] _tableaus;
 
-        public Transform StockTransform => _stock.CardsRootTr;
-
         private int _refreshFoundationsCoroutinesRunning;
         private int _refreshTableausCoroutinesRunning;
 

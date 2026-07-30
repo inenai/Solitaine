@@ -135,7 +135,7 @@ namespace FreeCell
         protected override void LoadDeckView(Action onDone)
         {
             Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, _view.FirstTableauTransform, onDone);
+            _view.Deck.Load(_deck, onDone);
         }
 
         protected override void ResetView() { }
