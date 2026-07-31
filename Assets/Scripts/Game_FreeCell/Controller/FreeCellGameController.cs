@@ -9,20 +9,11 @@ namespace FreeCell
     public class FreeCellGameController : GameController
     {
         [SerializeField] private FreeCellGameView _view;
-        private FreeCellGameGame _game;
+
+        private FreeCellGameGame FCGame => (FreeCellGameGame)_game;
         public override bool IsAutoMovesEnabled()
         {
             return true;
-        }
-
-        public override bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
-        {
-            return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
-        }
-
-        public override bool IsCardInTargetPile(Card card, out TargetCardPileView result)
-        {
-            return _view.IsCardInTargetPile(_game.FCState.GetCardPileOwnerData(card), out result);
         }
 
         public override bool IsRestockAvailable()
@@ -30,26 +21,9 @@ namespace FreeCell
             return false;
         }
 
-        public override void ResetSettingsToDefault() { }
-
-        protected override List<PileKind> Action_DoubleClickedCard(Card card)
+        public override void ResetSettingsToDefault()
         {
-            return _game.Action_TryMoveCardAutomatic(card);
-        }
 
-        protected override List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
-        {
-            return _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
-        }
-
-        protected override Func<List<PileKind>> Action_PileClicked(PileKind kind)
-        {
-            return null;
-        }
-
-        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
-        {
-            return _game.Auto_TryMoveCardToFoundationAutomatic(card);
         }
 
         protected override void CreateDeck()
@@ -76,7 +50,7 @@ namespace FreeCell
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
                         _view.RefreshFoundations(
-                            CardUtils.GetClonedStacks(_game.FCState.Foundations),
+                            CardUtils.GetClonedStacks(FCGame.FCState.Foundations),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -86,7 +60,7 @@ namespace FreeCell
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
                         _view.RefreshTableaus(
-                            CardUtils.GetClonedStacks(_game.FCState.Tableaus),
+                            CardUtils.GetClonedStacks(FCGame.FCState.Tableaus),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -96,7 +70,7 @@ namespace FreeCell
                     case PileKind.FREECELL:
                         _viewsRefreshing++;
                         _view.RefreshFreeCells(
-                            CardUtils.GetClonedStacks(_game.FCState.FreeCells),
+                            CardUtils.GetClonedStacks(FCGame.FCState.FreeCells),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -115,30 +89,21 @@ namespace FreeCell
             onDone?.Invoke();
         }
 
-        protected override Vector3 GetCardViewPosition(Card card)
+        protected override void InitConfig()
         {
-            return _view.GetCardViewPosition(card);
+
         }
 
-        protected override Card GetSolvableCard()
+        protected override void InitGameView()
         {
-            return _game.GetSolvableCard();
-        }
-
-        protected override void InitConfig() { }
-
-        protected override void InitView()
-        {
+            _gameView = _view;
             _view.Init(this);
         }
 
-        protected override void LoadDeckView(Action onDone)
+        protected override void ResetView()
         {
-            Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, onDone);
-        }
 
-        protected override void ResetView() { }
+        }
 
         protected override void UpdateWinsCount()
         {

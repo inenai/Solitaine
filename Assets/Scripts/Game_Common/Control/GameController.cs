@@ -10,6 +10,8 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     protected int _viewsRefreshing = 0;
     protected List<Card> _deck;
+    protected Game _game;
+    protected GameView _gameView;
     private GameStatus _status = GameStatus.INITIALIZING;
 
     GameStatus Status
@@ -25,23 +27,44 @@ public abstract class GameController : MonoBehaviour, IGameController
     public abstract void ResetSettingsToDefault();
     public abstract bool IsRestockAvailable();
     public abstract bool IsAutoMovesEnabled();
-    public abstract bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex);
-    public abstract bool IsCardInTargetPile(Card card, out TargetCardPileView result);
-    protected abstract void InitView();
+    protected abstract void InitGameView();
     protected abstract void CreateDeck();
     protected abstract void CreateGame();
     protected abstract void ResetView();
     protected abstract void InitConfig();
     protected abstract void UpdateWinsCount();
-    protected abstract Card GetSolvableCard();
-    protected abstract Vector3 GetCardViewPosition(Card card);
-    protected abstract void LoadDeckView(Action onDone);
     protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false);
 
-    protected abstract Func<List<PileKind>> Action_PileClicked(PileKind kind);
-    protected abstract List<PileKind> Action_DoubleClickedCard(Card card);
-    protected abstract List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex);
-    protected abstract List<PileKind> Auto_MoveCardAutomatically(Card card);
+    public bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
+    {
+        return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
+    }
+
+    public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
+    {
+        return _gameView.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+    }
+
+    protected Card GetSolvableCard()
+    {
+        return _game.GetSolvableCard();
+    }
+
+    protected Vector3 GetCardViewPosition(Card card)
+    {
+        return _gameView.GetCardViewPosition(card);
+    }
+
+    protected void LoadDeckView(Action onDone)
+    {
+        Debug.Log("LoadDeckView.");
+        _gameView.Deck.Load(_deck, onDone);
+    }
+
+    protected List<PileKind> AutoAction_MoveCardAutomatically(Card card)
+    {
+        return _game.GameAction_TryMoveCardToFoundationAutomatic(card);
+    }
 
     #region Initialization
     void Start()
@@ -67,7 +90,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         RegisterToEvents();
         InitConfig();
         _ui.Init(this);
-        InitView();
+        InitGameView();
         LoadDeckView(onDone);
     }
 
@@ -77,6 +100,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         ResetDeck();
         ResetView();
         CreateGame();
+        _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
     }
 
@@ -101,49 +125,40 @@ public abstract class GameController : MonoBehaviour, IGameController
         });
     }
 
-    public bool PileClicked(PileKind pileKind, int pileIndex)
+    public bool InputAction_PileClicked(PileKind pileKind, int pileIndex)
     {
         Debug.Log("Processing pile clicked.");
         if (Status != GameStatus.LISTENING) return false;
         Status = GameStatus.PROCESSING;
 
-        Func<List<PileKind>> action = Action_PileClicked(pileKind);
-
-        if (action == null)
-        {
-            Status = GameStatus.LISTENING;
-            return false;
-        }
-
         return CheckRefreshView(
-            action.Invoke(), null, default, () =>
+            _game.GameAction_ClickedPile(pileKind, pileIndex), null, default, () =>
             {
                 Status = GameStatus.LISTENING;
             });
     }
 
-
-    public bool CardDoubleClicked(Card card, Vector3 originalCardPosition)
+    public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
         Debug.Log("Processing double click.");
         if (Status != GameStatus.LISTENING) return false;
         Status = GameStatus.PROCESSING;
 
         return CheckRefreshView(
-            Action_DoubleClickedCard(card), card, originalCardPosition, () =>
+            _game.GameAction_TryMoveCardAutomatic(card), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
             });
     }
 
-    public bool CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
+    public bool InputAction_CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
     {
         Debug.Log("Processing card dragged to pile.");
         if (Status != GameStatus.LISTENING) return false;
         Status = GameStatus.PROCESSING;
 
         return CheckRefreshView(
-            Action_DragCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
+            _game.GameAction_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
             }, true);
@@ -172,7 +187,7 @@ public abstract class GameController : MonoBehaviour, IGameController
                     Vector3 originalSolvableCardPosition = GetCardViewPosition(solvableCard);
                     Debug.Log("Auto moves enabled. Solving automatic move.");
                     CheckRefreshView(
-                        Auto_MoveCardAutomatically(solvableCard), solvableCard, originalSolvableCardPosition, onDone, false);
+                        AutoAction_MoveCardAutomatically(solvableCard), solvableCard, originalSolvableCardPosition, onDone, false);
                 }
                 else
                 {
@@ -216,7 +231,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     private void OnDrawFromStockEvent()
     {
-        PileClicked(PileKind.STOCK, -1);
+        InputAction_PileClicked(PileKind.STOCK, -1);
     }
 
     private void OnGameWon()

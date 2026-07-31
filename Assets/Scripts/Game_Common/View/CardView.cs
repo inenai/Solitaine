@@ -96,7 +96,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         if (_targetPile != null && !cancelled)
         {
-            bool successfulMove = _view.Controller.CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
+            bool successfulMove = _view.Controller.InputAction_CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
             if (!successfulMove)
             {
                 Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
@@ -340,7 +340,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         if (_card == null) return;
         if (!_card.Revealed) return; //Ignores double clicks on hidden cards
 
-        _view.Controller.CardDoubleClicked(_card, transform.position);
+        _view.Controller.InputAction_CardDoubleClicked(_card, transform.position);
         Log($"{_card} Double Clicked!");
     }
     #endregion

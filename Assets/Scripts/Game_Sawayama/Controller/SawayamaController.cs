@@ -10,17 +10,7 @@ namespace Sawayama
     public class SawayamaController : GameController
     {
         [SerializeField] private SawayamaView _view;
-        private SawayamaGame _game;
-
-        public override bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
-        {
-            return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
-        }
-
-        public override bool IsCardInTargetPile(Card card, out TargetCardPileView result)
-        {
-            return _view.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
-        }
+        private SawayamaGame SGame => (SawayamaGame)_game;
 
         public override bool IsRestockAvailable()
         {
@@ -33,31 +23,6 @@ namespace Sawayama
         }
 
         public override void ResetSettingsToDefault() {}
-
-        protected override List<PileKind> Action_DoubleClickedCard(Card card)
-        {
-            return _game.Action_TryMoveCardAutomatic(card);
-        }
-
-        protected override List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
-        {
-            return _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
-        }
-
-        protected override Func<List<PileKind>> Action_PileClicked(PileKind pileKind)
-        {
-            Func<List<PileKind>> action = pileKind switch
-            {
-                PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
-                _ => null
-            };
-            return action;
-        }
-
-        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
-        {
-            return _game.Auto_TryMoveCardToFoundationAutomatic(card);
-        }
 
         protected override void CreateDeck()
         {
@@ -82,7 +47,7 @@ namespace Sawayama
                     case PileKind.WASTE:
                         _viewsRefreshing++;
                         _view.RefreshWaste(
-                            CommonUtils.CloneStack(_game.SState.WastePile),
+                            CommonUtils.CloneStack(SGame.SState.WastePile),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -92,7 +57,7 @@ namespace Sawayama
                     case PileKind.STOCK:
                         _viewsRefreshing++;
                         _view.RefreshStock(
-                            CommonUtils.CloneStack(_game.SState.StockPile),
+                            CommonUtils.CloneStack(SGame.SState.StockPile),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -102,7 +67,7 @@ namespace Sawayama
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
                         _view.RefreshFoundations(
-                            CardUtils.GetClonedStacks(_game.SState.Foundations),
+                            CardUtils.GetClonedStacks(SGame.SState.Foundations),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -112,7 +77,7 @@ namespace Sawayama
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
                         _view.RefreshTableaus(
-                            CardUtils.GetClonedStacks(_game.SState.Tableaus),
+                            CardUtils.GetClonedStacks(SGame.SState.Tableaus),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -132,15 +97,10 @@ namespace Sawayama
         }
 
         protected override void InitConfig() { }
-        protected override void InitView()
+        protected override void InitGameView()
         {
+            _gameView = _view;
             _view.Init(this);
-        }
-
-        protected override void LoadDeckView(Action onDone)
-        {
-            Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, onDone);
         }
 
         protected override void UpdateWinsCount()
@@ -151,16 +111,6 @@ namespace Sawayama
         protected override void ResetView()
         {
             _view.Reset();
-        }
-
-        protected override Card GetSolvableCard()
-        {
-           return _game.GetSolvableCard();
-        }
-
-        protected override Vector3 GetCardViewPosition(Card card)
-        {
-            return _view.GetCardViewPosition(card);
         }
     }
 }

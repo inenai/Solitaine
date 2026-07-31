@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Common;
 using UnityEngine;
 
 public abstract class Game
@@ -40,5 +42,14 @@ public abstract class Game
         Debug.Log("=== SOLITAIRE STATE ===");
         State.LogState();
     }
+
+    public abstract bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex);
+    public abstract List<PileKind> GameAction_TryMoveCardAutomatic(Card card);
+    public abstract List<PileKind> GameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex);
+    public abstract List<PileKind> GameAction_TryMoveCardToFoundationAutomatic(Card card);
+    public abstract List<PileKind> GameAction_ClickedPile(PileKind pileKind, int pileIndex);
+    public abstract Card GetSolvableCard();
+
+
     #endregion
 }

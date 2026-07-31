@@ -40,7 +40,7 @@ namespace Common
         public void OnClick()
         {
             Debug.Log($"Stock pile clicked!");
-            _view.Controller.PileClicked(PileKind.STOCK, -1);
+            _view.Controller.InputAction_PileClicked(PileKind.STOCK, -1);
         }
 
         public bool CanClick()

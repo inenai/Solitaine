@@ -75,7 +75,7 @@ namespace FreeCell
             return !sameColor && child.Value == parent.Value - 1;
         }
 
-        public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
+        public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
             PileData sourcePileData = State.GetCardPileOwnerData(card);
             if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
@@ -164,7 +164,7 @@ namespace FreeCell
             return deck;
         }
 
-        public Card GetSolvableCard()
+        public override Card GetSolvableCard()
         {
             Debug.Log("Looking for automatic move");
 
@@ -259,7 +259,7 @@ namespace FreeCell
             return card2found;
         }
 
-        public List<PileKind> Action_TryMoveCardAutomatic(Card card)
+        public override List<PileKind> GameAction_TryMoveCardAutomatic(Card card)
         {
             Log($"USER Action_TryMoveCardAutomatic {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -304,6 +304,11 @@ namespace FreeCell
             });
 
             return affectedPiles;
+        }
+
+        public override List<PileKind> GameAction_ClickedPile(PileKind pileKind, int pileIndex)
+        {
+            return new List<PileKind>();
         }
 
         private bool TryMoveCardToAnyFreeCell(Card card)
@@ -413,7 +418,7 @@ namespace FreeCell
             return false;
         }
 
-        public List<PileKind> Action_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
+        public override List<PileKind> GameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
         {
             Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -448,7 +453,7 @@ namespace FreeCell
             return affectedPiles;
         }
 
-        public List<PileKind> Auto_TryMoveCardToFoundationAutomatic(Card card)
+        public override List<PileKind> GameAction_TryMoveCardToFoundationAutomatic(Card card)
         {
             Log($"INNER MoveCardAutomatically {card}");
             PileData sourcePileData = _state.GetCardPileOwnerData(card);

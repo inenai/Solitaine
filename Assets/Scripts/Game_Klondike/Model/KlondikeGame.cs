@@ -9,8 +9,10 @@ namespace Klondike
     public class KlondikeGame : Game
     {
         public override IGameState State => _state;
-        protected override string DebugTag => "Klondike";
+
         public KlondikeState KState => _state;
+        protected override string DebugTag => "Klondike";
+
         KlondikeState _state;
 
         #region initialization
@@ -80,28 +82,14 @@ namespace Klondike
         #endregion
 
         #region userInteraction
-        public List<PileKind> Action_TryDrawCardsFromStock()
-        {
-            List<PileKind> affectedPiles = new List<PileKind>();
-            bool uiRefreshNeeded = ExecuteAction(() =>
-            {
-                return TryDrawCardsFromStock();
-            });
 
-            if (uiRefreshNeeded)
-            {
-                affectedPiles.Add(PileKind.WASTE);
-                affectedPiles.Add(PileKind.STOCK);
-            }
-            return affectedPiles;
-        }
 
         /// <summary>
         /// </summary>
         /// <param name="card"></param>
         /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
         /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public List<PileKind> Action_TryMoveCardAutomatic(Card card)
+        public override List<PileKind> GameAction_TryMoveCardAutomatic(Card card)
         {
             Log($"USER Action_TryMoveCardAutomatic {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -169,6 +157,50 @@ namespace Klondike
             return affectedPiles;
         }
 
+        public override List<PileKind> GameAction_TryMoveCardToFoundationAutomatic(Card card)
+        {
+            Log($"USER GameAction_TryMoveCardToFoundationAutomatic {card}");
+            List<PileKind> affectedPiles = new List<PileKind>();
+            PileData sourcePileData = _state.GetCardPileOwnerData(card);
+
+            if (sourcePileData.Kind == PileKind.FOUNDATION || sourcePileData.Kind == PileKind.STOCK)
+                return new List<PileKind>();
+
+            ExecuteAction(() =>
+            {
+                bool cardMoved = TryMoveCardToAnyFoundation(card);
+
+                if (cardMoved)
+                {
+                    affectedPiles.Add(sourcePileData.Kind);
+                    affectedPiles.Add(PileKind.FOUNDATION);
+                }
+
+                return cardMoved;
+            });
+
+            return affectedPiles;
+        }
+
+        public override List<PileKind> GameAction_ClickedPile(PileKind pileKind, int pileIndex)
+        {
+            if (pileKind != PileKind.STOCK)
+                return new List<PileKind>();
+
+            List<PileKind> affectedPiles = new List<PileKind>();
+            bool uiRefreshNeeded = ExecuteAction(() =>
+            {
+                return TryDrawCardsFromStock();
+            });
+
+            if (uiRefreshNeeded)
+            {
+                affectedPiles.Add(PileKind.WASTE);
+                affectedPiles.Add(PileKind.STOCK);
+            }
+            return affectedPiles;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="card"></param>
@@ -176,7 +208,7 @@ namespace Klondike
         /// <param name="targetPileIndex"></param>
         /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
         /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public List<PileKind> Action_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
+        public override List<PileKind> GameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
         {
             Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -380,7 +412,7 @@ namespace Klondike
             }
         }
 
-        public Card GetSolvableCard()
+        public override Card GetSolvableCard()
         {
             Debug.Log("Looking for automatic move");
 
@@ -440,7 +472,7 @@ namespace Klondike
             return !sameColor && child.Value == parent.Value - 1;
         }
 
-        public bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
+        public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
@@ -514,7 +546,6 @@ namespace Klondike
             return card2found;
         }
         #endregion
-
 
     }
 }

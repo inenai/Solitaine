@@ -11,17 +11,8 @@ namespace Klondike
     {
         [SerializeField] private KlondikeConfig _defaultConfig;
         [SerializeField] private KlondikeView _view;
-        private KlondikeGame _game;
 
-        public override bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
-        {
-            return _game.CanAddCardToPile(card, targetPile, targetPileIndex);
-        }
-
-        public override bool IsCardInTargetPile(Card card, out TargetCardPileView result)
-        {
-            return _view.IsCardInTargetPile(_game.KState.GetCardPileOwnerData(card), out result);
-        }
+        private KlondikeGame KGame => (KlondikeGame)_game;
 
         public override void ResetSettingsToDefault()
         {
@@ -30,7 +21,7 @@ namespace Klondike
 
         public override bool IsRestockAvailable()
         {
-            return _game.KState.AvailableRestocks != 0;
+            return ((KlondikeState)_game.State).AvailableRestocks != 0;
         }
 
         public override bool IsAutoMovesEnabled()
@@ -51,15 +42,10 @@ namespace Klondike
             }
         }
 
-        protected override void InitView()
+        protected override void InitGameView()
         {
+            _gameView = _view;
             _view.Init(this);
-        }
-
-        protected override void LoadDeckView(Action onDone)
-        {
-            Debug.Log("LoadDeckView.");
-            _view.Deck.Load(_deck, onDone);
         }
 
         protected override void CreateDeck()
@@ -70,26 +56,6 @@ namespace Klondike
         protected override void UpdateWinsCount()
         {
             KlondikeSettings.WinCount++;
-        }
-
-        protected override Func<List<PileKind>> Action_PileClicked(PileKind pileKind)
-        {
-            Func<List<PileKind>> action = pileKind switch
-            {
-                PileKind.STOCK => _game.Action_TryDrawCardsFromStock,
-                _ => null
-            };
-            return action;
-        }
-
-        protected override List<PileKind> Action_DoubleClickedCard(Card card)
-        {
-            return _game.Action_TryMoveCardAutomatic(card);
-        }
-
-        protected override List<PileKind> Action_DragCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
-        {
-            return _game.Action_TryMoveCardToPile(card, targetPileKind, targetPileIndex);
         }
 
         protected override void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
@@ -106,7 +72,7 @@ namespace Klondike
                     case PileKind.WASTE:
                         _viewsRefreshing++;
                         _view.RefreshWaste(
-                            CommonUtils.CloneStack(_game.KState.WastePile),
+                            CommonUtils.CloneStack(KGame.KState.WastePile),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -116,7 +82,7 @@ namespace Klondike
                     case PileKind.STOCK:
                         _viewsRefreshing++;
                         _view.RefreshStock(
-                            CommonUtils.CloneStack(_game.KState.StockPile),
+                            CommonUtils.CloneStack(KGame.KState.StockPile),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -126,7 +92,7 @@ namespace Klondike
                     case PileKind.FOUNDATION:
                         _viewsRefreshing++;
                         _view.RefreshFoundations(
-                            CardUtils.GetClonedStacks(_game.KState.Foundations),
+                            CardUtils.GetClonedStacks(KGame.KState.Foundations),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -136,7 +102,7 @@ namespace Klondike
                     case PileKind.TABLEAU:
                         _viewsRefreshing++;
                         _view.RefreshTableaus(
-                            CardUtils.GetClonedStacks(_game.KState.Tableaus),
+                            CardUtils.GetClonedStacks(KGame.KState.Tableaus),
                             cardMoved,
                             originalCardPosition,
                             immediate,
@@ -158,21 +124,6 @@ namespace Klondike
         protected override void ResetView()
         {
 
-        }
-
-        protected override Card GetSolvableCard()
-        {
-            return _game.GetSolvableCard();
-        }
-
-        protected override Vector3 GetCardViewPosition(Card card)
-        {
-            return _view.GetCardViewPosition(card);
-        }
-
-        protected override List<PileKind> Auto_MoveCardAutomatically(Card card)
-        {
-            return _game.Action_TryMoveCardAutomatic(card);
         }
     }
 }
