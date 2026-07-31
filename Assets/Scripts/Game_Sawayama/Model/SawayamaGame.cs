@@ -535,6 +535,20 @@ namespace Sawayama
             Debug.Log("Looking for automatic move");
 
             Card card;
+
+            if (_drewAllCardsFromStock && _state.StockPile.TryPeek(out card))
+            {
+                if (card != null && IsSafeToMoveCardToFoundation(card))
+                {
+                    Debug.Log($"Safe to move {card} to foundation. Can move?");
+                    if (CanMoveCardToAnyFoundation(card))
+                    {
+                        Debug.Log($"{card} can be moved from stock (free cell mode) to foundation.");
+                        return card;
+                    }
+                }
+            }
+
             _state.WastePile.TryPeek(out card);
 
             if (card != null && IsSafeToMoveCardToFoundation(card))

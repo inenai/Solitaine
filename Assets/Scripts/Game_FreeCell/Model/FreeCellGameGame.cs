@@ -97,7 +97,7 @@ namespace FreeCell
                 case PileKind.TABLEAU:
                     bool toEmptyTableau = _state.Tableaus[targetPileIndex].Count == 0;
 
-                    bool validStack = ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                    bool validStack = !toEmptyTableau && ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
                     bool fromTableau = sourcePileData.Kind == PileKind.TABLEAU;
                     bool hasRoom = GetMovingStackSize(card, sourcePileData) <= _state.FreeMovingSpaces + (toEmptyTableau ? 0 : 1);
 
