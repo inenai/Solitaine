@@ -100,7 +100,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         ResetDeck();
         ResetView();
         CreateGame();
-        _game.Init();
+       // _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
     }
 
