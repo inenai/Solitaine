@@ -37,4 +37,18 @@ namespace Common
         DRAG,
         PICKUP
     }
+
+    public enum RevealedAction
+    {
+        REVEALED,
+        HID,
+        NO_CHANGE
+    }
+
+    public enum FreedAction
+    {
+        FREED,
+        LOCKED,
+        NO_CHANGE
+    }
 }

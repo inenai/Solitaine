@@ -8,7 +8,7 @@ namespace Klondike
 {
     public class KlondikeGame : Game
     {
-        public override IGameState State => _state;
+        public override GameState State => _state;
 
         public KlondikeState KState => _state;
         protected override string DebugTag => "Klondike";
@@ -19,9 +19,20 @@ namespace Klondike
         public KlondikeGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
-            _state = new KlondikeState();
+            CreateState();
             ShuffleAndDeal(deck);
             Log();
+        }
+
+        private void CreateState()
+        {
+            _state = new KlondikeState(
+                foundations: 4,
+                tableaus: 7,
+                freeCells: 0,
+                stock: true,
+                waste: true
+            );
         }
 
         public static List<Card> CreateGameDeck()
@@ -89,15 +100,16 @@ namespace Klondike
         /// <param name="card"></param>
         /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
         /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public override List<PileKind> GameAction_TryMoveCardAutomatic(Card card)
+        public override List<PileKind> GameAction_TrySmartMoveCard(Card card)
         {
-            Log($"USER Action_TryMoveCardAutomatic {card}");
+            Log($"USER GameAction_TrySmartMoveCard {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
             ExecuteAction(() =>
             {
+                int targetPileIndex = -99;
                 bool cardMoved = false;
 
                 switch (sourcePileData.Kind)
@@ -105,7 +117,7 @@ namespace Klondike
                     case PileKind.WASTE:
                         if (IsSafeToMoveCardToFoundation(card))
                         {
-                            cardMoved = TryMoveCardToAnyFoundation(card);
+                            cardMoved = TryMoveCardToAnyFoundation(card, out targetPileIndex);
                         }
 
                         if (cardMoved)
@@ -114,14 +126,14 @@ namespace Klondike
                         }
                         else
                         {
-                            cardMoved = TryMoveCardToAnyTableau(card);
+                            cardMoved = TryMoveCardToAnyTableau(card, out targetPileIndex);
                             if (cardMoved)
                             {
                                 targetPileKind = PileKind.TABLEAU;
                             }
                             else
                             {
-                                cardMoved = TryMoveCardToAnyFoundation(card);
+                                cardMoved = TryMoveCardToAnyFoundation(card, out targetPileIndex);
                                 if (cardMoved)
                                 {
                                     targetPileKind = PileKind.FOUNDATION;
@@ -130,15 +142,15 @@ namespace Klondike
                         }
                         break;
                     case PileKind.FOUNDATION:
-                        cardMoved = TryMoveCardToAnyTableau(card);
+                        cardMoved = TryMoveCardToAnyTableau(card, out targetPileIndex);
                         if (cardMoved) targetPileKind = PileKind.TABLEAU;
                         break;
                     case PileKind.TABLEAU:
-                        cardMoved = TryMoveCardToAnyFoundation(card);
+                        cardMoved = TryMoveCardToAnyFoundation(card, out targetPileIndex);
                         if (cardMoved) targetPileKind = PileKind.FOUNDATION;
                         if (!cardMoved)
                         {
-                            cardMoved = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+                            cardMoved = TryMoveCardToAnyTableau(card, out targetPileIndex, sourcePileData.Index);
                             if (cardMoved) targetPileKind = PileKind.TABLEAU;
                         }
                         break;
@@ -149,15 +161,16 @@ namespace Klondike
                     affectedPiles.Add(sourcePileData.Kind);
                     if (sourcePileData.Kind != targetPileKind)
                         affectedPiles.Add(targetPileKind);
-                }
 
-                return cardMoved;
+                    return new GameCommand(sourcePileData.Kind, sourcePileData.Index, targetPileKind, targetPileIndex, false, false);
+                }
+                return null;
             });
 
             return affectedPiles;
         }
 
-        public override List<PileKind> GameAction_TryMoveCardToFoundationAutomatic(Card card)
+        public override List<PileKind> AutoAction_TryMoveCardToFoundationAutomatically(Card card)
         {
             Log($"USER GameAction_TryMoveCardToFoundationAutomatic {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
@@ -168,15 +181,17 @@ namespace Klondike
 
             ExecuteAction(() =>
             {
-                bool cardMoved = TryMoveCardToAnyFoundation(card);
+                int targetPileIndex = -99;
+                bool cardMoved = TryMoveCardToAnyFoundation(card, out targetPileIndex);
 
                 if (cardMoved)
                 {
                     affectedPiles.Add(sourcePileData.Kind);
                     affectedPiles.Add(PileKind.FOUNDATION);
-                }
 
-                return cardMoved;
+                    return new GameCommand(sourcePileData.Kind, sourcePileData.Index, PileKind.FOUNDATION, targetPileIndex, true);
+                }
+                return null;
             });
 
             return affectedPiles;
@@ -190,7 +205,19 @@ namespace Klondike
             List<PileKind> affectedPiles = new List<PileKind>();
             bool uiRefreshNeeded = ExecuteAction(() =>
             {
-                return TryDrawCardsFromStock();
+                int drewAmount = 0;
+                if (TryDrawCardsFromStock(out drewAmount))
+                {
+                    return new GameCommand(PileKind.STOCK, -1, PileKind.WASTE, -1, false, drewAmount);
+                }
+                else
+                {
+                    if (TryRestock())
+                    {
+                        return new GameCommand(PileKind.WASTE, -1, PileKind.STOCK, -1, false, _state.StockPile.Count);
+                    }
+                }
+                return null;
             });
 
             if (uiRefreshNeeded)
@@ -245,12 +272,14 @@ namespace Klondike
         #region innerActions
 
         // DEAL
-        private bool TryDrawCardsFromStock()
+        private bool TryDrawCardsFromStock(out int drewAmount)
         {
             Log("INNER TryDrawCardsFromStock");
+            drewAmount = 0;
+
             if (_state.StockPile.Count == 0)
             {
-                return TryRestock();
+                return false;
             }
 
             if (_state.WastePile.TryPeek(out var topCard))
@@ -291,29 +320,36 @@ namespace Klondike
         }
 
         //ADD TO ANY
-        private bool TryMoveCardToAnyFoundation(Card card)
+        private bool TryMoveCardToAnyFoundation(Card card, out int targetPileIndex)
         {
             Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
                 if (TryMoveCardToFoundationIndex(card, i))
                 {
+                    targetPileIndex = i;
                     return true;
                 }
             }
+            targetPileIndex = -99;
             return false;
         }
 
-        private bool TryMoveCardToAnyTableau(Card card, int excludeIndex = -1)
+        private bool TryMoveCardToAnyTableau(Card card, out int targetPileIndex, int excludeIndex = -1)
         {
             Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
             bool success = false;
+            targetPileIndex = -99;
             for (int i = 0; i < _state.Tableaus.Length; i++)
             {
                 if (i == excludeIndex) continue;
 
                 success = TryMoveCardsToTableauIndex(card, i);
-                if (success) break;
+                if (success)
+                {
+                    targetPileIndex = i;
+                    break;
+                }
             }
             return success;
         }

@@ -8,5 +8,5 @@ public static class EventManager
     public static Action OnGameWon;
     public static Action OnMenuOpened;
     public static Action OnMenuClosed;
-    public static Action OnStockEmpty;
+    public static Action<bool> OnStockEmpty;
 }

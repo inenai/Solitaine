@@ -63,7 +63,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     protected List<PileKind> AutoAction_MoveCardAutomatically(Card card)
     {
-        return _game.GameAction_TryMoveCardToFoundationAutomatic(card);
+        return _game.AutoAction_TryMoveCardToFoundationAutomatically(card);
     }
 
     #region Initialization
@@ -100,7 +100,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         ResetDeck();
         ResetView();
         CreateGame();
-       // _game.Init();
+        _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
     }
 
@@ -145,7 +145,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         Status = GameStatus.PROCESSING;
 
         return CheckRefreshView(
-            _game.GameAction_TryMoveCardAutomatic(card), card, originalCardPosition, () =>
+            _game.GameAction_TrySmartMoveCard(card), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
             });
@@ -237,6 +237,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     private void OnGameWon()
     {
         UpdateWinsCount();
+        _game.ResetSavedMoves();
         _ui.OnGameWon();
     }
 
