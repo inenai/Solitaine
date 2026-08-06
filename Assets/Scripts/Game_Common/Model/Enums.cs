@@ -41,14 +41,12 @@ namespace Common
     public enum RevealedAction
     {
         REVEALED,
-        HID,
-        NO_CHANGE
+        HID
     }
 
     public enum FreedAction
     {
         FREED,
-        LOCKED,
-        NO_CHANGE
+        LOCKED
     }
 }

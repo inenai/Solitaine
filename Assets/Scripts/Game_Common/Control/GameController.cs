@@ -42,7 +42,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
     {
-        return _gameView.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+        return _gameView.IsCardInATargetablePile(_game.State.GetCardPileOwnerData(card), out result);
     }
 
     protected Card GetSolvableCard()

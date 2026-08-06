@@ -17,7 +17,7 @@ namespace FreeCell
         private int _refreshTableausCoroutinesRunning;
         private int _refreshFreeCellsCoroutinesRunning;
 
-        public override bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
+        public override bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result)
         {
             result = null;
             switch (cardOwnerData.Kind)

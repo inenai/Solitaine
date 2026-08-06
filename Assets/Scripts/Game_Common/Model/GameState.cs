@@ -6,7 +6,6 @@ namespace Common
 {
     public abstract class GameState
     {
-        private static long _commandId;
         public Stack<Card> Deck;
         public Stack<Card> StockPile;
         public Stack<Card> WastePile;
@@ -25,6 +24,7 @@ namespace Common
             }
         }
         protected abstract void ApplyConfig();
+        public virtual void OnRestock(bool undo = false){}
 
         public GameState(int foundations, int tableaus, int freeCells, bool stock, bool waste)
         {
@@ -73,8 +73,6 @@ namespace Common
         {
             WastePile = new Stack<Card>();
         }
-
-
 
         public void LogState()
         {
@@ -186,7 +184,7 @@ namespace Common
             return new PileData(kind, index);
         }
 
-        public Stack<Card> GetCardStack(PileKind kind, int index)
+        public Stack<Card> GetCardStack(PileKind kind, int index = -1)
         {
             switch (kind)
             {

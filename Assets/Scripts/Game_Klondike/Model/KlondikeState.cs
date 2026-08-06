@@ -28,10 +28,13 @@ namespace Klondike
         }
 
 
-        public void OnRestocked()
+        public override void OnRestock(bool undo = false)
         {
             if (_availableRestocks > 0)
-                _availableRestocks--;
+            {
+                if (undo) _availableRestocks++;
+                else _availableRestocks--;
+            }
         }
     }
 }
