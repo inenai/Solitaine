@@ -6,14 +6,14 @@ namespace Klondike
     {
 
         public int DrawCount => _drawAmount;
-        public int AvailableRestocks => _availableRestocks;
+        public override int AvailableRestocks => _availableRestocks;
         public bool FoundationCardsFree => _foundationCardsFree;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
         bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
 
-        public KlondikeState(int foundations, int tableaus, int freeCells, bool stock, bool waste) : base(foundations, tableaus, freeCells, stock, waste)
+        public KlondikeState(Game game) : base(game)
         {
         }
 

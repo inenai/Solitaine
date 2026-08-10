@@ -12,6 +12,12 @@ namespace FreeCell
         public FreeCellGameState FCState => _state;
 
         protected override string DebugTag => "FreeCell";
+        public override int FoundationsAmount => 4;
+        public override int TableausAmount => 8;
+        public override int FreeCellsAmount => 4;
+        public override bool HasStock => false;
+        public override bool HasWaste => false;
+        protected override int DrawCount => 0;
 
         FreeCellGameState _state;
 
@@ -25,13 +31,7 @@ namespace FreeCell
 
         private void CreateState()
         {
-            _state = new FreeCellGameState(
-              foundations: 4,
-              tableaus: 8,
-              freeCells: 4,
-              stock: false,
-              waste: false
-          );
+            _state = new FreeCellGameState(this);
         }
 
         #region Initialization
@@ -448,17 +448,6 @@ namespace FreeCell
         #endregion
 
         #region Checks
-
-        protected override bool Won()
-        {
-            int total = 0;
-            foreach (Foundation f in _state.Foundations)
-            {
-                total += f.Stack.Count;
-            }
-            return total == 13 * 4;
-        }
-
         private bool ValidTableauCardStack(Card child, Card parent)
         {
             if (child == null || parent == null) return false;

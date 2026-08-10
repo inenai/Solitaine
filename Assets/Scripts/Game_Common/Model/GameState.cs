@@ -16,6 +16,8 @@ namespace Common
         Stack<GameCommand> _doneMoves;
         Stack<GameCommand> _undoneMoves;
 
+        public abstract int AvailableRestocks { get; }
+
         public void OnWin()
         {
             foreach (Foundation f in Foundations)
@@ -29,15 +31,15 @@ namespace Common
         protected abstract void ApplyConfig();
         public virtual void OnRestock(bool undo = false){}
 
-        public GameState(int foundations, int tableaus, int freeCells, bool stock, bool waste)
+        public GameState(Game game)
         {
             ApplyConfig();
 
-            InitFoundations(foundations);
-            InitTableau(tableaus);
-            InitFreeCells(freeCells);
-            if (stock) InitStock();
-            if (waste) InitWaste();
+            InitFoundations(game.FoundationsAmount);
+            InitTableau(game.TableausAmount);
+            InitFreeCells(game.FreeCellsAmount);
+            if (game.HasStock) InitStock();
+            if (game.HasWaste) InitWaste();
         }
 
         public void ResetSavedMoves()

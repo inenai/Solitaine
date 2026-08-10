@@ -13,6 +13,13 @@ namespace Klondike
         public KlondikeState KState => _state;
         protected override string DebugTag => "Klondike";
 
+        public override int FoundationsAmount => 4;
+        public override int TableausAmount => 7;
+        public override int FreeCellsAmount => 0;
+        public override bool HasStock => true;
+        public override bool HasWaste => true;
+        protected override int DrawCount => KState.DrawCount;
+
         KlondikeState _state;
 
         #region initialization
@@ -26,13 +33,7 @@ namespace Klondike
 
         private void CreateState()
         {
-            _state = new KlondikeState(
-                foundations: 4,
-                tableaus: 7,
-                freeCells: 0,
-                stock: true,
-                waste: true
-            );
+            _state = new KlondikeState(this);
         }
 
         public static List<Card> CreateGameDeck()
@@ -81,15 +82,6 @@ namespace Klondike
             _state.OnRestock();
         }
 
-        protected override bool Won()
-        {
-            int total = 0;
-            foreach (Foundation f in _state.Foundations)
-            {
-                total += f.Stack.Count;
-            }
-            return total == 13 * 4;
-        }
         #endregion
 
         #region userInteraction
@@ -175,29 +167,7 @@ namespace Klondike
             if (pileKind != PileKind.STOCK)
                 return new List<PileKind>();
 
-            List<PileKind> affectedPiles = new List<PileKind>();
-            bool uiRefreshNeeded = ExecuteAction(() =>
-            {
-                GameCommand command = default;
-                int drewAmount = 0;
-                command = TryDrawCardsFromStock(out drewAmount);
-                if (command is { Success: true })
-                {
-                    return command;
-                }
-                else
-                {
-                    command = TryRestock();
-                }
-                return command;
-            });
-
-            if (uiRefreshNeeded)
-            {
-                affectedPiles.Add(PileKind.WASTE);
-                affectedPiles.Add(PileKind.STOCK);
-            }
-            return affectedPiles;
+            return CommonGameAction_DrawFromStockOrRestock();
         }
 
         /// <summary>
@@ -266,73 +236,6 @@ namespace Klondike
         #endregion
 
         #region innerActions
-
-        // DEAL
-        private GameCommand TryDrawCardsFromStock(out int drewAmount)
-        {
-            Log("INNER TryDrawCardsFromStock");
-            drewAmount = 0;
-
-            if (_state.StockPile.Count == 0)
-            {
-                return null;
-            }
-
-            Queue<GameCommandAction> commands = new();
-
-            if (_state.WastePile.TryPeek(out var topCard))
-            {
-                GameCommandAction a = new GameCommandActionFree(
-                    topCard,
-                    cardFreed: FreedAction.LOCKED
-                );
-                a.Execute(State);
-                commands.Enqueue(a);
-            }
-
-            int stockFinalAmount = Mathf.Max(0, _state.StockPile.Count - _state.DrawCount);
-            for (int i = _state.StockPile.Count - 1; i >= stockFinalAmount; i--)
-            {
-                GameCommandAction a = new GameCommandActionMove(
-                       sourcePile: PileKind.STOCK,
-                       targetPile: PileKind.WASTE
-                  );
-                a.Execute(State);
-                commands.Enqueue(a);
-
-                a = new GameCommandActionReveal(
-                    _state.WastePile.Peek(),
-                    cardRevealed: RevealedAction.REVEALED
-                );
-                a.Execute(State);
-                commands.Enqueue(a);
-
-                if (i == stockFinalAmount)
-                {
-                    a = new GameCommandActionFree(
-                      _state.WastePile.Peek(),
-                      cardFreed: FreedAction.FREED
-                   );
-                    a.Execute(State);
-                    commands.Enqueue(a);
-                }
-            }
-            return new GameCommand(commands);
-        }
-
-        private GameCommand TryRestock()
-        {
-            Log("INNER AttemptRestock");
-
-            Queue<GameCommandAction> commands = new();
-            if (_state.WastePile.Count > 0 && _state.AvailableRestocks != 0)
-            {
-                GameCommandAction a = new GameCommandActionRestock();
-                a.Execute(State);
-                commands.Enqueue(a);
-            }
-            return new GameCommand(commands);
-        }
 
         //ADD TO ANY
         private GameCommand TryMoveCardToAnyFoundation(Card card, PileData sourcePileData)

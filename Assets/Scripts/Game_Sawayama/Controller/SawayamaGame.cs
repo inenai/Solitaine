@@ -11,7 +11,12 @@ namespace Sawayama
         public override GameState State => _state;
         public SawayamaState SState => _state;
         protected override string DebugTag => "Sawayama";
-        public int DrawCount => 3;
+        public override int FoundationsAmount => 4;
+        public override int TableausAmount => 7;
+        public override int FreeCellsAmount => 1;
+        public override bool HasStock => true;
+        public override bool HasWaste => true;
+        protected override int DrawCount => 3;
 
         SawayamaState _state;
 
@@ -26,13 +31,7 @@ namespace Sawayama
 
         private void CreateState()
         {
-            _state = new SawayamaState(
-                foundations: 4,
-                tableaus: 7,
-                freeCells: 1,
-                stock: true,
-                waste: true
-            );
+            _state = new SawayamaState(this);
         }
 
         public static List<Card> CreateGameDeck()
@@ -118,32 +117,7 @@ namespace Sawayama
         }
         #endregion
 
-        protected override bool Won()
-        {
-            int total = 0;
-            foreach (Foundation f in _state.Foundations)
-            {
-                total += f.Stack.Count;
-            }
-            return total == 13 * 4;
-        }
-
         #region UserInteraction
-        public List<PileKind> Action_TryDrawCardsFromStock()
-        {
-            List<PileKind> affectedPiles = new List<PileKind>();
-            bool uiRefreshNeeded = ExecuteAction(() =>
-            {
-                return TryDrawCardsFromStock();
-            });
-
-            if (uiRefreshNeeded)
-            {
-                affectedPiles.Add(PileKind.WASTE);
-                affectedPiles.Add(PileKind.STOCK);
-            }
-            return affectedPiles;
-        }
 
         /// <summary>
         /// </summary>
@@ -236,7 +210,7 @@ namespace Sawayama
             if (pileKind != PileKind.STOCK)
                 return new List<PileKind>();
 
-            return Action_TryDrawCardsFromStock();
+            return CommonGameAction_DrawFromStockOrRestock();
         }
         #endregion
 
@@ -261,57 +235,6 @@ namespace Sawayama
         #endregion
 
         #region InnerActions
-        // DEAL
-        private GameCommand TryDrawCardsFromStock()
-        {
-            Log("INNER TryDrawCardsFromStock");
-            if (_state.StockPile.Count == 0)
-            {
-                return null;
-            }
-
-            Queue<GameCommandAction> commands = new();
-
-            if (_state.WastePile.TryPeek(out var topCard))
-            {
-                GameCommandAction a = new GameCommandActionFree(
-                    topCard,
-                    cardFreed: FreedAction.LOCKED
-                );
-                a.Execute(State);
-                commands.Enqueue(a);
-            }
-
-            int stockFinalAmount = Mathf.Max(0, _state.StockPile.Count - DrawCount);
-            for (int i = _state.StockPile.Count - 1; i >= stockFinalAmount; i--)
-            {
-                GameCommandAction a = new GameCommandActionMove(
-                        sourcePile: PileKind.STOCK,
-                        targetPile: PileKind.WASTE
-                   );
-                a.Execute(State);
-                commands.Enqueue(a);
-
-                a = new GameCommandActionReveal(
-                     _state.WastePile.Peek(),
-                    cardRevealed: RevealedAction.REVEALED
-                );
-                a.Execute(State);
-                commands.Enqueue(a);
-
-                if (i == stockFinalAmount)
-                {
-                    a = new GameCommandActionFree(
-                       _state.WastePile.Peek(),
-                      cardFreed: FreedAction.FREED
-                   );
-                    a.Execute(State);
-                    commands.Enqueue(a);
-                }
-            }
-            return new GameCommand(commands);
-        }
-
         //ADD TO ANY
         private GameCommand TryMoveCardToAnyFoundation(Card card, PileData sourcePileData)
         {
