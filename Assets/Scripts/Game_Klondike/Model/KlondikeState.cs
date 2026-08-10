@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Common;
-using UnityEngine;
 
 namespace Klondike
 {
@@ -30,7 +27,7 @@ namespace Klondike
 
         public override void OnRestock(bool undo = false)
         {
-            if (_availableRestocks > 0)
+            if (_availableRestocks != -1)
             {
                 if (undo) _availableRestocks++;
                 else _availableRestocks--;
