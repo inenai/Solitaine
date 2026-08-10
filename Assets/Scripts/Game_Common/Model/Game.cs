@@ -8,10 +8,8 @@ public abstract class Game
     public abstract GameState State { get; }
     protected abstract string DebugTag { get; }
 
-    Stack<GameCommand> _doneMoves;
-    Stack<GameCommand> _undoneMoves;
-    protected abstract bool Won();
 
+    protected abstract bool Won();
 
     public void Init()
     {
@@ -20,8 +18,7 @@ public abstract class Game
 
     public void ResetSavedMoves()
     {
-        _doneMoves = new();
-        _undoneMoves = new();
+        State.ResetSavedMoves();
     }
 
     /// <summary>
@@ -31,14 +28,12 @@ public abstract class Game
     /// <returns>Whether a UI refresh is needed</returns>
     protected bool ExecuteAction(Func<GameCommand> action)
     {
-        if (_doneMoves == null) _doneMoves = new();
-
         GameCommand command = action();
         bool movesMade = command != null && command.Actions.Count > 0;
 
         if (movesMade)
         {
-            SaveCommand(command);
+            State.SaveCommand(command);
         }
 
         if (movesMade)
@@ -57,26 +52,21 @@ public abstract class Game
 
     #region Commands
 
-    protected virtual void SaveCommand(GameCommand command)
+
+    public virtual bool RedoCommmand()
     {
-        _undoneMoves?.Clear();
-        _doneMoves.Push(command);
+        bool redone = State.RedoCommand();
+        if (redone)
+            Log();
+        return redone;
     }
 
-    protected virtual void RedoCommmand()
+    public virtual bool UndoCommand()
     {
-        GameCommand c = _undoneMoves.Pop();
-        foreach (GameCommandAction a in c.Actions)
-            a.Execute(State);
-        _doneMoves.Push(c);
-    }
-
-    protected virtual void UndoCommand()
-    {
-        GameCommand c = _undoneMoves.Pop();
-        foreach (GameCommandAction a in c.Actions)
-            a.Execute(State, undo: true);
-        _doneMoves.Push(c);
+        bool undone = State.UndoCommand();
+        if (undone)
+            Log();
+        return undone;
     }
 
     #endregion

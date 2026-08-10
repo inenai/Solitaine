@@ -83,7 +83,7 @@ namespace Common
 
             if (cardViewToAnimate == null)
             {
-                Debug.Log($"TableauView[{Index}] refreshed.");
+                //Debug.Log($"TableauView[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }

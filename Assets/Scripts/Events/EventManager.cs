@@ -9,4 +9,6 @@ public static class EventManager
     public static Action OnMenuOpened;
     public static Action OnMenuClosed;
     public static Action OnCardsMoved;
+    public static Action OnUndo;
+    public static Action OnRedo;
 }

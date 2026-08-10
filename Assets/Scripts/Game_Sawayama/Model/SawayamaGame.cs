@@ -314,6 +314,10 @@ namespace Sawayama
             for (int i = 0; i < _state.Foundations.Length; i++)
             {
                 command = TryMoveCardToFoundationIndex(card, sourcePileData, i);
+                if (command is { Success: true })
+                {
+                    break;
+                }
             }
             return command;
         }
@@ -371,7 +375,9 @@ namespace Sawayama
         //ADD TO INDEX
         private GameCommand TryMoveCardToFoundationIndex(Card card, PileData sourcePileData, int targetPileIndex)
         {
+            Log($"INNER TryMoveCardToFoundationIndex {card} > F[{targetPileIndex}]");
             Queue<GameCommandAction> commandActions = new();
+
             if (CanAddCardToPile(card, PileKind.FOUNDATION, targetPileIndex))
             {
                 GameCommandAction a = new GameCommandActionMove(
@@ -528,7 +534,7 @@ namespace Sawayama
 
         private bool CanMoveCardToAnyFoundation(Card card)
         {
-            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
+            Log($"INNER CanMoveCardToAnyFoundation {card} > F*");
             if (card.Value == 1) return true;
 
             for (int i = 0; i < _state.Foundations.Length; i++)

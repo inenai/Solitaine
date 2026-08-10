@@ -13,6 +13,9 @@ namespace Common
         public Stack<Card>[] Tableaus;
         public Foundation[] Foundations;
 
+        Stack<GameCommand> _doneMoves;
+        Stack<GameCommand> _undoneMoves;
+
         public void OnWin()
         {
             foreach (Foundation f in Foundations)
@@ -35,6 +38,40 @@ namespace Common
             InitFreeCells(freeCells);
             if (stock) InitStock();
             if (waste) InitWaste();
+        }
+
+        public void ResetSavedMoves()
+        {
+            _doneMoves = new();
+            _undoneMoves = new();
+        }
+
+        public void SaveCommand(GameCommand command)
+        {
+            Debug.Log("SAVING COMMAND");
+            if (_doneMoves == null) _doneMoves = new();
+            _undoneMoves?.Clear();
+            _doneMoves.Push(command);
+        }
+
+        public bool UndoCommand()
+        {
+            if (_doneMoves.Count == 0) return false;
+            GameCommand c = _doneMoves.Pop();
+            foreach (GameCommandAction a in c.Actions)
+                a.Execute(this, undo: true);
+            _undoneMoves.Push(c);
+            return true;
+        }
+
+        public bool RedoCommand()
+        {
+            if (_undoneMoves.Count == 0) return false;
+            GameCommand c = _undoneMoves.Pop();
+            foreach (GameCommandAction a in c.Actions)
+                a.Execute(this);
+            _doneMoves.Push(c);
+            return true;
         }
 
         private void InitFoundations(int amount)
@@ -112,6 +149,16 @@ namespace Common
                     Debug.Log($"  T{i}: {string.Join(" ", Tableaus[i])}");
                     if (Tableaus[i].Count > 0) Debug.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
                 }
+            }
+
+            if (_doneMoves != null)
+            {
+                Debug.Log($"UNDOs available: {_doneMoves.Count}");
+            }
+
+            if (_undoneMoves != null)
+            {
+                Debug.Log($"REDOs available: {_undoneMoves.Count}");
             }
         }
 

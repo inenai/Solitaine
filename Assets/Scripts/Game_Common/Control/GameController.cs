@@ -13,6 +13,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     protected Game _game;
     protected GameView _gameView;
     private GameStatus _status = GameStatus.INITIALIZING;
+    private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
 
     GameStatus Status
     {
@@ -203,6 +204,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         return refreshNeeded;
     }
 
+
     #endregion
 
     #region Events
@@ -213,6 +215,8 @@ public abstract class GameController : MonoBehaviour, IGameController
         EventManager.OnGameWon += OnGameWon;
         EventManager.OnMenuClosed += OnMenuClosed;
         EventManager.OnMenuOpened += OnMenuOpened;
+        EventManager.OnUndo += OnUndo;
+        EventManager.OnRedo += OnRedo;
     }
 
     private void DeregisterFromEvents()
@@ -222,6 +226,8 @@ public abstract class GameController : MonoBehaviour, IGameController
         EventManager.OnGameWon -= OnGameWon;
         EventManager.OnMenuClosed -= OnMenuClosed;
         EventManager.OnMenuOpened -= OnMenuOpened;
+        EventManager.OnUndo -= OnUndo;
+        EventManager.OnRedo -= OnRedo;
     }
 
     private void OnResetGameEvent()
@@ -249,6 +255,48 @@ public abstract class GameController : MonoBehaviour, IGameController
     private void OnMenuClosed()
     {
         _input.Pause(false);
+    }
+
+    private void OnUndo()
+    {
+        Debug.Log("Processing UNDO.");
+        if (Status != GameStatus.LISTENING) return;
+        Status = GameStatus.PROCESSING;
+
+        bool success = _game != null && _game.UndoCommand();
+
+        if (success)
+        {
+            DoRefreshView(AllPileKinds, () =>
+            {
+                Status = GameStatus.LISTENING;
+            }, null, default, true);
+        }
+        else
+        {
+            Status = GameStatus.LISTENING;
+        }
+    }
+
+    private void OnRedo()
+    {
+        Debug.Log("Processing REDO.");
+        if (Status != GameStatus.LISTENING) return;
+        Status = GameStatus.PROCESSING;
+
+        bool success = _game != null && _game.RedoCommmand();
+
+        if (success)
+        {
+            DoRefreshView(AllPileKinds, () =>
+            {
+                Status = GameStatus.LISTENING;
+            }, null, default, true);
+        }
+        else
+        {
+            Status = GameStatus.LISTENING;
+        }
     }
     #endregion
 }

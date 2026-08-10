@@ -99,14 +99,14 @@ namespace FreeCell
                 }
                 else
                 {
-                    command = TryMoveCardToAnyFreeCell(card);
+                    command = TryMoveCardToAnyFreeCell(card, sourcePileData);
                     if (command is { Success: true })
                     {
                         targetPileKind = PileKind.FREECELL;
                     }
                     else
                     {
-                        command = TryMoveCardToAnyFoundation(card);
+                        command = TryMoveCardToAnyFoundation(card, sourcePileData);
                         if (command is { Success: true })
                         {
                             targetPileKind = PileKind.FOUNDATION;
@@ -136,27 +136,27 @@ namespace FreeCell
 
             ExecuteAction(() =>
             {
-                bool cardMoved = false;
+                GameCommand command = default; ;
                 switch (targetPileKind)
                 {
                     case PileKind.FOUNDATION:
-                        cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
+                        command = TryMoveCardToFoundationIndex(card, sourcePileData, targetPileIndex);
                         break;
                     case PileKind.TABLEAU:
-                        cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
+                        command = TryMoveCardsToTableauIndex(card, sourcePileData, targetPileIndex);
                         break;
                     case PileKind.FREECELL:
-                        cardMoved = TryMoveCardToFreeCellIndex(card, targetPileIndex);
+                        command = TryMoveCardToFreeCellIndex(card, sourcePileData, targetPileIndex);
                         break;
                 }
 
-                if (cardMoved)
+                if (command is { Success: true })
                 {
                     affectedPiles.Add(sourcePileData.Kind);
                     if (sourcePileData.Kind != targetPileKind)
                         affectedPiles.Add(targetPileKind);
 
-                    return new GameCommand(sourcePileData.Kind, sourcePileData.Index, targetPileKind, targetPileIndex, false);
+                    return command;
                 }
 
                 return null;
@@ -170,7 +170,7 @@ namespace FreeCell
             return new List<PileKind>();
         }
 
-        private GameCommand TryMoveCardToAnyFreeCell(Card card)
+        private GameCommand TryMoveCardToAnyFreeCell(Card card, PileData sourcePileData)
         {
             GameCommand command = default;
             for (int i = 0; i < _state.FreeCells.Length; i++)
@@ -196,15 +196,13 @@ namespace FreeCell
             List<PileKind> affectedPiles = new();
             ExecuteAction(() =>
             {
-                int targetIndex;
-                if (TryMoveCardToAnyFoundation(card, out targetIndex))
+                GameCommand command = TryMoveCardToAnyFoundation(card, sourcePileData);
+                if (command is { Success: true })
                 {
                     affectedPiles.Add(PileKind.FOUNDATION);
                     affectedPiles.Add(sourcePileData.Kind);
-
-                    return new GameCommand(sourcePileData.Kind, sourcePileData.Index, PileKind.FOUNDATION, targetIndex, true);
                 }
-                return null;
+                return command;
             });
             return affectedPiles;
         }

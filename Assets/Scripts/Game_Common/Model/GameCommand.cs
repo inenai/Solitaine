@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Common
 {
@@ -17,14 +19,6 @@ namespace Common
         public GameCommand(Queue<GameCommandAction> actions)
         {
             _actions = actions;
-        }
-
-        public void Execute(GameState s)
-        {
-            foreach (GameCommandAction a in _actions)
-            {
-                a.Execute(s);
-            }
         }
     }
 
@@ -50,6 +44,9 @@ namespace Common
 
         public override void Execute(GameState s, bool undo = false)
         {
+            string message = undo ? "UNDOING " : "";
+            Debug.Log($"[COMMAND] {message}Move from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
+
             PileKind sourceKind = _sourcePile;
             int sourceIndex = _sourceIndex;
 
@@ -96,6 +93,8 @@ namespace Common
         }
         public override void Execute(GameState s, bool undo)
         {
+            string message = undo ? "UNDOING " : "";
+            Debug.Log($"[COMMAND] {message}Assign foundation [{_foundationIndex}] suit {_suit}");
             s.Foundations[_foundationIndex].Suit = undo ? null : _suit;
         }
     }
@@ -113,6 +112,9 @@ namespace Common
 
         public override void Execute(GameState s, bool undo)
         {
+            string message = undo ? "UNDOING " : "";
+            string revealMessage = _revealed == RevealedAction.REVEALED ? "Reveal" : _revealed == RevealedAction.HID ? "Hide" : "No change!!!";
+            Debug.Log($"[COMMAND] {message}{revealMessage} card {_card}");
             switch (_revealed)
             {
                 case RevealedAction.REVEALED:
@@ -138,6 +140,9 @@ namespace Common
 
         public override void Execute(GameState s, bool undo)
         {
+            string message = undo ? "UNDOING " : "";
+            string freedMessage = _freed == FreedAction.FREED ? "Free" : _freed == FreedAction.LOCKED ? "Lock" : "No change!!!";
+            Debug.Log($"[COMMAND] {message}{freedMessage} card {_card}");
             switch (_freed)
             {
                 case FreedAction.FREED:
@@ -154,6 +159,8 @@ namespace Common
     {
         public override void Execute(GameState s, bool undo = false)
         {
+            string message = undo ? "UNDOING " : "";
+            Debug.Log($"[COMMAND] {message}Restock");
             Stack<Card> source = undo ? s.GetCardStack(PileKind.STOCK) : s.GetCardStack(PileKind.WASTE);
             Stack<Card> target = undo ? s.GetCardStack(PileKind.WASTE) : s.GetCardStack(PileKind.STOCK);
 
@@ -165,6 +172,62 @@ namespace Common
             }
 
             s.OnRestock(undo);
+        }
+    }
+
+    public class GameCommandActionMoveStack : GameCommandAction
+    {
+        private Card _card;
+        private PileKind _sourcePile;
+        private int _sourceIndex;
+        private PileKind _targetPile;
+        private int _targetIndex;
+
+        public GameCommandActionMoveStack(Card card, PileKind sourcePile, PileKind targetPile, int sourceIndex = -1, int targetIndex = -1)
+        {
+            _card = card;
+            _sourcePile = sourcePile;
+            _sourceIndex = sourceIndex;
+            _targetPile = targetPile;
+            _targetIndex = targetIndex;
+        }
+
+        public override void Execute(GameState s, bool undo = false)
+        {
+            string message = undo ? "UNDOING " : "";
+            Debug.Log($"[COMMAND] {message}Move card {_card} stack from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
+
+            PileKind sourceKind = _sourcePile;
+            int sourceIndex = _sourceIndex;
+
+            PileKind targetKind = _targetPile;
+            int targetIndex = _targetIndex;
+
+            if (undo)
+            {
+                sourceKind = _targetPile;
+                sourceIndex = _targetIndex;
+
+                targetKind = _sourcePile;
+                targetIndex = _sourceIndex;
+            }
+
+            Stack<Card> source = s.GetCardStack(sourceKind, sourceIndex);
+            Stack<Card> target = s.GetCardStack(targetKind, targetIndex);
+            Stack<Card> tempStack = new();
+
+            Card next = source.Pop();
+            while (next != _card)
+            {
+                tempStack.Push(next);
+                next = source.Pop();
+            }
+            tempStack.Push(next);
+
+            while(tempStack.Count > 0)
+            {
+                target.Push(tempStack.Pop());
+            }
         }
     }
 }
