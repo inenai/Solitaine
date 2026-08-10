@@ -27,7 +27,7 @@ namespace Common {
         {
             string action = free ? "Freed" : "Locked";
             _free = free;
-            Debug.Log($"{action} card {this}");
+            //Debug.Log($"{action} card {this}");
         }
 
         public CardSuit Suit => _suit;

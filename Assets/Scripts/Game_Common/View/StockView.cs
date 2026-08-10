@@ -5,12 +5,13 @@ using UnityEngine;
 namespace Common
 {
     [RequireComponent(typeof(Collider2D))]
-    public class StockView : TargetCardPileView, IClick
+    public class StockView : CardPileView, IClick
     {
+        public override PileKind PileKind => PileKind.STOCK;
+
         [SerializeField] GameObject _restockLocked;
         [SerializeField] Transform _cardsRoot;
 
-        public Transform CardsRootTr => _cardsRoot;
         protected override void OnInit() { }
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)

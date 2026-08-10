@@ -8,11 +8,10 @@ namespace Sawayama
 {
     public class SawayamaGame : Game
     {
-        public override IGameState State => _state;
+        public override GameState State => _state;
         public SawayamaState SState => _state;
         protected override string DebugTag => "Sawayama";
         public int DrawCount => 3;
-        private bool _drewAllCardsFromStock;
 
         SawayamaState _state;
 
@@ -20,9 +19,20 @@ namespace Sawayama
         public SawayamaGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
-            _state = new SawayamaState();
+            CreateState();
             ShuffleAndDealDeck(deck);
             Log();
+        }
+
+        private void CreateState()
+        {
+            _state = new SawayamaState(
+                foundations: 4,
+                tableaus: 7,
+                freeCells: 1,
+                stock: true,
+                waste: true
+            );
         }
 
         public static List<Card> CreateGameDeck()
@@ -74,23 +84,37 @@ namespace Sawayama
             UpdateFreeCards();
         }
 
-        private void UpdateFreeCards()
+        private Queue<GameCommandAction> UpdateFreeCards()
         {
+            Queue<GameCommandAction> commands = new();
             for (int i = 0; i < 7; i++)
             {
                 for (int j = 0; j < _state.Tableaus[i].Count; j++)
                 {
                     if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                    if (j == 0)
+                    {
+                        GameCommandAction a = new GameCommandActionFree(
+                             _state.Tableaus[i].ElementAt(j),
+                             cardFreed: FreedAction.FREED);
+                        a.Execute(State);
+                        commands.Enqueue(a);
+                    }
                     if (j > 0)
                     {
                         if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
                         {
-                            _state.Tableaus[i].ElementAt(j).FreeCard(true);
+                            GameCommandAction a = new GameCommandActionFree(
+                                _state.Tableaus[i].ElementAt(j),
+                                cardFreed: FreedAction.FREED);
+                            a.Execute(State);
+                            commands.Enqueue(a);
                         }
                         else break;
                     }
                 }
             }
+            return commands;
         }
         #endregion
 
@@ -108,8 +132,7 @@ namespace Sawayama
         public List<PileKind> Action_TryDrawCardsFromStock()
         {
             List<PileKind> affectedPiles = new List<PileKind>();
-
-           bool uiRefreshNeeded = ExecuteAction(() =>
+            bool uiRefreshNeeded = ExecuteAction(() =>
             {
                 return TryDrawCardsFromStock();
             });
@@ -137,73 +160,72 @@ namespace Sawayama
 
             ExecuteAction(() =>
             {
-                bool cardMoved = false;
+                GameCommand command = default;
                 switch (targetPileKind)
                 {
                     case PileKind.FOUNDATION:
-                        cardMoved = TryMoveCardToFoundationIndex(card, targetPileIndex);
+                        command = TryMoveCardToFoundationIndex(card, sourcePileData, targetPileIndex);
                         break;
                     case PileKind.TABLEAU:
-                        cardMoved = TryMoveCardsToTableauIndex(card, targetPileIndex);
+                        command = TryMoveCardsToTableauIndex(card, sourcePileData, targetPileIndex);
                         break;
-                    case PileKind.STOCK:
-                        cardMoved = TryMoveCardToStock(card);
+                    case PileKind.FREECELL:
+                        command = TryMoveCardToFreeCell(card, sourcePileData);
                         break;
                 }
 
-                if (cardMoved)
+                if (command is { Success: true })
                 {
                     affectedPiles.Add(sourcePileData.Kind);
                     if (sourcePileData.Kind != targetPileKind)
                         affectedPiles.Add(targetPileKind);
                 }
-
-                return cardMoved;
+                return command;
             });
 
             return affectedPiles;
         }
 
-        public override List<PileKind> GameAction_TryMoveCardAutomatic(Card card)
+        public override List<PileKind> GameAction_TrySmartMoveCard(Card card)
         {
-            Log($"USER Action_TryMoveCardAutomatic {card}");
+            Log($"USER GameAction_TrySmartMoveCard {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
             ExecuteAction(() =>
             {
-                bool cardMoved = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+                GameCommand command = default;
 
-                if (cardMoved)
+                command = TryMoveCardToAnyTableau(card, sourcePileData);
+                if (command is { Success: true })
                 {
                     targetPileKind = PileKind.TABLEAU;
                 }
                 else
                 {
-                    cardMoved = TryMoveCardToStock(card);
-                    if (cardMoved)
+                    command = TryMoveCardToFreeCell(card, sourcePileData);
+                    if (command is { Success: true })
                     {
-                        targetPileKind = PileKind.STOCK;
+                        targetPileKind = PileKind.FREECELL;
                     }
                     else
                     {
-                        cardMoved = TryMoveCardToAnyFoundation(card);
-                        if (cardMoved)
+                        command = TryMoveCardToAnyFoundation(card, sourcePileData);
+                        if (command is { Success: true })
                         {
                             targetPileKind = PileKind.FOUNDATION;
                         }
                     }
                 }
 
-                if (cardMoved)
+                if (command is { Success: true })
                 {
                     affectedPiles.Add(sourcePileData.Kind);
                     if (sourcePileData.Kind != targetPileKind)
                         affectedPiles.Add(targetPileKind);
                 }
-
-                return cardMoved;
+                return command;
             });
 
             return affectedPiles;
@@ -214,36 +236,25 @@ namespace Sawayama
             if (pileKind != PileKind.STOCK)
                 return new List<PileKind>();
 
-            List<PileKind> affectedPiles = new List<PileKind>();
-            bool uiRefreshNeeded = ExecuteAction(() =>
-            {
-                return TryDrawCardsFromStock();
-            });
-
-            if (uiRefreshNeeded)
-            {
-                affectedPiles.Add(PileKind.WASTE);
-                affectedPiles.Add(PileKind.STOCK);
-            }
-            return affectedPiles;
+            return Action_TryDrawCardsFromStock();
         }
         #endregion
 
         #region AutomaticActions
-        public override List<PileKind> GameAction_TryMoveCardToFoundationAutomatic(Card card)
+        public override List<PileKind> AutoAction_TryMoveCardToFoundationAutomatically(Card card)
         {
             Log($"INNER MoveCardAutomatically {card}");
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             List<PileKind> affectedPiles = new();
             ExecuteAction(() =>
             {
-                if (TryMoveCardToAnyFoundation(card))
+                GameCommand command = TryMoveCardToAnyFoundation(card, sourcePileData);
+                if (command is { Success: true })
                 {
                     affectedPiles.Add(PileKind.FOUNDATION);
                     affectedPiles.Add(sourcePileData.Kind);
-                    return true;
                 }
-                return false;
+                return command;
             });
             return affectedPiles;
         }
@@ -251,81 +262,83 @@ namespace Sawayama
 
         #region InnerActions
         // DEAL
-        private bool TryDrawCardsFromStock()
+        private GameCommand TryDrawCardsFromStock()
         {
             Log("INNER TryDrawCardsFromStock");
-            if (_drewAllCardsFromStock || _state.StockPile.Count == 0)
-            {
-                return false;
-            }
-
-            if (_state.WastePile.TryPeek(out var topCard))
-                topCard.FreeCard(false);
-
-            for (int i = 0; i < DrawCount; i++)
-            {
-                if (_state.StockPile.Count > 0)
-                {
-                    Card nextCard = _state.StockPile.Pop();
-                    nextCard.Show(true);
-                    _state.WastePile.Push(nextCard);
-                }
-                else break;
-            }
-
             if (_state.StockPile.Count == 0)
             {
-                _drewAllCardsFromStock = true;
-                EventManager.OnStockEmpty?.Invoke();
+                return null;
             }
 
-            if (_state.WastePile.TryPeek(out topCard))
-                topCard.FreeCard(true);
+            Queue<GameCommandAction> commands = new();
 
-            return true;
-        }
-
-
-        //ADD TO ANY
-        private bool TryMoveCardToAnyFoundation(Card card)
-        {
-            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
-            for (int i = 0; i < _state.Foundations.Length; i++)
+            if (_state.WastePile.TryPeek(out var topCard))
             {
-                if (card.Value > 1 && _state.Foundations[i].Suit != card.Suit)
-                    continue;
+                GameCommandAction a = new GameCommandActionFree(
+                    topCard,
+                    cardFreed: FreedAction.LOCKED
+                );
+                a.Execute(State);
+                commands.Enqueue(a);
+            }
 
-                if (TryMoveCardToFoundationIndex(card, i))
+            int stockFinalAmount = Mathf.Max(0, _state.StockPile.Count - DrawCount);
+            for (int i = _state.StockPile.Count - 1; i >= stockFinalAmount; i--)
+            {
+                GameCommandAction a = new GameCommandActionMove(
+                        sourcePile: PileKind.STOCK,
+                        targetPile: PileKind.WASTE
+                   );
+                a.Execute(State);
+                commands.Enqueue(a);
+
+                a = new GameCommandActionReveal(
+                     _state.WastePile.Peek(),
+                    cardRevealed: RevealedAction.REVEALED
+                );
+                a.Execute(State);
+                commands.Enqueue(a);
+
+                if (i == stockFinalAmount)
                 {
-                    return true;
+                    a = new GameCommandActionFree(
+                       _state.WastePile.Peek(),
+                      cardFreed: FreedAction.FREED
+                   );
+                    a.Execute(State);
+                    commands.Enqueue(a);
                 }
             }
-            return false;
+            return new GameCommand(commands);
         }
 
-        //ADD TO INDEX
-        private bool TryMoveCardToFoundationIndex(Card card, int index)
+        //ADD TO ANY
+        private GameCommand TryMoveCardToAnyFoundation(Card card, PileData sourcePileData)
         {
-            Foundation foundation = _state.Foundations[index];
-            Log($"INNER TryMoveCardToFoundationIndex{card} > {foundation}]");
-            if (CanAddCardToPile(card, PileKind.FOUNDATION, index))
+            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
+
+            GameCommand command = default;
+            for (int i = 0; i < _state.Foundations.Length; i++)
             {
-                RemoveCardFromPile(card);
-                if (foundation.Stack.Count == 0)
-                    foundation.Suit = card.Suit;
-                else
-                    foundation.Stack.Peek().FreeCard(false);
-                foundation.Stack.Push(card);
-                card.FreeCard(false);
-                return true;
+                command = TryMoveCardToFoundationIndex(card, sourcePileData, i);
+                if (command is { Success: true })
+                {
+                    break;
+                }
             }
-            return false;
+            return command;
         }
 
-        private bool TryMoveCardToAnyTableau(Card card, int excludeIndex = -1)
+        private GameCommand TryMoveCardToAnyTableau(Card card, PileData sourcePileData)
         {
+            int excludeIndex = -99;
+            if (sourcePileData.Kind == PileKind.TABLEAU)
+            {
+                excludeIndex = sourcePileData.Index;
+            }
+
             Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
-            bool success = false;
+            GameCommand command = default;
 
             List<int> emptyCandidates = new();
             List<int> compatibleFullCandidates = new();
@@ -349,104 +362,169 @@ namespace Sawayama
 
             for (int i = 0; i < compatibleFullCandidates.Count; i++)
             {
-                success = TryMoveCardsToTableauIndex(card, compatibleFullCandidates[i]);
-                if (success) break;
+                command = TryMoveCardsToTableauIndex(card, sourcePileData, compatibleFullCandidates[i]);
+                if (command is { Success: true })
+                {
+                    break;
+                }
             }
 
-            if (!success)
+            if (command == null || !command.Success)
             {
                 for (int i = 0; i < emptyCandidates.Count; i++)
                 {
-                    success = TryMoveCardsToTableauIndex(card, emptyCandidates[i]);
-                    if (success) break;
+                    command = TryMoveCardsToTableauIndex(card, sourcePileData, emptyCandidates[i]);
+                    if (command is { Success: true })
+                    {
+                        break;
+                    }
                 }
             }
 
-            return success;
+            return command;
         }
 
-        private bool TryMoveCardsToTableauIndex(Card card, int index)
+        //ADD TO INDEX
+        private GameCommand TryMoveCardToFoundationIndex(Card card, PileData sourcePileData, int targetPileIndex)
         {
-            Log($"INNER TryMoveCardsToTableauIndex {card} > T[{index}]");
-            if (CanAddCardToPile(card, PileKind.TABLEAU, index)) //VALIDATION DONE
+            Log($"INNER TryMoveCardToFoundationIndex {card} > F[{targetPileIndex}]");
+            Queue<GameCommandAction> commandActions = new();
+
+            if (CanAddCardToPile(card, PileKind.FOUNDATION, targetPileIndex))
             {
-                PileData sourcePileData = _state.GetCardPileOwnerData(card);
+                GameCommandAction a = new GameCommandActionMove(
+                    sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
+                    targetPile: PileKind.FOUNDATION, targetIndex: targetPileIndex
+                );
+                a.Execute(State);
+                commandActions.Enqueue(a);
+
+                a = new GameCommandActionFree(
+                    card,
+                    cardFreed: FreedAction.LOCKED
+                );
+                a.Execute(State);
+                commandActions.Enqueue(a);
+
+                Queue<GameCommandAction> extraMoves = AfterRemovingCardFromPile(sourcePileData);
+                while (extraMoves.Count > 0)
+                {
+                    a = extraMoves.Dequeue();
+                    a.Execute(State);
+                    commandActions.Enqueue(a);
+                }
+            }
+            return new GameCommand(commandActions);
+        }
+
+        private GameCommand TryMoveCardsToTableauIndex(Card card, PileData sourcePileData, int targetPileIndex)
+        {
+            Log($"INNER TryMoveCardsToTableauIndex {card} > T[{targetPileIndex}]");
+            Queue<GameCommandAction> commandActions = new();
+
+            if (CanAddCardToPile(card, PileKind.TABLEAU, targetPileIndex)) //VALIDATION DONE
+            {
                 switch (sourcePileData.Kind)
                 {
                     case PileKind.TABLEAU:
-                        Stack<Card> fromTableau = _state.Tableaus[sourcePileData.Index];
-
-                        Stack<Card> tempStack = new Stack<Card>();
-                        while (tempStack.Count == 0 || tempStack.Peek() != card)
-                        {
-                            tempStack.Push(fromTableau.Pop());
-                        }
-                        if (fromTableau.Count > 0)
-                        {
-                            fromTableau.Peek().Show(true);
-                            fromTableau.Peek().FreeCard(true);
-                            UpdateFreeCards();
-                        }
-                        while (tempStack.Count > 0)
-                        {
-                            _state.Tableaus[index].Push(tempStack.Pop());
-                        }
+                        GameCommandAction moveStackAction = new GameCommandActionMoveStack(
+                           card,
+                           sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
+                           targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
+                       );
+                        moveStackAction.Execute(State);
+                        commandActions.Enqueue(moveStackAction);
                         break;
                     case PileKind.WASTE:
-                        RemoveCardFromPile(card);
-                        _state.Tableaus[index].Push(card);
-                        break;
-                    case PileKind.STOCK:
-                        RemoveCardFromPile(card);
-                        _state.Tableaus[index].Push(card);
+                    case PileKind.FREECELL:
+                        GameCommandAction moveAction = new GameCommandActionMove(
+                                    sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
+                                    targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
+                                );
+                        moveAction.Execute(State);
+                        commandActions.Enqueue(moveAction);
                         break;
                 }
-                return true;
+
+                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                while (extraCommands.Count > 0)
+                {
+                    commandActions.Enqueue(extraCommands.Dequeue());
+                }
             }
-            return false;
+            return new GameCommand(commandActions);
         }
 
-        private bool TryMoveCardToStock(Card card)
+        private GameCommand TryMoveCardToFreeCell(Card card, PileData sourcePileData)
         {
-            if (CanAddCardToPile(card, PileKind.STOCK, -1))
+            Queue<GameCommandAction> commandActions = new();
+            if (CanAddCardToPile(card, PileKind.FREECELL, -1))
             {
-                RemoveCardFromPile(card);
-                _state.StockPile.Push(card);
-                return true;
+                GameCommandAction a = new GameCommandActionMove(
+                    sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
+                    targetPile: PileKind.FREECELL, targetIndex: 0
+                );
+                a.Execute(State);
+                commandActions.Enqueue(a)
+;
+                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                while (extraCommands.Count > 0)
+                {
+                    commandActions.Enqueue(extraCommands.Dequeue());
+                }
+                return new GameCommand(commandActions);
             }
-            return false;
+            return null;
         }
 
         // REMOVE
-        private void RemoveCardFromPile(Card card)
+        private Queue<GameCommandAction> AfterRemovingCardFromPile(PileData pileData)
         {
-            Log($"INNER RemoveCardFromPile {card}");
-            PileData pileData = _state.GetCardPileOwnerData(card);
+            Log($"INNER RemovedCardFromPile {pileData.Kind}[{pileData.Index}]");
+            Queue<GameCommandAction> result = new();
+
             switch (pileData.Kind)
             {
                 case PileKind.WASTE:
-                    _state.WastePile.Pop();
                     if (_state.WastePile.Count > 0)
                     {
-                        _state.WastePile.Peek().FreeCard(true);
+                        GameCommandAction a = new GameCommandActionFree(
+                            _state.WastePile.Peek(),
+                            cardFreed: FreedAction.FREED
+                        );
+                        a.Execute(State);
+                        result.Enqueue(a);
                     }
                     break;
                 case PileKind.TABLEAU:
-                    if (_state.Tableaus[pileData.Index].Peek() == card)
+                    if (_state.Tableaus[pileData.Index].Count > 0)
                     {
-                        _state.Tableaus[pileData.Index].Pop();
-                        if (_state.Tableaus[pileData.Index].Count > 0)
+                        Card tCard = _state.Tableaus[pileData.Index].Peek();
+                        if (!tCard.Revealed)
                         {
-                            _state.Tableaus[pileData.Index].Peek().FreeCard(true);
-                            _state.Tableaus[pileData.Index].Peek().Show(true);
-                            UpdateFreeCards();
+                            GameCommandAction a = new GameCommandActionReveal(
+                                tCard,
+                                cardRevealed: RevealedAction.REVEALED);
+                            a.Execute(State);
+                            result.Enqueue(a);
+                        }
+                        if (!tCard.Free)
+                        {
+                            GameCommandAction a = new GameCommandActionFree(
+                                tCard,
+                                cardFreed: FreedAction.FREED);
+                            a.Execute(State);
+                            result.Enqueue(a);
                         }
                     }
-                    break;
-                case PileKind.STOCK:
-                    _state.StockPile.Pop();
+                    Queue<GameCommandAction> extraCommands = UpdateFreeCards();
+                    while (extraCommands.Count > 0)
+                    {
+                        result.Enqueue(extraCommands.Dequeue());
+                    }
                     break;
             }
+            return result;
         }
         #endregion
 
@@ -461,7 +539,7 @@ namespace Sawayama
 
         private bool CanMoveCardToAnyFoundation(Card card)
         {
-            Log($"INNER TryMoveCardToAnyFoundation {card} > F*");
+            Log($"INNER CanMoveCardToAnyFoundation {card} > F*");
             if (card.Value == 1) return true;
 
             for (int i = 0; i < _state.Foundations.Length; i++)
@@ -487,7 +565,7 @@ namespace Sawayama
 
             switch (targetPile)
             {
-                case PileKind.STOCK:
+                case PileKind.FREECELL:
                     bool stockEmpty = _state.StockPile.Count == 0;
                     return stockEmpty && !tableauCardStackParent;
                 case PileKind.WASTE:
@@ -548,23 +626,23 @@ namespace Sawayama
             }
             return card2found;
         }
+        #endregion
 
+        #region Utilities
         public override Card GetSolvableCard()
         {
             Debug.Log("Looking for automatic move");
 
             Card card;
 
-            if (_drewAllCardsFromStock && _state.StockPile.TryPeek(out card))
+            _state.FreeCells[0].TryPeek(out card);
+            if (card != null && IsSafeToMoveCardToFoundation(card))
             {
-                if (card != null && IsSafeToMoveCardToFoundation(card))
+                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                if (CanMoveCardToAnyFoundation(card))
                 {
-                    Debug.Log($"Safe to move {card} to foundation. Can move?");
-                    if (CanMoveCardToAnyFoundation(card))
-                    {
-                        Debug.Log($"{card} can be moved from stock (free cell mode) to foundation.");
-                        return card;
-                    }
+                    Debug.Log($"{card} can be moved from stock (free cell mode) to foundation.");
+                    return card;
                 }
             }
 
@@ -599,5 +677,6 @@ namespace Sawayama
         }
 
         #endregion
+
     }
 }

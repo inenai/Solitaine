@@ -11,17 +11,14 @@ namespace Sawayama
         //View
         [SerializeField] StockView _stock;
         [SerializeField] WasteView _waste;
+        [SerializeField] FreeCellView _freeCell;
         [SerializeField] FoundationView[] _foundations;
         [SerializeField] TableauView[] _tableaus;
 
         private int _refreshFoundationsCoroutinesRunning;
         private int _refreshTableausCoroutinesRunning;
-        private bool _stockEmptied;
 
-        void Awake()
-        {
-            EventManager.OnStockEmpty += OnStockEmpty;
-        }
+        private bool _stockEmptied;
 
         protected override void OnInit()
         {
@@ -36,14 +33,10 @@ namespace Sawayama
             {
                 _tableaus[i].Init(this, i);
             }
+            _freeCell.Init(this);
         }
 
-        void OnDestroy()
-        {
-            EventManager.OnStockEmpty -= OnStockEmpty;
-        }
-
-        public override bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
+        public override bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result)
         {
             result = null;
             switch (cardOwnerData.Kind)
@@ -52,6 +45,9 @@ namespace Sawayama
                     return false;
                 case PileKind.STOCK:
                     return false;
+                case PileKind.FREECELL:
+                    result = _freeCell;
+                    return true;
                 case PileKind.FOUNDATION:
                     result = _foundations[cardOwnerData.Index];
                     return true;
@@ -65,6 +61,7 @@ namespace Sawayama
         public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
+            OnStockEmpty(stockCards.Count == 0);
         }
 
         public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
@@ -112,16 +109,31 @@ namespace Sawayama
             onDone?.Invoke();
         }
 
-        private void OnStockEmpty()
+        public void RefreshFreeCells(Stack<Card> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
         {
-            if (_stockEmptied) return;
-            _stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, 0f);
+            _freeCell.Refresh(list, cardMoved, originalCardPosition, immediate, refreshDone);
+        }
+
+        private void OnStockEmpty(bool empty)
+        {
+            if (empty == _stockEmptied) return;
+            if (!empty)
+            {
+                _stockEmptied = false;
+                Reset();
+                return;
+            }
+            //_stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, 0f);
+            _freeCell.gameObject.SetActive(true);
+            _stock.gameObject.SetActive(false);
             _stockEmptied = true;
         }
 
         public void Reset()
         {
-            _stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, -6f);
+            //_stock.transform.localPosition = new Vector3(_stock.transform.localPosition.x, _stock.transform.localPosition.y, -6f);
+            _freeCell.gameObject.SetActive(false);
+            _stock.gameObject.SetActive(true);
             _stockEmptied = false;
         }
     }

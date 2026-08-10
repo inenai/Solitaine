@@ -6,6 +6,8 @@ namespace Common
 {
     public class FoundationView : TargetCardPileView
     {
+        public override PileKind PileKind => PileKind.FOUNDATION;
+
         protected override void OnInit(){}
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)

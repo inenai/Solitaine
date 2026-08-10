@@ -8,6 +8,7 @@ namespace Common
 {
     public class TableauView : TargetCardPileView
     {
+        public override PileKind PileKind => PileKind.TABLEAU;
         private const float _offsetY = -0.3f;
 
         private List<CardView> _cardViews;
@@ -83,7 +84,7 @@ namespace Common
 
             if (cardViewToAnimate == null)
             {
-                Debug.Log($"TableauView[{Index}] refreshed.");
+                //Debug.Log($"TableauView[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }

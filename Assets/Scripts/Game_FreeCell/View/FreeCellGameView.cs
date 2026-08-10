@@ -17,7 +17,7 @@ namespace FreeCell
         private int _refreshTableausCoroutinesRunning;
         private int _refreshFreeCellsCoroutinesRunning;
 
-        public override bool IsCardInTargetPile(PileData cardOwnerData, out TargetCardPileView result)
+        public override bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result)
         {
             result = null;
             switch (cardOwnerData.Kind)
@@ -91,6 +91,7 @@ namespace FreeCell
             while (_refreshFreeCellsCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
         }
+
         public void RefreshTableaus(List<Stack<Card>> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
         {
             _refreshTableausCoroutinesRunning = 0;

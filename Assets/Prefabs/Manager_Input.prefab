@@ -52,4 +52,6 @@ MonoBehaviour:
   resetGameAction: {fileID: 3702535587559308308, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   drawFromStockAction: {fileID: -4692990639484379486, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   cancelDrag: {fileID: -3964200297264616475, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  undo: {fileID: -3538527904713253658, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  redo: {fileID: -8096504389074362917, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   mouseDragSpeed: 0

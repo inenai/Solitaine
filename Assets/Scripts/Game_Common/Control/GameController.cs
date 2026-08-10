@@ -13,6 +13,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     protected Game _game;
     protected GameView _gameView;
     private GameStatus _status = GameStatus.INITIALIZING;
+    private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
 
     GameStatus Status
     {
@@ -42,7 +43,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
     {
-        return _gameView.IsCardInTargetPile(_game.State.GetCardPileOwnerData(card), out result);
+        return _gameView.IsCardInATargetablePile(_game.State.GetCardPileOwnerData(card), out result);
     }
 
     protected Card GetSolvableCard()
@@ -63,7 +64,7 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     protected List<PileKind> AutoAction_MoveCardAutomatically(Card card)
     {
-        return _game.GameAction_TryMoveCardToFoundationAutomatic(card);
+        return _game.AutoAction_TryMoveCardToFoundationAutomatically(card);
     }
 
     #region Initialization
@@ -100,7 +101,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         ResetDeck();
         ResetView();
         CreateGame();
-       // _game.Init();
+        _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
     }
 
@@ -145,7 +146,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         Status = GameStatus.PROCESSING;
 
         return CheckRefreshView(
-            _game.GameAction_TryMoveCardAutomatic(card), card, originalCardPosition, () =>
+            _game.GameAction_TrySmartMoveCard(card), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
             });
@@ -203,6 +204,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         return refreshNeeded;
     }
 
+
     #endregion
 
     #region Events
@@ -213,6 +215,8 @@ public abstract class GameController : MonoBehaviour, IGameController
         EventManager.OnGameWon += OnGameWon;
         EventManager.OnMenuClosed += OnMenuClosed;
         EventManager.OnMenuOpened += OnMenuOpened;
+        EventManager.OnUndo += OnUndo;
+        EventManager.OnRedo += OnRedo;
     }
 
     private void DeregisterFromEvents()
@@ -222,6 +226,8 @@ public abstract class GameController : MonoBehaviour, IGameController
         EventManager.OnGameWon -= OnGameWon;
         EventManager.OnMenuClosed -= OnMenuClosed;
         EventManager.OnMenuOpened -= OnMenuOpened;
+        EventManager.OnUndo -= OnUndo;
+        EventManager.OnRedo -= OnRedo;
     }
 
     private void OnResetGameEvent()
@@ -237,6 +243,7 @@ public abstract class GameController : MonoBehaviour, IGameController
     private void OnGameWon()
     {
         UpdateWinsCount();
+        _game.ResetSavedMoves();
         _ui.OnGameWon();
     }
 
@@ -248,6 +255,48 @@ public abstract class GameController : MonoBehaviour, IGameController
     private void OnMenuClosed()
     {
         _input.Pause(false);
+    }
+
+    private void OnUndo()
+    {
+        Debug.Log("Processing UNDO.");
+        if (Status != GameStatus.LISTENING) return;
+        Status = GameStatus.PROCESSING;
+
+        bool success = _game != null && _game.UndoCommand();
+
+        if (success)
+        {
+            DoRefreshView(AllPileKinds, () =>
+            {
+                Status = GameStatus.LISTENING;
+            }, null, default, true);
+        }
+        else
+        {
+            Status = GameStatus.LISTENING;
+        }
+    }
+
+    private void OnRedo()
+    {
+        Debug.Log("Processing REDO.");
+        if (Status != GameStatus.LISTENING) return;
+        Status = GameStatus.PROCESSING;
+
+        bool success = _game != null && _game.RedoCommmand();
+
+        if (success)
+        {
+            DoRefreshView(AllPileKinds, () =>
+            {
+                Status = GameStatus.LISTENING;
+            }, null, default, true);
+        }
+        else
+        {
+            Status = GameStatus.LISTENING;
+        }
     }
     #endregion
 }

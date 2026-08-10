@@ -16,6 +16,8 @@ namespace Common
       [SerializeField] private InputActionReference resetGameAction;
       [SerializeField] private InputActionReference drawFromStockAction;
       [SerializeField] private InputActionReference cancelDrag;
+      [SerializeField] private InputActionReference undo;
+      [SerializeField] private InputActionReference redo;
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
@@ -47,6 +49,8 @@ namespace Common
          resetGameAction.action.Enable();
          drawFromStockAction.action.Enable();
          cancelDrag.action.Enable();
+         undo.action.Enable();
+         redo.action.Enable();
 
          pointerDownAction.action.performed += Action_PointerPressed;
          pointerMovedAction.action.performed += Action_PointerMoved;
@@ -54,6 +58,8 @@ namespace Common
          resetGameAction.action.performed += Action_ResetGame;
          drawFromStockAction.action.performed += Action_DrawFromStock;
          cancelDrag.action.performed += Action_CancelDrag;
+         undo.action.performed += Action_Undo;
+         redo.action.performed += Action_Redo;
 
          if (doubleClickEnabled)
          {
@@ -73,6 +79,8 @@ namespace Common
          resetGameAction.action.Disable();
          drawFromStockAction.action.Disable();
          cancelDrag.action.Disable();
+         undo.action.Disable();
+         redo.action.Disable();
 
          pointerDownAction.action.performed -= Action_PointerPressed;
          pointerMovedAction.action.performed -= Action_PointerMoved;
@@ -80,6 +88,8 @@ namespace Common
          resetGameAction.action.performed -= Action_ResetGame;
          drawFromStockAction.action.performed -= Action_DrawFromStock;
          cancelDrag.action.performed -= Action_CancelDrag;
+         undo.action.performed -= Action_Undo;
+         redo.action.performed -= Action_Redo;
 
          if (doubleClickEnabled)
          {
@@ -137,6 +147,16 @@ namespace Common
       private void Action_CancelDrag(InputAction.CallbackContext context)
       {
          EndDrag(cancelled: true);
+      }
+
+      private void Action_Undo(InputAction.CallbackContext context)
+      {
+         EventManager.OnUndo?.Invoke();
+      }
+
+      private void Action_Redo(InputAction.CallbackContext context)
+      {
+         EventManager.OnRedo?.Invoke();
       }
 
       private void EndDrag(bool cancelled)
