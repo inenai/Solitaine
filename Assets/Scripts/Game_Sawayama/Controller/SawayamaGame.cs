@@ -92,6 +92,14 @@ namespace Sawayama
                 for (int j = 0; j < _state.Tableaus[i].Count; j++)
                 {
                     if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                    if (j == 0)
+                    {
+                        GameCommandAction a = new GameCommandActionFree(
+                             _state.Tableaus[i].ElementAt(j),
+                             cardFreed: FreedAction.FREED);
+                        a.Execute(State);
+                        commands.Enqueue(a);
+                    }
                     if (j > 0)
                     {
                         if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
@@ -449,6 +457,7 @@ namespace Sawayama
 
         private GameCommand TryMoveCardToFreeCell(Card card, PileData sourcePileData)
         {
+            Queue<GameCommandAction> commandActions = new();
             if (CanAddCardToPile(card, PileKind.FREECELL, -1))
             {
                 GameCommandAction a = new GameCommandActionMove(
@@ -456,7 +465,14 @@ namespace Sawayama
                     targetPile: PileKind.FREECELL, targetIndex: 0
                 );
                 a.Execute(State);
-                return new GameCommand(a);
+                commandActions.Enqueue(a)
+;
+                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                while (extraCommands.Count > 0)
+                {
+                    commandActions.Enqueue(extraCommands.Dequeue());
+                }
+                return new GameCommand(commandActions);
             }
             return null;
         }
