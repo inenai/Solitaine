@@ -17,6 +17,7 @@ namespace Common
         Stack<GameCommand> _undoneMoves;
 
         public abstract int AvailableRestocks { get; }
+        public abstract bool FoundationCardsFree { get; }
 
         public void OnWin()
         {

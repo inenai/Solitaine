@@ -13,6 +13,8 @@ namespace FreeCell
 
         public override int AvailableRestocks => 0;
 
+        public override bool FoundationCardsFree => true;
+
         protected override void ApplyConfig()
         {
 

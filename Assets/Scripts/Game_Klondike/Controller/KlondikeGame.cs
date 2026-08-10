@@ -170,43 +170,7 @@ namespace Klondike
             return CommonGameAction_DrawFromStockOrRestock();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="card"></param>
-        /// <param name="targetPileKind"></param>
-        /// <param name="targetPileIndex"></param>
-        /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
-        /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public override List<PileKind> GameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
-        {
-            Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
-            List<PileKind> affectedPiles = new List<PileKind>();
-            PileData sourcePileData = _state.GetCardPileOwnerData(card);
 
-            ExecuteAction(() =>
-            {
-                GameCommand command = default;
-                switch (targetPileKind)
-                {
-                    case PileKind.FOUNDATION:
-                        command = TryMoveCardToFoundationIndex(card, sourcePileData, targetPileIndex);
-                        break;
-                    case PileKind.TABLEAU:
-                        command = TryMoveCardsToTableauIndex(card, sourcePileData, targetPileIndex);
-                        break;
-                }
-
-                if (command is { Success: true })
-                {
-                    affectedPiles.Add(sourcePileData.Kind);
-                    if (sourcePileData.Kind != targetPileKind)
-                        affectedPiles.Add(targetPileKind);
-                }
-                return command;
-            });
-
-            return affectedPiles;
-        }
         #endregion
 
         #region AutomaticActions
@@ -300,7 +264,7 @@ namespace Klondike
                 a.Execute(State);
                 commandActions.Enqueue(a);
 
-                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                Queue<GameCommandAction> extraCommands = CommonInner_AfterRemovingCardFromPile(sourcePileData);
                 while (extraCommands.Count > 0)
                 {
                     commandActions.Enqueue(extraCommands.Dequeue());
@@ -337,7 +301,7 @@ namespace Klondike
                         commandActions.Enqueue(moveAction);
                         break;
                 }
-                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                Queue<GameCommandAction> extraCommands = CommonInner_AfterRemovingCardFromPile(sourcePileData);
                 while (extraCommands.Count > 0)
                 {
                     commandActions.Enqueue(extraCommands.Dequeue());
@@ -346,61 +310,6 @@ namespace Klondike
             return new GameCommand(commandActions);
         }
 
-        // REMOVE
-        private Queue<GameCommandAction> AfterRemovingCardFromPile(PileData pileData)
-        {
-            Log($"INNER RemovedCardFromPile {pileData.Kind}[{pileData.Index}]");
-            Queue<GameCommandAction> result = new();
-
-            switch (pileData.Kind)
-            {
-                case PileKind.WASTE:
-                    if (_state.WastePile.Count > 0)
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                            _state.WastePile.Peek(),
-                            cardFreed: FreedAction.FREED
-                        );
-                        a.Execute(State);
-                        result.Enqueue(a);
-                    }
-                    break;
-                case PileKind.FOUNDATION:
-                    if (_state.FoundationCardsFree && _state.Foundations[pileData.Index].Stack.Count > 0)
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                           _state.Foundations[pileData.Index].Stack.Peek(),
-                            cardFreed: FreedAction.FREED
-                        );
-                        a.Execute(State);
-                        result.Enqueue(a);
-                    }
-                    break;
-                case PileKind.TABLEAU:
-                    if (_state.Tableaus[pileData.Index].Count > 0)
-                    {
-                        Card tCard = _state.Tableaus[pileData.Index].Peek();
-                        if (!tCard.Revealed)
-                        {
-                            GameCommandAction a = new GameCommandActionReveal(
-                                tCard,
-                                cardRevealed: RevealedAction.REVEALED);
-                            a.Execute(State);
-                            result.Enqueue(a);
-                        }
-                        if (!tCard.Free)
-                        {
-                            GameCommandAction a = new GameCommandActionFree(
-                                tCard,
-                                cardFreed: FreedAction.FREED);
-                            a.Execute(State);
-                            result.Enqueue(a);
-                        }
-                    }
-                    break;
-            }
-            return result;
-        }
         #endregion
 
         #region Checks
@@ -419,7 +328,7 @@ namespace Klondike
             }
             return false;
         }
-        private bool ValidTableauCardStack(Card child, Card parent)
+        protected override bool ValidTableauCardStack(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
 

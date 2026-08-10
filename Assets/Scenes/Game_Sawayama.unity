@@ -1869,7 +1869,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76e19e8865cb9784c8e113e18047ebff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KlondikePileUI
-  triggerHighlight: {fileID: 0}
   _restockLocked: {fileID: 0}
   _cardsRoot: {fileID: 616256370}
 --- !u!61 &905025710
@@ -6985,7 +6984,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
       propertyPath: dragMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
       propertyPath: pickUpEnabled

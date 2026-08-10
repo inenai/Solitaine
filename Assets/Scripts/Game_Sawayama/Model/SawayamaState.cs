@@ -10,6 +10,8 @@ namespace Sawayama
 
         public override int AvailableRestocks => 0;
 
+        public override bool FoundationCardsFree => false;
+
         protected override void ApplyConfig()
         {
         }

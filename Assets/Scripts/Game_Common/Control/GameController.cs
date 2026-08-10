@@ -159,7 +159,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         Status = GameStatus.PROCESSING;
 
         return CheckRefreshView(
-            _game.GameAction_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
+            _game.CommonGameAction_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
             {
                 Status = GameStatus.LISTENING;
             }, true);

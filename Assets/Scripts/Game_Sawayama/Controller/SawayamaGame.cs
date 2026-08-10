@@ -119,46 +119,6 @@ namespace Sawayama
 
         #region UserInteraction
 
-        /// <summary>
-        /// </summary>
-        /// <param name="card"></param>
-        /// <param name="targetPileKind"></param>
-        /// <param name="targetPileIndex"></param>
-        /// <returns><para>A list of the pile kinds that have been affected and should be updated in the ui.</para>
-        /// <para>If returned list is not empty you must call UIDoneRefreshing when UI has finished updating. </para></returns>
-        public override List<PileKind> GameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
-        {
-            Log($"USER Action_DragCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
-            List<PileKind> affectedPiles = new List<PileKind>();
-            PileData sourcePileData = _state.GetCardPileOwnerData(card);
-
-            ExecuteAction(() =>
-            {
-                GameCommand command = default;
-                switch (targetPileKind)
-                {
-                    case PileKind.FOUNDATION:
-                        command = TryMoveCardToFoundationIndex(card, sourcePileData, targetPileIndex);
-                        break;
-                    case PileKind.TABLEAU:
-                        command = TryMoveCardsToTableauIndex(card, sourcePileData, targetPileIndex);
-                        break;
-                    case PileKind.FREECELL:
-                        command = TryMoveCardToFreeCell(card, sourcePileData);
-                        break;
-                }
-
-                if (command is { Success: true })
-                {
-                    affectedPiles.Add(sourcePileData.Kind);
-                    if (sourcePileData.Kind != targetPileKind)
-                        affectedPiles.Add(targetPileKind);
-                }
-                return command;
-            });
-
-            return affectedPiles;
-        }
 
         public override List<PileKind> GameAction_TrySmartMoveCard(Card card)
         {
@@ -329,12 +289,10 @@ namespace Sawayama
                 a.Execute(State);
                 commandActions.Enqueue(a);
 
-                Queue<GameCommandAction> extraMoves = AfterRemovingCardFromPile(sourcePileData);
+                Queue<GameCommandAction> extraMoves = CommonInner_AfterRemovingCardFromPile(sourcePileData);
                 while (extraMoves.Count > 0)
                 {
-                    a = extraMoves.Dequeue();
-                    a.Execute(State);
-                    commandActions.Enqueue(a);
+                    commandActions.Enqueue(extraMoves.Dequeue());
                 }
             }
             return new GameCommand(commandActions);
@@ -369,7 +327,7 @@ namespace Sawayama
                         break;
                 }
 
-                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                Queue<GameCommandAction> extraCommands = CommonInner_AfterRemovingCardFromPile(sourcePileData);
                 while (extraCommands.Count > 0)
                 {
                     commandActions.Enqueue(extraCommands.Dequeue());
@@ -390,7 +348,7 @@ namespace Sawayama
                 a.Execute(State);
                 commandActions.Enqueue(a)
 ;
-                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                Queue<GameCommandAction> extraCommands = CommonInner_AfterRemovingCardFromPile(sourcePileData);
                 while (extraCommands.Count > 0)
                 {
                     commandActions.Enqueue(extraCommands.Dequeue());
@@ -400,59 +358,10 @@ namespace Sawayama
             return null;
         }
 
-        // REMOVE
-        private Queue<GameCommandAction> AfterRemovingCardFromPile(PileData pileData)
-        {
-            Log($"INNER RemovedCardFromPile {pileData.Kind}[{pileData.Index}]");
-            Queue<GameCommandAction> result = new();
-
-            switch (pileData.Kind)
-            {
-                case PileKind.WASTE:
-                    if (_state.WastePile.Count > 0)
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                            _state.WastePile.Peek(),
-                            cardFreed: FreedAction.FREED
-                        );
-                        a.Execute(State);
-                        result.Enqueue(a);
-                    }
-                    break;
-                case PileKind.TABLEAU:
-                    if (_state.Tableaus[pileData.Index].Count > 0)
-                    {
-                        Card tCard = _state.Tableaus[pileData.Index].Peek();
-                        if (!tCard.Revealed)
-                        {
-                            GameCommandAction a = new GameCommandActionReveal(
-                                tCard,
-                                cardRevealed: RevealedAction.REVEALED);
-                            a.Execute(State);
-                            result.Enqueue(a);
-                        }
-                        if (!tCard.Free)
-                        {
-                            GameCommandAction a = new GameCommandActionFree(
-                                tCard,
-                                cardFreed: FreedAction.FREED);
-                            a.Execute(State);
-                            result.Enqueue(a);
-                        }
-                    }
-                    Queue<GameCommandAction> extraCommands = UpdateFreeCards();
-                    while (extraCommands.Count > 0)
-                    {
-                        result.Enqueue(extraCommands.Dequeue());
-                    }
-                    break;
-            }
-            return result;
-        }
         #endregion
 
         #region Checks
-        private bool ValidTableauCardStack(Card child, Card parent)
+        protected override bool ValidTableauCardStack(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
             //Debug.Log($"Valid Tableau Stack {child} > {parent}?");

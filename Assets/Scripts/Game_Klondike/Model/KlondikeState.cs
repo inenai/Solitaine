@@ -4,10 +4,9 @@ namespace Klondike
 {
     public class KlondikeState : GameState
     {
-
         public int DrawCount => _drawAmount;
         public override int AvailableRestocks => _availableRestocks;
-        public bool FoundationCardsFree => _foundationCardsFree;
+        public override bool FoundationCardsFree => _foundationCardsFree;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;

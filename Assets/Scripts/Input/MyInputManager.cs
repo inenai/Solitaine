@@ -6,7 +6,7 @@ namespace Common
    public class MyInputManager : MonoBehaviour
    {
       [Header("Settings")]
-      [SerializeField] private bool doubleClickEnabled;
+      private bool doubleClickEnabled => dragMode != DragMode.PICKUP;
       [SerializeField] private DragMode dragMode;
 
       [Header("Input References")]
