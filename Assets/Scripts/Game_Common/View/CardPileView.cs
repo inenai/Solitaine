@@ -8,10 +8,7 @@ namespace Common
 {
     public abstract class CardPileView : MonoBehaviour
     {
-
-        [SerializeField] protected PileKind _pileKind;
-
-        public PileKind PileKind => _pileKind;
+        public abstract PileKind PileKind { get; }
         public int Index => _index;
 
         protected int _index = -1;

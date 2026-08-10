@@ -17,6 +17,7 @@ namespace Sawayama
 
         private int _refreshFoundationsCoroutinesRunning;
         private int _refreshTableausCoroutinesRunning;
+
         private bool _stockEmptied;
 
         protected override void OnInit()
@@ -106,6 +107,11 @@ namespace Sawayama
         {
             while (_refreshTableausCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
+        }
+
+        public void RefreshFreeCells(Stack<Card> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
+        {
+            _freeCell.Refresh(list, cardMoved, originalCardPosition, immediate, refreshDone);
         }
 
         private void OnStockEmpty(bool empty)

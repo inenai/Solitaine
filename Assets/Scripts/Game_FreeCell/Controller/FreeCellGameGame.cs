@@ -50,7 +50,10 @@ namespace FreeCell
                 tableauIndex = (tableauIndex + 1) % 8;
             }
 
-            UpdateFreeCards();
+            for (int i = 0; i < _state.Tableaus.Length; i++)
+            {
+                _state.Tableaus[i].Peek().FreeCard(true);
+            }
         }
 
         public static List<Card> CreateGameDeck()
@@ -86,12 +89,10 @@ namespace FreeCell
             PileData sourcePileData = _state.GetCardPileOwnerData(card);
             PileKind targetPileKind = default;
 
-            int targetIndexExclude = sourcePileData.Kind == PileKind.TABLEAU ? sourcePileData.Index : -1;
-
             ExecuteAction(() =>
             {
                 GameCommand command = default;
-                command = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+                command = TryMoveCardToAnyTableau(card, sourcePileData);
 
                 if (command is { Success: true })
                 {
@@ -169,23 +170,6 @@ namespace FreeCell
         {
             return new List<PileKind>();
         }
-
-        private GameCommand TryMoveCardToAnyFreeCell(Card card, PileData sourcePileData)
-        {
-            GameCommand command = default;
-            for (int i = 0; i < _state.FreeCells.Length; i++)
-            {
-                if (_state.FreeCells[i].Count > 0)
-                    continue;
-
-                command = TryMoveCardToFreeCellIndex(card, sourcePileData, i);
-                if (command is { Success: true })
-                {
-                    break;
-                }
-            }
-            return command;
-        }
         #endregion
 
         #region AutomaticActions
@@ -247,44 +231,49 @@ namespace FreeCell
                  );
                 a.Execute(State);
                 commandActions.Enqueue(a);
+
+                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
+                while (extraCommands.Count > 0)
+                {
+                    commandActions.Enqueue(extraCommands.Dequeue());
+                }
             }
             return new GameCommand(commandActions);
         }
 
         //REMOVE
-        private Queue<GameCommandAction> AfterRemovingCardFromPile(Card card)
+        private Queue<GameCommandAction> AfterRemovingCardFromPile(PileData pileData)
         {
-            Log($"INNER AfterRemovingCardFromPile {card}");
+            Log($"INNER RemovedCardFromPile {pileData.Kind}[{pileData.Index}]");
             Queue<GameCommandAction> result = new();
-            PileData pileData = _state.GetCardPileOwnerData(card);
+
             switch (pileData.Kind)
             {
                 case PileKind.TABLEAU:
-                    if (_state.Tableaus[pileData.Index].Peek() == card)
+                    if (_state.Tableaus[pileData.Index].Count > 0)
                     {
-                        if (_state.Tableaus[pileData.Index].Count > 1)
+                        Card tCard = _state.Tableaus[pileData.Index].Peek();
+                        if (!tCard.Revealed)
                         {
-                            Card tCard = _state.Tableaus[pileData.Index].Peek();
-                            if (!tCard.Revealed)
-                            {
-                                GameCommandAction a = new GameCommandActionReveal(
-                                    tCard,
-                                    cardRevealed: RevealedAction.REVEALED);
-                                a.Execute(State);
-                                result.Enqueue(a);
-                            }
-                            if (!tCard.Free)
-                            {
-                                GameCommandAction a = new GameCommandActionFree(
-                                    tCard,
-                                    cardFreed: FreedAction.FREED);
-                                a.Execute(State);
-                                result.Enqueue(a);
-                            }
-                            Queue<GameCommandAction> extraCommands = UpdateFreeCards();
-                            while (extraCommands.Count > 0)
-                                result.Enqueue(extraCommands.Dequeue());
+                            GameCommandAction a = new GameCommandActionReveal(
+                                tCard,
+                                cardRevealed: RevealedAction.REVEALED);
+                            a.Execute(State);
+                            result.Enqueue(a);
                         }
+                        if (!tCard.Free)
+                        {
+                            GameCommandAction a = new GameCommandActionFree(
+                                tCard,
+                                cardFreed: FreedAction.FREED);
+                            a.Execute(State);
+                            result.Enqueue(a);
+                        }
+                    }
+                    Queue<GameCommandAction> extraCommands = UpdateFreeCards();
+                    while (extraCommands.Count > 0)
+                    {
+                        result.Enqueue(extraCommands.Dequeue());
                     }
                     break;
             }
@@ -299,6 +288,14 @@ namespace FreeCell
                 for (int j = 0; j < _state.Tableaus[i].Count; j++)
                 {
                     if (_state.Tableaus[i].ElementAt(j).Free) continue;
+                    if (j == 0)
+                    {
+                        GameCommandAction a = new GameCommandActionFree(
+                             _state.Tableaus[i].ElementAt(j),
+                             cardFreed: FreedAction.FREED);
+                        a.Execute(State);
+                        commands.Enqueue(a);
+                    }
                     if (j > 0)
                     {
                         if (ValidTableauCardStack(_state.Tableaus[i].ElementAt(j - 1), _state.Tableaus[i].ElementAt(j)))
@@ -316,9 +313,27 @@ namespace FreeCell
             return commands;
         }
 
+        private GameCommand TryMoveCardToAnyFreeCell(Card card, PileData sourcePileData)
+        {
+            Log($"INNER TryMoveCardToAnyFreeCell {card} > FC*");
+            GameCommand command = default;
+            for (int i = 0; i < _state.FreeCells.Length; i++)
+            {
+                if (_state.FreeCells[i].Count > 0)
+                    continue;
+
+                command = TryMoveCardToFreeCellIndex(card, sourcePileData, i);
+                if (command is { Success: true })
+                {
+                    break;
+                }
+            }
+            return command;
+        }
+
         private GameCommand TryMoveCardToFreeCellIndex(Card card, PileData sourcePileData, int targetPileIndex)
         {
-            Log($"INNER TryMoveCardToFreeCellIndex{card} > {targetPileIndex}]");
+            Log($"INNER TryMoveCardToFreeCellIndex{card} > FC[{targetPileIndex}]");
             Queue<GameCommandAction> commandActions = new();
             if (CanAddCardToPile(card, PileKind.FREECELL, targetPileIndex))
             {
@@ -327,8 +342,9 @@ namespace FreeCell
                      targetPile: PileKind.FREECELL, targetIndex: targetPileIndex
                  );
                 a.Execute(State);
+                commandActions.Enqueue(a);
 
-                Queue<GameCommandAction> extraMoves = AfterRemovingCardFromPile(card);
+                Queue<GameCommandAction> extraMoves = AfterRemovingCardFromPile(sourcePileData);
                 while (extraMoves.Count > 0)
                 {
                     a = extraMoves.Dequeue();
@@ -339,10 +355,15 @@ namespace FreeCell
             return new GameCommand(commandActions);
         }
 
-        private GameCommand TryMoveCardToAnyTableau(Card card, int excludeIndex = -99)
+        private GameCommand TryMoveCardToAnyTableau(Card card, PileData sourcePileData)
         {
+            int excludeIndex = -99;
+            if (sourcePileData.Kind == PileKind.TABLEAU)
+            {
+                excludeIndex = sourcePileData.Index;
+            }
+
             Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
-            PileData soucePileData = _state.GetCardPileOwnerData(card);
             GameCommand command = default;
 
             List<int> emptyCandidates = new();
@@ -367,7 +388,7 @@ namespace FreeCell
 
             for (int i = 0; i < compatibleFullCandidates.Count; i++)
             {
-                command = TryMoveCardsToTableauIndex(card, soucePileData, compatibleFullCandidates[i]);
+                command = TryMoveCardsToTableauIndex(card, sourcePileData, compatibleFullCandidates[i]);
                 if (command is { Success: true })
                 {
                     break;
@@ -378,7 +399,7 @@ namespace FreeCell
             {
                 for (int i = 0; i < emptyCandidates.Count; i++)
                 {
-                    command = TryMoveCardsToTableauIndex(card, soucePileData, emptyCandidates[i]);
+                    command = TryMoveCardsToTableauIndex(card, sourcePileData, emptyCandidates[i]);
                     if (command is { Success: true })
                     {
                         break;
@@ -399,27 +420,13 @@ namespace FreeCell
                 switch (sourcePileData.Kind)
                 {
                     case PileKind.TABLEAU:
-                        Stack<GameCommandAction> cardsInTableauToMove = new();
-                        Stack<Card> fromTableau = _state.Tableaus[sourcePileData.Index];
-
-                        for (int i = fromTableau.Count - 1; i >= 0; i--)
-                        {
-                            bool cardMatch = fromTableau.ElementAt(i) != card;
-                            cardsInTableauToMove.Push(new GameCommandActionMove(
-                                sourcePile: PileKind.TABLEAU, sourceIndex: sourcePileData.Index,
-                                targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
-                            ));
-                            if (cardMatch)
-                            {
-                                while (cardsInTableauToMove.Count > 0)
-                                {
-                                    GameCommandAction moveCardAction = cardsInTableauToMove.Pop();
-                                    moveCardAction.Execute(State);
-                                    commandActions.Enqueue(moveCardAction);
-                                }
-                                break;
-                            }
-                        }
+                        GameCommandAction moveStackAction = new GameCommandActionMoveStack(
+                           card,
+                           sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
+                           targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
+                       );
+                        moveStackAction.Execute(State);
+                        commandActions.Enqueue(moveStackAction);
                         break;
                     case PileKind.FREECELL:
                         GameCommandAction moveAction = new GameCommandActionMove(
@@ -430,7 +437,7 @@ namespace FreeCell
                         commandActions.Enqueue(moveAction);
                         break;
                 }
-                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(card);
+                Queue<GameCommandAction> extraCommands = AfterRemovingCardFromPile(sourcePileData);
                 while (extraCommands.Count > 0)
                 {
                     commandActions.Enqueue(extraCommands.Dequeue());

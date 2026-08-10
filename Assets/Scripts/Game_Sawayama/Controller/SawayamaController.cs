@@ -83,6 +83,16 @@ namespace Sawayama
                             immediate,
                             RefreshDone);
                         break;
+
+                    case PileKind.FREECELL:
+                        _viewsRefreshing++;
+                        _view.RefreshFreeCells(
+                            CommonUtils.CloneStack(SGame.SState.FreeCells[0]),
+                            cardMoved,
+                            originalCardPosition,
+                            immediate,
+                            RefreshDone);
+                        break;
                 }
             }
             Debug.Log("Await...");

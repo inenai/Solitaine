@@ -8,6 +8,7 @@ namespace Common
 {
     public class TableauView : TargetCardPileView
     {
+        public override PileKind PileKind => PileKind.TABLEAU;
         private const float _offsetY = -0.3f;
 
         private List<CardView> _cardViews;

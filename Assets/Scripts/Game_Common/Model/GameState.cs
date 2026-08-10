@@ -169,13 +169,13 @@ namespace Common
             int index = -1;
             bool found = false;
 
-            if (WastePile.Contains(card))
+            if (WastePile != null && WastePile.Contains(card))
             {
                 kind = PileKind.WASTE;
                 found = true;
             }
 
-            if (!found && StockPile.Contains(card))
+            if (!found && StockPile != null && StockPile.Contains(card))
             {
                 kind = PileKind.STOCK;
                 found = true;

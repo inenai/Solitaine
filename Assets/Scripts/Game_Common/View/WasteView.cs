@@ -7,6 +7,8 @@ namespace Common
 {
     public class WasteView : CardPileView
     {
+        public override PileKind PileKind => PileKind.WASTE;
+
         [SerializeField] private int _maxCardsInView = 1;
         [SerializeField] private float _xOffset = 0.3f;
         protected List<CardView> _cardViews;

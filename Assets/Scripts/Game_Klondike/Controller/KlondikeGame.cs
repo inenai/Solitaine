@@ -124,7 +124,7 @@ namespace Klondike
                         }
                         else
                         {
-                            command = TryMoveCardToAnyTableau(card);
+                            command = TryMoveCardToAnyTableau(card, sourcePileData);
                             if (command != null && command.Actions.Count > 0)
                             {
                                 targetPileKind = PileKind.TABLEAU;
@@ -140,7 +140,7 @@ namespace Klondike
                         }
                         break;
                     case PileKind.FOUNDATION:
-                        command = TryMoveCardToAnyTableau(card);
+                        command = TryMoveCardToAnyTableau(card, sourcePileData);
                         if (command is { Success: true })
                             targetPileKind = PileKind.TABLEAU;
                         break;
@@ -150,7 +150,7 @@ namespace Klondike
                             targetPileKind = PileKind.FOUNDATION;
                         else
                         {
-                            command = TryMoveCardToAnyTableau(card, sourcePileData.Index);
+                            command = TryMoveCardToAnyTableau(card, sourcePileData);
                             if (command is { Success: true })
                                 targetPileKind = PileKind.TABLEAU;
                         }
@@ -352,17 +352,22 @@ namespace Klondike
             return command;
         }
 
-        private GameCommand TryMoveCardToAnyTableau(Card card, int excludeIndex = -1)
+        private GameCommand TryMoveCardToAnyTableau(Card card, PileData sourcePileData)
         {
+            int excludeIndex = -99;
+            if (sourcePileData.Kind == PileKind.TABLEAU)
+            {
+                excludeIndex = sourcePileData.Index;
+            }
+
             Log($"INNER TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
-            PileData soucePileData = _state.GetCardPileOwnerData(card);
             GameCommand command = default;
 
             for (int i = 0; i < _state.Tableaus.Length; i++)
             {
                 if (i == excludeIndex) continue;
 
-                command = TryMoveCardsToTableauIndex(card, soucePileData, i);
+                command = TryMoveCardsToTableauIndex(card, sourcePileData, i);
                 if (command is { Success: true })
                 {
                     break;

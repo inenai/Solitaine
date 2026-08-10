@@ -91,6 +91,7 @@ namespace FreeCell
             while (_refreshFreeCellsCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
         }
+
         public void RefreshTableaus(List<Stack<Card>> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
         {
             _refreshTableausCoroutinesRunning = 0;

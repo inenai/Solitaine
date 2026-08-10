@@ -7,6 +7,8 @@ namespace Common
 {
     public class FreeCellView : TargetCardPileView
     {
+
+        public override PileKind PileKind => PileKind.FREECELL;
         private CardView _cardView;
         private Vector3 _cardPosition;
 
