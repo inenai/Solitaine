@@ -450,6 +450,7 @@ public abstract class Game
                     commandActions.Enqueue(moveStackAction);
                     break;
                 case PileKind.FOUNDATION:
+                case PileKind.FREECELL:
                 case PileKind.WASTE:
                     GameCommandAction moveAction = new GameCommandActionMove(
                                sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
