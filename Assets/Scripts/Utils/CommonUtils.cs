@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Common;
+using UnityEngine;
 
 namespace Utils
 {
@@ -9,7 +11,7 @@ namespace Utils
     {
         public static IList<T> Shuffle<T>(IList<T> list)
         {
-            Random rng = new Random();
+            System.Random rng = new System.Random();
             int n = list.Count;
             while (n > 1)
             {
@@ -26,6 +28,36 @@ namespace Utils
         {
             Contract.Requires(stack != null);
             return new Stack<T>(stack.Reverse());
+        }
+
+        public static Color GetUIImageColor(SolitaireKind kind)
+        {
+            switch (kind)
+            {
+                case SolitaireKind.KLONDIKE:
+                    return new Color(0f / 255f, 63f / 255f, 135f / 255f);
+                case SolitaireKind.SAWAYAMA:
+                    return new Color(70f / 255f, 5f / 255f, 14f / 255f);
+                case SolitaireKind.FREECELL:
+                    return new Color(9f / 255f, 113f / 255f, 82f / 255f);
+                default:
+                    return new Color(100f / 255f, 100f / 255f, 100f / 255f);
+            }
+        }
+
+        public static Color GetUITextColor(SolitaireKind kind)
+        {
+            switch (kind)
+            {
+                case SolitaireKind.KLONDIKE:
+                    return new Color(50f / 255f, 113f / 255f, 185f / 255f);
+                case SolitaireKind.SAWAYAMA:
+                    return new Color(120f / 255f, 55f / 255f, 64f / 255f);
+                case SolitaireKind.FREECELL:
+                    return new Color(59f / 255f, 163f / 255f, 132f / 255f);
+                default:
+                    return new Color(200f / 255f, 200f / 255f, 200f / 255f);
+            }
         }
     }
 }
