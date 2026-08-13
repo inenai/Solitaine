@@ -381,7 +381,8 @@ public abstract class Game
         {
             excludeIndex = sourcePileData.Index;
             Log($"INNER CommonInner_TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
-        } else
+        }
+        else
         {
             Log($"INNER CommonInner_TryMoveCardToAnyTableau {card} > T*");
         }
@@ -431,6 +432,7 @@ public abstract class Game
 
         return command;
     }
+
     private GameCommand CommonInner_TryMoveCardsToTableauIndex(Card card, PileData sourcePileData, int targetPileIndex)
     {
         Log($"INNER TryMoveCardsToTableauIndex {card} > T[{targetPileIndex}]");

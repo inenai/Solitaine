@@ -74,9 +74,9 @@ public abstract class GameController : MonoBehaviour, IGameController
         Initialize(() =>
         {
             StartNewGame(() =>
-                {
-                    Status = GameStatus.LISTENING;
-                });
+            {
+                Status = GameStatus.LISTENING;
+            });
         });
     }
 

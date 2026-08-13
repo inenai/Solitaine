@@ -329,6 +329,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     {
         return !_animating && Card.Free;
     }
+
     public void OnDoubleClickAttemptFailed()
     {
         PlayLocked();
