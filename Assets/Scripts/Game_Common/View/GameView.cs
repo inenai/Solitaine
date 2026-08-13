@@ -4,13 +4,13 @@ using UnityEngine;
 public abstract class GameView : MonoBehaviour
 {
     [SerializeField] CardView[] cardViews;
-    protected IGameController _controller;
+    protected GameController _controller;
     protected DeckView _deckView;
 
     public DeckView Deck => _deckView;
-    public IGameController Controller => _controller;
+    public GameController Controller => _controller;
 
-    public virtual void Init(IGameController controller)
+    public virtual void Init(GameController controller)
     {
         _controller = controller;
         _deckView = new DeckView(this,cardViews);

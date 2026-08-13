@@ -340,9 +340,16 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         Log($"Card {_card} double clicked!");
         if (_card == null) return;
         if (!_card.Revealed) return; //Ignores double clicks on hidden cards
+        if (_view.Controller.CurrentStatus != GameStatus.LISTENING) return;
 
-        _view.Controller.InputAction_CardDoubleClicked(_card, transform.position);
-        Log($"{_card} Double Clicked!");
+        bool success = _view.Controller.InputAction_CardDoubleClicked(_card, transform.position);
+        if (!success)
+        {
+            CardView[] cardV = transform.GetComponentsInChildren<CardView>();
+            foreach (CardView c in cardV) {
+                c.OnDoubleClickAttemptFailed();
+            }
+        }
     }
     #endregion
 }

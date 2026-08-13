@@ -133,7 +133,11 @@ public abstract class Game
                 }
                 else
                 {
-                    command = CommonInner_TryMoveCardToAnyFreeCell(card, sourcePileData);
+                    if (sourcePileData.Kind != PileKind.FREECELL)
+                    {
+                        command = CommonInner_TryMoveCardToAnyFreeCell(card, sourcePileData);
+                    }
+
                     if (command is { Success: true })
                     {
                         targetPileKind = PileKind.FREECELL;

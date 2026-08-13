@@ -25,6 +25,8 @@ public abstract class GameController : MonoBehaviour, IGameController
         }
     }
 
+    public GameStatus CurrentStatus => _status;
+
     public abstract void ResetSettingsToDefault();
     public abstract bool IsRestockAvailable();
     public abstract bool IsAutoMovesEnabled();
