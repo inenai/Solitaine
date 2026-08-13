@@ -16,8 +16,6 @@ namespace Klondike
 
         [SerializeField] ToggleGroup _autoMoveOption;
         [SerializeField] Toggle _autoMoveEnabledToggle;
-        [SerializeField] Toggle _autoMoveDisabledToggle;
-
 
         public override void OnEnabled()
         {
@@ -31,8 +29,7 @@ namespace Klondike
             _draw3Toggle.isOn = false;
             _restock3Toggle.isOn = false;
             _restockInfToggle.isOn = false;
-            _autoMoveEnabledToggle.isOn = false;
-            _autoMoveDisabledToggle.isOn = false;
+            _autoMoveEnabledToggle.isOn = KlondikeSettings.AutoMovesEnabled;
         }
 
         private void InitToggleGroups()
@@ -70,19 +67,6 @@ namespace Klondike
                 Debug.Log("[Settings] Available Restocks is -1, turn on toggle for \"Restock: Unlimited\"");
             }
 
-            _autoMoveOption.RegisterToggle(_autoMoveEnabledToggle);
-            _autoMoveOption.RegisterToggle(_autoMoveDisabledToggle);
-
-            if (KlondikeSettings.AutoMovesEnabled)
-            {
-                _autoMoveEnabledToggle.isOn = true;
-                _autoMoveOption.NotifyToggleOn(_autoMoveEnabledToggle);
-
-            } else
-            {
-                _autoMoveDisabledToggle.isOn = true;
-                _autoMoveOption.NotifyToggleOn(_autoMoveDisabledToggle);
-            }
         }
 
         public override void Save()
@@ -93,8 +77,7 @@ namespace Klondike
             if (_restock3Toggle.isOn) KlondikeSettings.AvailableRestocks = 3;
             if (_restockInfToggle.isOn) KlondikeSettings.AvailableRestocks = -1;
 
-            if (_autoMoveEnabledToggle.isOn) KlondikeSettings.AutoMovesEnabled = true;
-            if (_autoMoveDisabledToggle.isOn) KlondikeSettings.AutoMovesEnabled = false;
+            KlondikeSettings.AutoMovesEnabled = _autoMoveEnabledToggle.isOn;
         }
     }
 }

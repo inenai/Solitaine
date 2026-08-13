@@ -14,7 +14,7 @@ namespace Klondike
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
         public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;
-        public const bool DEFAULT_AUTO_MOVES_ENABLED = false;
+        public const bool DEFAULT_AUTO_MOVES_ENABLED = true;
 
         public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(SavedSettingsFlag, 0) != 0;
 

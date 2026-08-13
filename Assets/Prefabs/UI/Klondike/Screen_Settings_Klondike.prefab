@@ -165,9 +165,9 @@ MonoBehaviour:
   _restockOption: {fileID: 7125994900363325092}
   _restockInfToggle: {fileID: 3486070207581124619}
   _restock3Toggle: {fileID: 7979916238241112720}
-  _autoMoveOption: {fileID: 7014177626093731653}
+  _autoMoveOption: {fileID: 0}
   _autoMoveEnabledToggle: {fileID: 3734259910114306538}
-  _autoMoveDisabledToggle: {fileID: 7858104541232903025}
+  _autoMoveDisabledToggle: {fileID: 0}
 --- !u!224 &1341786407556272138 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3469299280999251721, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
@@ -416,6 +416,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1565265907249352981, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+      propertyPath: m_IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565265907249352981, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+      propertyPath: m_Group
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2723851967948056652, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
       propertyPath: m_Name
       value: Setting_AutoMoves
@@ -440,8 +448,10 @@ PrefabInstance:
       propertyPath: m_text
       value: AutoMoves
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 5133380052514752442, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 6656900661743455761, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
@@ -453,28 +463,6 @@ RectTransform:
 --- !u!114 &3734259910114306538 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1565265907249352981, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
-  m_PrefabInstance: {fileID: 2768078345499900159}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Toggle
---- !u!114 &7014177626093731653 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5133380052514752442, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
-  m_PrefabInstance: {fileID: 2768078345499900159}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ToggleGroup
---- !u!114 &7858104541232903025 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5433497176442063758, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
   m_PrefabInstance: {fileID: 2768078345499900159}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
