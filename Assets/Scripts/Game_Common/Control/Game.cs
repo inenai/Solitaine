@@ -536,6 +536,7 @@ public abstract class Game
             for (int j = 0; j < State.Tableaus[i].Count; j++)
             {
                 if (State.Tableaus[i].ElementAt(j).Free) continue;
+                if (!State.Tableaus[i].ElementAt(j).Revealed) continue;
                 if (j == 0)
                 {
                     GameCommandAction a = new GameCommandActionFree(
