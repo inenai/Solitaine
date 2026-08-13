@@ -124,7 +124,7 @@ namespace Common
                 Debug.Log($"Waste ({WastePile.Count}): {string.Join(" ", WastePile)}");
             //if (WastePile.Count > 0) Debug.Log($"Top card in waste is: {WastePile.Peek()}");
 
-            if (FreeCells != null)
+            if (FreeCells != null && FreeCells.Length > 0)
             {
                 Debug.Log("FreeCells:");
                 for (int i = 0; i < FreeCells.Length; i++)
@@ -134,7 +134,7 @@ namespace Common
                 }
             }
 
-            if (Foundations != null)
+            if (Foundations != null && Foundations.Length > 0)
             {
                 Debug.Log("Foundations:");
                 for (int i = 0; i < Foundations.Length; i++)
@@ -144,7 +144,7 @@ namespace Common
                 }
             }
 
-            if (Tableaus != null)
+            if (Tableaus != null && Tableaus.Length > 0)
             {
                 Debug.Log("Tableaus:");
                 for (int i = 0; i < Tableaus.Length; i++)
