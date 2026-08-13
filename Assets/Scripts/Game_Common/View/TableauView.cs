@@ -60,6 +60,7 @@ namespace Common
             if (tableauCards.Count == 0)
             {
                 //Debug.Log($"TableauView[{Index}] refreshed.");
+                UpdateTriggerHightlight();
                 onDone?.Invoke();
                 return;
             }

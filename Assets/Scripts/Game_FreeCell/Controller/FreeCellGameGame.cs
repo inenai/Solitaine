@@ -53,6 +53,8 @@ namespace FreeCell
             {
                 _state.Tableaus[i].Peek().FreeCard(true);
             }
+
+            CommonInner_UpdateFreeCards();
         }
 
         public static List<Card> CreateGameDeck()

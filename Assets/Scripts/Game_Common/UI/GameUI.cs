@@ -24,7 +24,7 @@ namespace Common
         {
             ApplyTints();
 #if UNITY_ANDROID && !UNITY_EDITOR
-            _controlsTxt.SetActive(false);
+            _controlsBtn.SetActive(false);
 #endif
             _controller = controller;
             _gameLabel.text = _solitaireKind.ToString();
