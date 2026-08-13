@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Common;
+using FreeCell;
+using Klondike;
+using Sawayama;
 using UnityEngine;
 
 namespace Utils
@@ -57,6 +60,23 @@ namespace Utils
                     return new Color(59f / 255f, 163f / 255f, 132f / 255f);
                 default:
                     return new Color(200f / 255f, 200f / 255f, 200f / 255f);
+            }
+        }
+
+        public static int GetWinsFor(SolitaireKind solitaireKind)
+        {
+            switch (solitaireKind)
+            {
+                case SolitaireKind.KLONDIKE:
+                    return KlondikeSettings.WinCount;
+
+                case SolitaireKind.SAWAYAMA:
+                    return SawayamaSettings.WinCount;
+
+                case SolitaireKind.FREECELL:
+                    return FreeCellGameSettings.WinCount;
+                default:
+                    throw new Exception($"Solitaire not yet fully supported by UI: {solitaireKind}");
             }
         }
     }
