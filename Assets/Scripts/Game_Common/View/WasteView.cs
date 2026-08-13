@@ -25,10 +25,10 @@ namespace Common
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            Debug.Log("WasteView refreshing...");
+            //Debug.Log("WasteView refreshing...");
             if (cards.Count == 0)
             {
-                Debug.Log("WasteView refreshed.");
+                //Debug.Log("WasteView refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -54,7 +54,7 @@ namespace Common
                 Debug.Log($"Card {_cardViews[i].Card} index {i} to card slot {cardSlotIndex}");
             }
 
-            Debug.Log("WasteView refreshed.");
+            //Debug.Log("WasteView refreshed.");
             onDone?.Invoke();
         }
     }

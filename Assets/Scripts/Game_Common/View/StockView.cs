@@ -16,13 +16,13 @@ namespace Common
 
         public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            Debug.Log("StockView refreshing...");
+            //Debug.Log("StockView refreshing...");
             if (_restockLocked != null)
                 _restockLocked.SetActive(!_view.Controller.IsRestockAvailable());
 
             if (cards.Count == 0)
             {
-                Debug.Log("StockView refreshed.");
+                //Debug.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -30,7 +30,7 @@ namespace Common
             if (cardMoved == null)
             {
                 StackCardsInPosition(cards, _cardsRoot.position, transform, "Card_S_");
-                Debug.Log("StockView refreshed.");
+                //Debug.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
             }

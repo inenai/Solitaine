@@ -18,7 +18,6 @@ namespace Common
             _cardViews = new();
         }
 
-
         private Card[] ReloadCards(Stack<Card> tableauCards)
         {
             _cardViews.Clear();
@@ -54,13 +53,13 @@ namespace Common
 
         public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            Debug.Log($"TableauView[{Index}] refreshing...");
+            //Debug.Log($"TableauView[{Index}] refreshing...");
 
             Card[] cards = ReloadCards(tableauCards);
 
             if (tableauCards.Count == 0)
             {
-                Debug.Log($"TableauView[{Index}] refreshed.");
+                //Debug.Log($"TableauView[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }
