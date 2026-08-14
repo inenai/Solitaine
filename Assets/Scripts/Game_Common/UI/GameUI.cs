@@ -3,6 +3,7 @@ using Klondike;
 using Sawayama;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 namespace Common
 {
@@ -63,19 +64,7 @@ namespace Common
 
         private void UpdateWins()
         {
-            int wins = 0;
-            switch (_solitaireKind)
-            {
-                case SolitaireKind.KLONDIKE:
-                    wins = KlondikeSettings.WinCount;
-                    break;
-                case SolitaireKind.SAWAYAMA:
-                    wins = SawayamaSettings.WinCount;
-                    break;
-                case SolitaireKind.FREECELL:
-                    wins = FreeCellGameSettings.WinCount;
-                    break;
-            }
+            int wins = CommonUtils.GetWinsFor(_solitaireKind);
             _winsTxt.text = $"Wins: {wins}";
         }
 
