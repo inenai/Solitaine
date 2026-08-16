@@ -72,5 +72,15 @@ namespace Common
             _controlsScreen.SetActive(false);
             EventManager.OnMenuClosed?.Invoke();
         }
+
+        public void Undo()
+        {
+            EventManager.OnUndo?.Invoke();
+        }
+
+        public void Redo()
+        {
+            EventManager.OnRedo?.Invoke();
+        }
     }
 }
