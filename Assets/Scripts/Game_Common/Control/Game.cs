@@ -220,7 +220,7 @@ public abstract class Game
                     command = CommonInner_TryMoveCardsToTableauIndex(card, sourcePileData, targetPileIndex);
                     break;
                 case PileKind.FREECELL:
-                    command = CommonInner_TryMoveCardToAnyFreeCell(card, sourcePileData);
+                    command = CommonInner_TryMoveCardToFreeCellIndex(card, sourcePileData, targetPileIndex);
                     break;
             }
 
