@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,7 +24,8 @@ namespace Common
 
       public const float DragDepth = 5f;
 
-      private bool _paused;
+      private bool InputBlocked => _inputBlockers.Count > 0;
+      private HashSet<string> _inputBlockers;
       private Vector3 _dragOffset;
       private Camera _mainCamera;
       private Plane _dragPlane;
@@ -38,6 +40,7 @@ namespace Common
 
       private void Awake()
       {
+         _inputBlockers = new();
          _mainCamera = Camera.main;
          _dragPlane = new Plane(Vector3.forward, DragDepth);
       }
@@ -98,27 +101,44 @@ namespace Common
          }
       }
 
-      public void Pause(bool pause)
+      public void BlockInput(string reason)
       {
-         _paused = pause;
+         if (_inputBlockers.Contains(reason))
+         {
+            Debug.LogError($"Input block reason already used: {reason}");
+            return;
+         }
+
+         _inputBlockers.Add(reason);
+      }
+
+      public void UnblockInput(string reason)
+      {
+         if (!_inputBlockers.Contains(reason))
+         {
+            Debug.LogError($"Input block reason not used: {reason}");
+            return;
+         }
+
+         _inputBlockers.Remove(reason);
       }
 
       private void Action_ResetGame(InputAction.CallbackContext context)
       {
          if (dragging) return;
-         EventManager.OnResetGameEvent?.Invoke();
+         EventManager.OnResetGameRequested?.Invoke();
       }
 
       private void Action_DrawFromStock(InputAction.CallbackContext context)
       {
          if (dragging) return;
-         EventManager.OnDrawFromStockEvent?.Invoke();
+         EventManager.OnDrawFromStock?.Invoke();
       }
 
       private void Action_PointerPressed(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer pressed");
-         if (_paused) return;
+         if (InputBlocked) return;
          _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
 
          Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
@@ -175,7 +195,7 @@ namespace Common
       private void Action_PointerMoved(InputAction.CallbackContext context)
       {
          //Debug.Log("[InputManager] Pointer moved");
-         if (_paused) return;
+         if (InputBlocked) return;
 
          _pointerPosition = context.ReadValue<Vector2>();
          if (dragging)
@@ -195,7 +215,7 @@ namespace Common
       private void Action_PointerReleased(InputAction.CallbackContext context)
       {
          // Debug.Log("[InputManager] Pointer released");
-         if (_paused)
+         if (InputBlocked)
          {
             EndDrag(cancelled: true);
             _clickingObject = null;
@@ -245,7 +265,7 @@ namespace Common
       private void Action_DoublePressed(InputAction.CallbackContext context)
       {
          Debug.Log("[InputManager] Pointer double pressed");
-         if (_paused) return;
+         if (InputBlocked) return;
 
          EndDrag(cancelled: true);
 

@@ -15,6 +15,10 @@ public abstract class GameController : MonoBehaviour, IGameController
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
 
+    private const string MENU_OPENED_REASON = "IBR_MenuOpened";
+    private const string GAME_BUSY_REASON = "IBR_GameProcessing";
+    private bool IsBusy => _status != GameStatus.LISTENING;
+
     GameStatus Status
     {
         get => _status;
@@ -73,11 +77,12 @@ public abstract class GameController : MonoBehaviour, IGameController
     void Start()
     {
         Status = GameStatus.INITIALIZING;
+        _input.BlockInput(GAME_BUSY_REASON);
         Initialize(() =>
         {
             StartNewGame(() =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             });
         });
     }
@@ -119,11 +124,11 @@ public abstract class GameController : MonoBehaviour, IGameController
     #region GameController
     public void RestartGame()
     {
-        if (Status != GameStatus.LISTENING) return;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return;
+        Processing();
         StartNewGame(() =>
         {
-            Status = GameStatus.LISTENING;
+            Listening();
             EventManager.OnGameStarted?.Invoke();
         });
     }
@@ -131,39 +136,39 @@ public abstract class GameController : MonoBehaviour, IGameController
     public bool InputAction_PileClicked(PileKind pileKind, int pileIndex)
     {
         Debug.Log("Processing pile clicked.");
-        if (Status != GameStatus.LISTENING) return false;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return false;
+        Processing();
 
         return CheckRefreshView(
             _game.GameAction_ClickedPile(pileKind, pileIndex), null, default, () =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             });
     }
 
     public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
         Debug.Log("Processing double click.");
-        if (Status != GameStatus.LISTENING) return false;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return false;
+        Processing();
 
         return CheckRefreshView(
             _game.GameAction_TrySmartMoveCard(card), card, originalCardPosition, () =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             });
     }
 
     public bool InputAction_CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
     {
         Debug.Log("Processing card dragged to pile.");
-        if (Status != GameStatus.LISTENING) return false;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return false;
+        Processing();
 
         return CheckRefreshView(
             _game.CommonGameAction_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             }, true);
     }
     #endregion
@@ -251,19 +256,19 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     private void OnMenuOpened()
     {
-        _input.Pause(true);
+        _input.BlockInput(MENU_OPENED_REASON);
     }
 
     private void OnMenuClosed()
     {
-        _input.Pause(false);
+        _input.UnblockInput(MENU_OPENED_REASON);
     }
 
     private void OnUndo()
     {
         Debug.Log("Processing UNDO.");
-        if (Status != GameStatus.LISTENING) return;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return;
+        Processing();
 
         bool success = _game != null && _game.UndoCommand();
 
@@ -271,20 +276,20 @@ public abstract class GameController : MonoBehaviour, IGameController
         {
             DoRefreshView(AllPileKinds, () =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             }, null, default, true);
         }
         else
         {
-            Status = GameStatus.LISTENING;
+            Listening();
         }
     }
 
     private void OnRedo()
     {
         Debug.Log("Processing REDO.");
-        if (Status != GameStatus.LISTENING) return;
-        Status = GameStatus.PROCESSING;
+        if (IsBusy) return;
+        Processing();
 
         bool success = _game != null && _game.RedoCommmand();
 
@@ -292,13 +297,25 @@ public abstract class GameController : MonoBehaviour, IGameController
         {
             DoRefreshView(AllPileKinds, () =>
             {
-                Status = GameStatus.LISTENING;
+                Listening();
             }, null, default, true);
         }
         else
         {
-            Status = GameStatus.LISTENING;
+            Listening();
         }
+    }
+
+    private void Processing()
+    {
+        Status = GameStatus.PROCESSING;
+        _input.BlockInput(GAME_BUSY_REASON);
+    }
+
+    private void Listening()
+    {
+        Status = GameStatus.LISTENING;
+        _input.UnblockInput(GAME_BUSY_REASON);
     }
     #endregion
 }
