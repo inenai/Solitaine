@@ -35,7 +35,7 @@ namespace Common
         public void SaveAndRestart()
         {
             SaveAndClose();
-            EventManager.OnResetGameEvent?.Invoke();
+            EventManager.OnResetGameRequested?.Invoke();
         }
 
         public void Close()

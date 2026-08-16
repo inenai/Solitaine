@@ -99,7 +99,6 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     private void StartNewGame(Action onDone)
     {
-        _ui.OnStartNewGame();
         ResetDeck();
         ResetView();
         CreateGame();
@@ -125,6 +124,7 @@ public abstract class GameController : MonoBehaviour, IGameController
         StartNewGame(() =>
         {
             Status = GameStatus.LISTENING;
+            EventManager.OnGameStarted?.Invoke();
         });
     }
 
@@ -212,8 +212,8 @@ public abstract class GameController : MonoBehaviour, IGameController
     #region Events
     private void RegisterToEvents()
     {
-        EventManager.OnResetGameEvent += OnResetGameEvent;
-        EventManager.OnDrawFromStockEvent += OnDrawFromStockEvent;
+        EventManager.OnResetGameRequested += OnResetGameEvent;
+        EventManager.OnDrawFromStock += OnDrawFromStockEvent;
         EventManager.OnGameWon += OnGameWon;
         EventManager.OnMenuClosed += OnMenuClosed;
         EventManager.OnMenuOpened += OnMenuOpened;
@@ -223,8 +223,8 @@ public abstract class GameController : MonoBehaviour, IGameController
 
     private void DeregisterFromEvents()
     {
-        EventManager.OnResetGameEvent -= OnResetGameEvent;
-        EventManager.OnDrawFromStockEvent -= OnDrawFromStockEvent;
+        EventManager.OnResetGameRequested -= OnResetGameEvent;
+        EventManager.OnDrawFromStock -= OnDrawFromStockEvent;
         EventManager.OnGameWon -= OnGameWon;
         EventManager.OnMenuClosed -= OnMenuClosed;
         EventManager.OnMenuOpened -= OnMenuOpened;

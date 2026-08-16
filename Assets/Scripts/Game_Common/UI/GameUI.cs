@@ -14,7 +14,6 @@ namespace Common
         [SerializeField] private TextMeshProUGUI _gameLabel;
         [SerializeField] private SolitaireKind _solitaireKind;
         [SerializeField] private TextMeshProUGUI _winsTxt;
-        [SerializeField] private ParticleSystem _victoryParticles;
         [SerializeField] private BaseSettingsScreen _settingsScreen;
         [SerializeField] private GameObject _controlsBtn;
         [SerializeField] private GameObject _controlsScreen;
@@ -41,15 +40,9 @@ namespace Common
             }
         }
 
-        public void OnStartNewGame()
-        {
-            _victoryParticles.Stop();
-        }
-
         public void OnGameWon()
         {
             UpdateWins();
-            _victoryParticles.Play();
         }
 
         public void OpenSettings()
