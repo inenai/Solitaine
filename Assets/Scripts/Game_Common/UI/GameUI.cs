@@ -1,8 +1,10 @@
+using System;
 using FreeCell;
 using Klondike;
 using Sawayama;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Utils;
 
 namespace Common
@@ -17,6 +19,8 @@ namespace Common
         [SerializeField] private BaseSettingsScreen _settingsScreen;
         [SerializeField] private GameObject _controlsBtn;
         [SerializeField] private GameObject _controlsScreen;
+        [SerializeField] private Button _undoBtn;
+        [SerializeField] private Button _redoBtn;
 
         private GameController _controller;
 
@@ -81,6 +85,12 @@ namespace Common
         public void Redo()
         {
             EventManager.OnRedo?.Invoke();
+        }
+
+        public void UpdateUndoRedoButtons(bool enableUndoBtn, bool enableRedoBtn)
+        {
+            _undoBtn.interactable = enableUndoBtn;
+            _redoBtn.interactable = enableRedoBtn;
         }
     }
 }

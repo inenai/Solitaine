@@ -191,6 +191,7 @@ public abstract class GameController : MonoBehaviour
         bool refreshNeeded = pilesToRefresh.Count > 0;
         if (refreshNeeded)
         {
+            _ui.UpdateUndoRedoButtons(enableUndoBtn:_game.State.UndoAvailable,enableRedoBtn:_game.State.RedoAvailable);
             DoRefreshView(pilesToRefresh, () =>
             {
                 if (IsAutoMovesEnabled())
@@ -287,6 +288,7 @@ public abstract class GameController : MonoBehaviour
             {
                 Listening();
             }, null, default, true);
+            _ui.UpdateUndoRedoButtons(enableUndoBtn: _game.State.UndoAvailable, enableRedoBtn: _game.State.RedoAvailable);
         }
         else
         {
@@ -308,6 +310,7 @@ public abstract class GameController : MonoBehaviour
             {
                 Listening();
             }, null, default, true);
+            _ui.UpdateUndoRedoButtons(enableUndoBtn: _game.State.UndoAvailable, enableRedoBtn: _game.State.RedoAvailable);
         }
         else
         {

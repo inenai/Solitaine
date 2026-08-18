@@ -1,3 +1,4 @@
+using System;
 using Common;
 using UnityEngine;
 
@@ -10,15 +11,15 @@ public abstract class GameView : MonoBehaviour
     public DeckView Deck => _deckView;
     public GameController Controller => _controller;
 
+    public abstract bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result);
+    protected abstract void OnInit();
+
     public virtual void Init(GameController controller)
     {
         _controller = controller;
-        _deckView = new DeckView(this,cardViews);
+        _deckView = new DeckView(this, cardViews);
         OnInit();
     }
-
-    protected abstract void OnInit();
-    public abstract bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result);
 
     public Vector3 GetCardViewPosition(Card card)
     {

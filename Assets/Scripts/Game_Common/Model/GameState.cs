@@ -17,6 +17,8 @@ namespace Common
 
         public abstract int AvailableRestocks { get; }
         public abstract bool FoundationCardsFree { get; }
+        public bool RedoAvailable => _undoneMoves?.Count > 0;
+        public bool UndoAvailable => _doneMoves?.Count > 0;
 
         public void OnWin()
         {
