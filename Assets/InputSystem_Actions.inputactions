@@ -82,17 +82,6 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "9403c3e6-b1f3-4462-a141-585be7c2eed5",
-                    "path": "<Pointer>/press",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "PointerDown",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "a29a49c1-1b7f-4e99-9bf2-91ab491b5b61",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -104,11 +93,11 @@
                 },
                 {
                     "name": "",
-                    "id": "3765f1c6-2490-45cf-b84c-56cb1048ccce",
-                    "path": "<Touchscreen>/Press",
+                    "id": "6b99d866-f328-409c-8722-4c847557bc10",
+                    "path": "<Mouse>/press",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Touch",
+                    "groups": ";Keyboard&Mouse",
                     "action": "PointerDown",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -120,17 +109,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "PointerMoved",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "73045a66-9f8b-4db1-a8a2-0c3b3d85bebb",
-                    "path": "<Touchscreen>/primaryTouch/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Touch",
                     "action": "PointerMoved",
                     "isComposite": false,
                     "isPartOfComposite": false

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 namespace Common
 {
@@ -47,6 +48,13 @@ namespace Common
 
       private void OnEnable()
       {
+         EnhancedTouchSupport.Enable();
+
+         // Subscribe to explicit EnhancedTouch events to avoid bug when switching from pen to finger
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += OnFingerDown;
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove += OnFingerMove;
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += OnFingerUp;
+
          pointerMovedAction.action.Enable();
          pointerDownAction.action.Enable();
          resetGameAction.action.Enable();
@@ -77,6 +85,10 @@ namespace Common
 
       private void OnDisable()
       {
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= OnFingerDown;
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove -= OnFingerMove;
+         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= OnFingerUp;
+
          pointerMovedAction.action.Disable();
          pointerDownAction.action.Disable();
          resetGameAction.action.Disable();
@@ -100,6 +112,92 @@ namespace Common
             doublePressAction.action.performed -= Action_DoublePressed;
          }
       }
+
+      #region EnhancedTouch
+      private void OnFingerDown(Finger finger)
+      {
+         if (InputBlocked) return;
+
+         _pointerPosition = finger.currentTouch.screenPosition;
+
+         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+         if (hit.collider != null)
+         {
+            _previousClickedCollider = _lastClickCollider;
+            _lastClickCollider = hit.collider;
+
+            if (dragging && dragMode == DragMode.PICKUP)
+            {
+               EndDrag(cancelled: false);
+               return;
+            }
+
+            if (dragMode == DragMode.DRAG)
+            {
+               TryBeginDrag(hit.collider);
+            }
+            TryBeginClick(hit.collider);
+         }
+      }
+
+      private void OnFingerMove(Finger finger)
+      {
+         if (InputBlocked) return;
+
+         _pointerPosition = finger.currentTouch.screenPosition;
+
+         if (dragging)
+         {
+            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            if (_dragPlane.Raycast(ray, out float distance))
+            {
+               _draggingObject.transform.position = Vector3.SmoothDamp(
+                   current: _draggingObject.transform.position,
+                   target: ray.GetPoint(distance),
+                   currentVelocity: ref _velocity,
+                   smoothTime: mouseDragSpeed) + _dragOffset;
+            }
+         }
+      }
+
+      private void OnFingerUp(Finger finger)
+      {
+         if (InputBlocked)
+         {
+            EndDrag(cancelled: true);
+            _clickingObject = null;
+            return;
+         }
+
+         if (dragging && dragMode == DragMode.DRAG)
+         {
+            EndDrag(cancelled: false);
+         }
+
+         if (clicking)
+         {
+            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+            if (hit.collider != null)
+            {
+               IClick c = hit.collider.gameObject.GetComponent<IClick>();
+               if (c != null && hit.collider.gameObject == _clickingObject)
+               {
+                  if (c.CanClick()) c.OnClick();
+                  else c.OnClickAttemptFailed();
+               }
+               else if (dragMode == DragMode.PICKUP)
+               {
+                  TryBeginDrag(hit.collider);
+               }
+            }
+            _clickingObject = null;
+         }
+      }
+      #endregion
 
       public void BlockInput(string reason)
       {
