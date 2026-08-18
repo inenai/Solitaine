@@ -6,7 +6,6 @@ namespace Common
 {
     public abstract class GameState
     {
-        public Stack<Card> Deck;
         public Stack<Card> StockPile;
         public Stack<Card> WastePile;
         public Stack<Card>[] FreeCells;
@@ -53,7 +52,7 @@ namespace Common
         {
             Debug.Log("SAVING COMMAND");
             if (_doneMoves == null) _doneMoves = new();
-            _undoneMoves?.Clear();
+            _undoneMoves.Clear();
             _doneMoves.Push(command);
         }
 
