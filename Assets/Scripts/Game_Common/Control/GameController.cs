@@ -19,17 +19,15 @@ public abstract class GameController : MonoBehaviour, IGameController
     private const string GAME_BUSY_REASON = "IBR_GameProcessing";
     private bool IsBusy => _status != GameStatus.LISTENING;
 
-    GameStatus Status
+    public GameStatus Status
     {
         get => _status;
-        set
+        private set
         {
             _status = value;
             Debug.Log($"STATUS {value}");
         }
     }
-
-    public GameStatus CurrentStatus => _status;
 
     public abstract void ResetSettingsToDefault();
     public abstract bool IsRestockAvailable();
