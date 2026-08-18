@@ -6,7 +6,7 @@ namespace Common
     public class Foundation
     {
         public Stack<Card> Stack;
-        public CardSuit? Suit;
+        public CardSuit? Suit => Stack.Count == 0? null : Stack.Peek().Suit;
 
         public Foundation()
         {

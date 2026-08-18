@@ -67,35 +67,7 @@ namespace Common
 
             Card card = source.Pop();
 
-            if (sourceKind == PileKind.FOUNDATION && source.Count == 0)
-            {
-                s.Foundations[sourceIndex].Suit = null;
-            }
-
-            if (targetKind == PileKind.FOUNDATION && target.Count == 0)
-            {
-                s.Foundations[targetIndex].Suit = card.Suit;
-            }
-
             target.Push(card);
-        }
-    }
-
-    public class GameCommandActionFundationSuit : GameCommandAction
-    {
-        private CardSuit _suit;
-        private int _foundationIndex;
-
-        public GameCommandActionFundationSuit(CardSuit suit, int foundationIndex)
-        {
-            _suit = suit;
-            _foundationIndex = foundationIndex;
-        }
-        public override void Execute(GameState s, bool undo)
-        {
-            string message = undo ? "UNDOING " : "";
-            Debug.Log($"[COMMAND] {message}Assign foundation [{_foundationIndex}] suit {_suit}");
-            s.Foundations[_foundationIndex].Suit = undo ? null : _suit;
         }
     }
 
