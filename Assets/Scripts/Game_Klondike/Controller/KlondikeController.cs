@@ -14,17 +14,17 @@ namespace Klondike
 
         private KlondikeGame KGame => (KlondikeGame)_game;
 
-        public override void ResetSettingsToDefault()
-        {
-            KlondikeSettings.Reset(_defaultConfig);
-        }
-
         public override bool IsRestockAvailable()
         {
             return ((KlondikeState)_game.State).AvailableRestocks != 0;
         }
 
-        public override bool IsAutoMovesEnabled()
+        protected override void ResetSettingsToDefault()
+        {
+            KlondikeSettings.Reset(_defaultConfig);
+        }
+
+        protected override bool IsAutoMovesEnabled()
         {
             return KlondikeSettings.AutoMovesEnabled;
         }

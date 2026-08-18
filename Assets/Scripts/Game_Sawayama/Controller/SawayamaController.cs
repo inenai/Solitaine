@@ -17,12 +17,12 @@ namespace Sawayama
             return false;
         }
 
-        public override bool IsAutoMovesEnabled()
+        protected override bool IsAutoMovesEnabled()
         {
             return true;
         }
 
-        public override void ResetSettingsToDefault() {}
+        protected override void ResetSettingsToDefault() {}
 
         protected override void CreateDeck()
         {

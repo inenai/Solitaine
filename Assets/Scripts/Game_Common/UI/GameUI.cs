@@ -18,9 +18,9 @@ namespace Common
         [SerializeField] private GameObject _controlsBtn;
         [SerializeField] private GameObject _controlsScreen;
 
-        private IGameController _controller;
+        private GameController _controller;
 
-        public void Init(IGameController controller)
+        public void Init(GameController controller)
         {
             ApplyTints();
 #if UNITY_ANDROID && !UNITY_EDITOR

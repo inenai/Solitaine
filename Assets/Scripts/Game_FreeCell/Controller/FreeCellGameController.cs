@@ -11,17 +11,18 @@ namespace FreeCell
         [SerializeField] private FreeCellGameView _view;
 
         private FreeCellGameGame FCGame => (FreeCellGameGame)_game;
-        public override bool IsAutoMovesEnabled()
-        {
-            return true;
-        }
 
         public override bool IsRestockAvailable()
         {
             return false;
         }
 
-        public override void ResetSettingsToDefault()
+        protected override bool IsAutoMovesEnabled()
+        {
+            return true;
+        }
+
+        protected override void ResetSettingsToDefault()
         {
 
         }
