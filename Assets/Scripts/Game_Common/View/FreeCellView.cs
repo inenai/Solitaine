@@ -36,9 +36,13 @@ namespace Common
                 return;
             }
 
+            if (immediate)
+            {
+                onDone?.Invoke();
+                return;
+            }
+
             AnimateCardMoved(_cardView, originalCardPosition, _cardPosition, onDone);
         }
-
-
     }
 }
