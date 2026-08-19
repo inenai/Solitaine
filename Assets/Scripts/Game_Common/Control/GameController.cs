@@ -72,7 +72,7 @@ public abstract class GameController : MonoBehaviour
         ResetView();
         CreateGame();
         _game.Init();
-        CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, null, default, onDone, true);
+        CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
     }
 
     private void ResetDeck()
@@ -113,11 +113,14 @@ public abstract class GameController : MonoBehaviour
         if (IsBusy) return false;
         Processing();
 
+        PileData sourcePileData = _game.State.GetCardPileOwnerData(card);
+        bool shouldHoldAutoMoves = sourcePileData.Kind == PileKind.FOUNDATION;
+
         return CheckRefreshView(
-            _game.CommonGameAction_TryMoveCardToPile(card, targetPileKind, targetPileIndex), card, originalCardPosition, () =>
+            _game.CommonGameAction_TryMoveCardToPile(card, sourcePileData, targetPileKind, targetPileIndex), () =>
             {
                 Listening();
-            }, true);
+            }, card, originalCardPosition, immediate: true, holdAutoMoves: shouldHoldAutoMoves);
     }
 
     public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
@@ -126,11 +129,14 @@ public abstract class GameController : MonoBehaviour
         if (IsBusy) return false;
         Processing();
 
+        PileData sourcePileData = _game.State.GetCardPileOwnerData(card);
+        bool shouldHoldAutoMoves = sourcePileData.Kind == PileKind.FOUNDATION;
+
         return CheckRefreshView(
-            _game.GameAction_TrySmartMoveCard(card), card, originalCardPosition, () =>
+            _game.GameAction_TrySmartMoveCard(card, sourcePileData), () =>
             {
                 Listening();
-            });
+            }, card, originalCardPosition, holdAutoMoves: shouldHoldAutoMoves);
     }
 
     public bool IsCardAllowedInPile(Card card, PileKind targetPile, int targetPileIndex)
@@ -156,7 +162,7 @@ public abstract class GameController : MonoBehaviour
         Processing();
 
         return CheckRefreshView(
-            _game.GameAction_ClickedPile(pileKind, pileIndex), null, default, () =>
+            _game.GameAction_ClickedPile(pileKind, pileIndex), () =>
             {
                 Listening();
             });
@@ -185,7 +191,7 @@ public abstract class GameController : MonoBehaviour
         _gameView.Deck.Load(_deck, onDone);
     }
 
-    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Card cardMoved, Vector3 originalCardPosition, Action onDone, bool immediate = false)
+    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
     {
         Debug.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;
@@ -194,7 +200,7 @@ public abstract class GameController : MonoBehaviour
             _ui.UpdateUndoRedoButtons(enableUndoBtn:_game.State.UndoAvailable,enableRedoBtn:_game.State.RedoAvailable);
             DoRefreshView(pilesToRefresh, () =>
             {
-                if (IsAutoMovesEnabled())
+                if (!holdAutoMoves && IsAutoMovesEnabled())
                 {
                     Card solvableCard = GetSolvableCard();
                     if (solvableCard == null)
@@ -207,7 +213,7 @@ public abstract class GameController : MonoBehaviour
                     Vector3 originalSolvableCardPosition = GetCardViewPosition(solvableCard);
                     Debug.Log("Auto moves enabled. Solving automatic move.");
                     CheckRefreshView(
-                        AutoAction_MoveCardAutomatically(solvableCard), solvableCard, originalSolvableCardPosition, onDone, false);
+                        AutoAction_MoveCardAutomatically(solvableCard), onDone, solvableCard, originalSolvableCardPosition);
                 }
                 else
                 {
