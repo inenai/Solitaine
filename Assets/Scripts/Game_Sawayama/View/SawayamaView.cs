@@ -33,7 +33,7 @@ namespace Sawayama
             {
                 _tableaus[i].Init(this, i);
             }
-            _freeCell.Init(this);
+            _freeCell.Init(this, 0);
         }
 
         public override bool IsCardInATargetablePile(PileData cardOwnerData, out TargetCardPileView result)
