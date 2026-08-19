@@ -8,7 +8,7 @@ namespace Common
     {
         public Queue<GameCommandAction> Actions => _actions;
         private Queue<GameCommandAction> _actions;
-        public bool Success => _actions != null && _actions.Count > 0;
+        public bool Valid => _actions != null && _actions.Count > 0;
 
         public GameCommand(GameCommandAction action)
         {

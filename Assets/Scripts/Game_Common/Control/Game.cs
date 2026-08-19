@@ -44,7 +44,7 @@ public abstract class Game
     protected bool ExecuteAction(Func<GameCommand> action)
     {
         GameCommand command = action();
-        bool movesMade = command != null && command.Actions.Count > 0;
+        bool movesMade = command is { Valid: true };
 
         if (movesMade)
         {
@@ -119,7 +119,7 @@ public abstract class Game
                 command = CommonInner_TryMoveCardToAnyFoundation(card, sourcePileData);
             }
 
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 targetPileKind = PileKind.FOUNDATION;
             }
@@ -127,7 +127,7 @@ public abstract class Game
             {
                 command = CommonInner_TryMoveCardToAnyTableau(card, sourcePileData);
 
-                if (command is { Success: true })
+                if (command is { Valid: true })
                 {
                     targetPileKind = PileKind.TABLEAU;
                 }
@@ -138,14 +138,14 @@ public abstract class Game
                         command = CommonInner_TryMoveCardToAnyFreeCell(card, sourcePileData);
                     }
 
-                    if (command is { Success: true })
+                    if (command is { Valid: true })
                     {
                         targetPileKind = PileKind.FREECELL;
                     }
                     else
                     {
                         command = CommonInner_TryMoveCardToAnyFoundation(card, sourcePileData);
-                        if (command is { Success: true })
+                        if (command is { Valid: true })
                         {
                             targetPileKind = PileKind.FOUNDATION;
                         }
@@ -153,7 +153,7 @@ public abstract class Game
                 }
             }
 
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 affectedPiles.Add(sourcePileData.Kind);
                 if (sourcePileData.Kind != targetPileKind)
@@ -181,7 +181,7 @@ public abstract class Game
         {
             GameCommand command = CommonInner_TryMoveCardToAnyFoundation(card, sourcePileData);
 
-            if (command != null && command.Actions.Count > 0)
+            if (command is { Valid: true })
             {
                 affectedPiles.Add(sourcePileData.Kind);
                 affectedPiles.Add(PileKind.FOUNDATION);
@@ -224,7 +224,7 @@ public abstract class Game
                     break;
             }
 
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 affectedPiles.Add(sourcePileData.Kind);
                 if (sourcePileData.Kind != targetPileKind)
@@ -244,7 +244,7 @@ public abstract class Game
             GameCommand command = default;
             int drewAmount = 0;
             command = CommonInner_TryDrawCardsFromStock(out drewAmount);
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 return command;
             }
@@ -283,7 +283,7 @@ public abstract class Game
             if (i == excludeIndex) continue;
 
             command = CommonInner_TryMoveCardToFoundationIndex(card, sourcePileData, i);
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 break;
             }
@@ -347,7 +347,7 @@ public abstract class Game
             if (i == excludeIndex) continue;
 
             command = CommonInner_TryMoveCardToFreeCellIndex(card, sourcePileData, i);
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 break;
             }
@@ -416,18 +416,18 @@ public abstract class Game
         for (int i = 0; i < compatibleFullCandidates.Count; i++)
         {
             command = CommonInner_TryMoveCardsToTableauIndex(card, sourcePileData, compatibleFullCandidates[i]);
-            if (command is { Success: true })
+            if (command is { Valid: true })
             {
                 break;
             }
         }
 
-        if (command == null || !command.Success)
+        if (command == null || !command.Valid)
         {
             for (int i = 0; i < emptyCandidates.Count; i++)
             {
                 command = CommonInner_TryMoveCardsToTableauIndex(card, sourcePileData, emptyCandidates[i]);
-                if (command is { Success: true })
+                if (command is { Valid: true })
                 {
                     break;
                 }
