@@ -13,8 +13,6 @@ namespace Klondike
         [SerializeField] ToggleGroup _restockOption;
         [SerializeField] Toggle _restockInfToggle;
         [SerializeField] Toggle _restock3Toggle;
-
-        [SerializeField] ToggleGroup _autoMoveOption;
         [SerializeField] Toggle _autoMoveEnabledToggle;
 
         public override void OnEnabled()

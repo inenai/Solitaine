@@ -2,14 +2,14 @@ using Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameNavigator : MonoBehaviour
+public static class GameNavigator
 {
-    public void ToMainMenu()
+    public static void ToMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void ExitApplication()
+    public static void ExitApplication()
     {
         Debug.Log("Quitting application.");
         Application.Quit();
@@ -18,7 +18,7 @@ public class GameNavigator : MonoBehaviour
 #endif
     }
 
-    public void LoadGame(SolitaireKind kind)
+    public static void LoadGame(SolitaireKind kind)
     {
         switch (kind)
         {
@@ -34,17 +34,17 @@ public class GameNavigator : MonoBehaviour
         }
     }
 
-    public void LoadKlondike()
+    public static void LoadKlondike()
     {
         SceneManager.LoadScene("Game_Klondike");
     }
 
-    public void LoadSawayama()
+    public static void LoadSawayama()
     {
         SceneManager.LoadScene("Game_Sawayama");
     }
 
-    public void LoadFreeCell()
+    public static void LoadFreeCell()
     {
         SceneManager.LoadScene("Game_FreeCell");
     }

@@ -1,25 +1,39 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Utils;
 
 namespace Common
 {
+    [RequireComponent(typeof(Button))]
     public class MainMenuGameButton : MonoBehaviour
     {
         [SerializeField] SolitaireKind _kind;
-        [SerializeField] GameObject _winIconGO;
+        [SerializeField] Image _winsIcon;
         [SerializeField] TextMeshProUGUI _winsTxt;
 
         void Start()
         {
+            GetComponent<Button>().onClick.AddListener(GoToGame);
             UpdateWinShowcase(CommonUtils.GetWinsFor(_kind));
+        }
+
+        private void GoToGame()
+        {
+            GameNavigator.LoadGame(_kind);
         }
 
         private void UpdateWinShowcase(int wins)
         {
             _winsTxt.text = wins.ToString();
             _winsTxt.gameObject.SetActive(wins > 0);
-            _winIconGO.SetActive(wins > 0);
+            _winsIcon.color = CommonUtils.GetWinsColor(wins);
+            _winsIcon.gameObject.SetActive(wins > 0);
+        }
+
+        void OnDestroy()
+        {
+            GetComponent<Button>().onClick.RemoveAllListeners();
         }
     }
 }

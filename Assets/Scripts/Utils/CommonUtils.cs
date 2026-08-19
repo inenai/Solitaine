@@ -79,5 +79,15 @@ namespace Utils
                     throw new Exception($"Solitaire not yet fully supported by UI: {solitaireKind}");
             }
         }
+
+        public static Color GetWinsColor(int wins)
+        {
+            if (wins < 10) return new Color(1f, 1f, 1f);
+            if (wins < 50) return new Color(0.7f, 0.4f, 0.23f);
+            if (wins < 200) return new Color(0.67f, 0.67f, 0.67f);
+            if (wins < 1000) return new Color(1f, 0.83f, 0f);
+            if (wins < 5000) return new Color(0f, 1f, 0.67f);
+            return new Color(1f, 0f, 0.66f);
+        }
     }
 }

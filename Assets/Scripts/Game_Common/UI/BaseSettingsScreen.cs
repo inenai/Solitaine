@@ -2,16 +2,14 @@ using UnityEngine;
 
 namespace Common
 {
-    [RequireComponent(typeof(GameNavigator))]
     public class BaseSettingsScreen : MonoBehaviour
     {
-        private GameNavigator _navi;
+
         private GameSettingsScreen _screen;
 
         void Awake()
         {
             _screen = GetComponent<GameSettingsScreen>();
-            _navi = GetComponent<GameNavigator>();
         }
 
         void OnEnable()
@@ -29,7 +27,7 @@ namespace Common
         public void SaveAndStart()
         {
             SaveAndClose();
-            _navi.LoadGame(_screen.Kind);
+            GameNavigator.LoadGame(_screen.Kind);
         }
 
         public void SaveAndRestart()
