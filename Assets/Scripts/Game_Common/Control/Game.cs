@@ -104,11 +104,10 @@ public abstract class Game
     #endregion
 
     #region UserInteraction
-    public virtual List<PileKind> GameAction_TrySmartMoveCard(Card card)
+    public virtual List<PileKind> GameAction_TrySmartMoveCard(Card card, PileData sourcePileData)
     {
         Log($"USER GameAction_TrySmartMoveCard {card}");
         List<PileKind> affectedPiles = new List<PileKind>();
-        PileData sourcePileData = State.GetCardPileOwnerData(card);
         PileKind targetPileKind = default;
 
         ExecuteAction(() =>
@@ -202,11 +201,10 @@ public abstract class Game
         return CommonGameAction_DrawFromStockOrRestock();
     }
 
-    public List<PileKind> CommonGameAction_TryMoveCardToPile(Card card, PileKind targetPileKind, int targetPileIndex)
+    public List<PileKind> CommonGameAction_TryMoveCardToPile(Card card, PileData sourcePileData, PileKind targetPileKind, int targetPileIndex)
     {
         Log($"USER CommonGameAction_TryMoveCardToPile {card} > {targetPileKind}[{targetPileIndex}]");
         List<PileKind> affectedPiles = new List<PileKind>();
-        PileData sourcePileData = State.GetCardPileOwnerData(card);
 
         ExecuteAction(() =>
         {
