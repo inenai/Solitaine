@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common;
-using UnityEngine;
 using Utils;
 
 namespace FreeCell
@@ -9,25 +8,36 @@ namespace FreeCell
     public class FreeCellGameGame : Game
     {
         public override GameState State => _state;
-        public FreeCellGameState FCState => _state;
-
-        protected override string DebugTag => "FreeCell";
         public override int FoundationsAmount => 4;
         public override int TableausAmount => 8;
         public override int FreeCellsAmount => 4;
         public override bool HasStock => false;
         public override bool HasWaste => false;
+        protected override string DebugTag => "FreeCell";
         protected override int DrawCount => 0;
 
-        FreeCellGameState _state;
+        public FreeCellGameState FCState => _state;
+        private Dictionary<Card, int> _cardStackSizeCache = new();
+        private FreeCellGameState _state;
 
         #region Initialization
         public FreeCellGameGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
             CreateState();
+            RegisterToEvents();
             ShuffleAndDealDeck(deck);
             Log();
+        }
+
+        private void RegisterToEvents()
+        {
+            EventManager.OnStateChanged += OnStateChanged;
+        }
+
+        ~FreeCellGameGame()
+        {
+            EventManager.OnStateChanged -= OnStateChanged;
         }
 
         private void CreateState()
@@ -126,7 +136,6 @@ namespace FreeCell
 
                     bool validMove = !toEmptyTableau && validStack;
                     bool hasSpaceToMove = !fromTableau || hasRoom;
-                    Log($"Can add card {card} to tableau? {hasSpaceToMove && (toEmptyTableau || validMove)}. toEmptyTableau {toEmptyTableau}, validStack {validStack}, fromTableau {fromTableau}, hasRoom {hasRoom}, validMove {validMove}, hasSpaceToMove {hasSpaceToMove}, should be hasSpaceToMove && (toEmptyTableau || validMove)");
                     return hasSpaceToMove && (toEmptyTableau || validMove);
                 case PileKind.FREECELL:
                     bool cellEmpty = _state.FreeCells[targetPileIndex].Count == 0;
@@ -141,26 +150,35 @@ namespace FreeCell
         private bool HasRoomToMove(Card card, PileData sourcePileData, bool toEmpty)
         {
             int stackSize = GetMovingStackSize(card, sourcePileData);
-            int availableSpace = _state.FreeMovingSpaces + (toEmpty ? 0 : 1);
+            int availableSpace = _state.GetFreeMovingSpaces() + (toEmpty ? 0 : 1);
             return stackSize <= availableSpace;
         }
 
-        private int GetMovingStackSize(Card card, PileData pileData)
+        private int GetMovingStackSize(Card card, PileData sourcePileData)
         {
-            if (pileData.Kind != PileKind.TABLEAU) return 1;
+            if (sourcePileData.Kind != PileKind.TABLEAU) return 1;
 
-            int amount = 0;
-            bool count = false;
-            for (int i = _state.Tableaus[pileData.Index].Count - 1; i >= 0; i--)
+            if (!_cardStackSizeCache.ContainsKey(card))
             {
-                if (_state.Tableaus[pileData.Index].ElementAt(i) == card)
+                int amount = 0;
+                bool count = false;
+                for (int i = _state.Tableaus[sourcePileData.Index].Count - 1; i >= 0; i--)
                 {
-                    count = true;
+                    if (_state.Tableaus[sourcePileData.Index].ElementAt(i) == card)
+                    {
+                        count = true;
+                    }
+                    if (count) amount++;
                 }
-                if (count) amount++;
+                _cardStackSizeCache.Add(card, amount);
             }
-            //Debug.Log($"Moving stack size for card {card} in tableau {pileData.Index} is {amount}");
-            return amount;
+
+            return _cardStackSizeCache[card];
+        }
+
+        private void OnStateChanged()
+        {
+            _cardStackSizeCache.Clear();
         }
         #endregion
     }

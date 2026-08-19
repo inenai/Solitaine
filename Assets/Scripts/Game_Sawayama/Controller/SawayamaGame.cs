@@ -142,46 +142,6 @@ namespace Sawayama
             }
             return false;
         }
-
-        private bool IsSafeToMoveCardToFoundation(Card card)
-        {
-            if (card.Value < 3) return true;
-            CardSuit[] oppositeColorSuites = CardUtils.GetOppositeColorSuits(card.Suit);
-
-            bool card1Found = false;
-            foreach (Foundation f in _state.Foundations)
-            {
-                if (f.Suit == oppositeColorSuites[0])
-                {
-                    foreach (Card c in f.Stack)
-                    {
-                        if (c.Value == card.Value - 2)
-                        {
-                            card1Found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!card1Found) return false;
-
-            bool card2found = false;
-            foreach (Foundation f in _state.Foundations)
-            {
-                if (f.Suit == oppositeColorSuites[1])
-                {
-                    foreach (Card c in f.Stack)
-                    {
-                        if (c.Value == card.Value - 2)
-                        {
-                            card2found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            return card2found;
-        }
         #endregion
 
     }

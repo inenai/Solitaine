@@ -25,8 +25,8 @@ namespace Common {
 
         public void FreeCard(bool free)
         {
-            string action = free ? "Freed" : "Locked";
             _free = free;
+            //string action = free ? "Freed" : "Locked";
             //Debug.Log($"{action} card {this}");
         }
 

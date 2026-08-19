@@ -29,6 +29,12 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     private Coroutine _animateCardCR;
     private bool ViewRevealed => Mathf.Approximately(_rotationRoot.transform.localRotation.eulerAngles.y, 180f);
 
+    //AUX
+    private static List<TargetCardPileView> _auxCompatiblePilesList = new();
+    private static Vector2 _auxPileXYPosVector = new();
+    private static Vector2 _auxThisXYPosVector = new();
+    private static List<TargetCardPileView> _auxTargetPilesList = new();
+
     void Awake()
     {
         _positionOnStartDrag = transform.position;
@@ -127,30 +133,32 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     private List<TargetCardPileView> GetOverlappingPiles()
     {
-        List<TargetCardPileView> piles = new();
+        _auxTargetPilesList.Clear();
         foreach (Collider2D col in _overlappingColliders)
         {
-            TargetCardPileView pile = col.gameObject.GetComponent<TargetCardPileView>();
-            if (pile != null && !piles.Contains(pile))
+            bool isTargetCardPileView = col.gameObject.TryGetComponent(out TargetCardPileView pile);
+
+            if (isTargetCardPileView && !_auxTargetPilesList.Contains(pile))
             {
-                piles.Add(pile);
+                _auxTargetPilesList.Add(pile);
                 continue;
             }
 
-            CardView otherCard = col.gameObject.GetComponent<CardView>();
-            if (otherCard != null && otherCard.Card != null)
+            bool isCard = col.gameObject.TryGetComponent(out CardView otherCard);
+
+            if (isCard && otherCard.Card != null)
             {
                 if (_view.Controller.IsCardInTargetPile(otherCard.Card, out TargetCardPileView targetPile))
                 {
-                    if (targetPile != null && !piles.Contains(targetPile))
+                    if (targetPile != null && !_auxTargetPilesList.Contains(targetPile))
                     {
-                        piles.Add(targetPile);
+                        _auxTargetPilesList.Add(targetPile);
                     }
                 }
             }
         }
 
-        return piles;
+        return _auxTargetPilesList;
     }
 
     #region CardToPileInteraction
@@ -182,24 +190,27 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         _targetPile = null;
         if (_overlappingColliders.Count == 0) return;
 
-        List<TargetCardPileView> compatiblePiles = new();
+        _auxCompatiblePilesList.Clear();
         foreach (TargetCardPileView pile in GetOverlappingPiles())
         {
             bool allowedMove = pile.IsCardAllowedHere(Card);
-            if (allowedMove && !compatiblePiles.Contains(pile))
+            if (allowedMove && !_auxCompatiblePilesList.Contains(pile))
             {
-                compatiblePiles.Add(pile);
+                _auxCompatiblePilesList.Add(pile);
             }
             else pile.EnableHighlight(false);
         }
 
         float closestDistance = float.MaxValue;
         TargetCardPileView closestPile = null;
-        foreach (TargetCardPileView pile in compatiblePiles)
+        foreach (TargetCardPileView pile in _auxCompatiblePilesList)
         {
-            Vector2 pileXYPos = new Vector2(pile.transform.position.x, pile.transform.position.y);
-            Vector2 thisXYPos = new Vector2(transform.position.x, transform.position.y);
-            float distance = Vector2.Distance(pileXYPos, thisXYPos);
+            _auxPileXYPosVector.x = pile.transform.position.x;
+            _auxPileXYPosVector.y = pile.transform.position.y;
+            _auxThisXYPosVector.x = transform.position.x;
+            _auxThisXYPosVector.y = transform.position.y;
+
+            float distance = Vector2.Distance(_auxPileXYPosVector, _auxThisXYPosVector);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -207,7 +218,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
             }
         }
 
-        foreach (TargetCardPileView pile in compatiblePiles)
+        foreach (TargetCardPileView pile in _auxCompatiblePilesList)
         {
             if (pile == closestPile)
             {

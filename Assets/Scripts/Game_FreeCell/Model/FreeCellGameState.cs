@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Common;
 
@@ -9,8 +10,6 @@ namespace FreeCell
         {
         }
 
-        public int FreeMovingSpaces => FreeCells.Count(card => card.Count == 0) + Tableaus.Count(card => card.Count == 0);
-
         public override int AvailableRestocks => 0;
 
         public override bool FoundationCardsFree => true;
@@ -18,6 +17,21 @@ namespace FreeCell
         protected override void ApplyConfig()
         {
 
+        }
+
+        public int GetFreeMovingSpaces()
+        {
+            int total = 0;
+            foreach (Stack<Card> freeCell in FreeCells)
+            {
+                if (freeCell.Count == 0) total++;
+            }
+
+            foreach (Stack<Card> tableau in Tableaus)
+            {
+                if (tableau.Count == 0) total++;
+            }
+            return total;
         }
     }
 }

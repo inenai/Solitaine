@@ -12,4 +12,5 @@ public static class EventManager
     public static Action OnCardsMoved;
     public static Action OnUndo;
     public static Action OnRedo;
+    public static Action OnStateChanged;
 }

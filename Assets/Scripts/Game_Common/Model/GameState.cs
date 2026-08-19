@@ -56,6 +56,7 @@ namespace Common
             if (_doneMoves == null) _doneMoves = new();
             _undoneMoves.Clear();
             _doneMoves.Push(command);
+            EventManager.OnStateChanged?.Invoke();
         }
 
         public bool UndoCommand()
@@ -65,6 +66,7 @@ namespace Common
             foreach (GameCommandAction a in c.Actions)
                 a.Execute(this, undo: true);
             _undoneMoves.Push(c);
+            EventManager.OnStateChanged?.Invoke();
             return true;
         }
 
@@ -75,6 +77,7 @@ namespace Common
             foreach (GameCommandAction a in c.Actions)
                 a.Execute(this);
             _doneMoves.Push(c);
+            EventManager.OnStateChanged?.Invoke();
             return true;
         }
 
