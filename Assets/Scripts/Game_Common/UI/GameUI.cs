@@ -1,7 +1,3 @@
-using System;
-using FreeCell;
-using Klondike;
-using Sawayama;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,10 +5,8 @@ using Utils;
 
 namespace Common
 {
-    [RequireComponent(typeof(GameNavigator))]
     public class GameUI : MonoBehaviour, ISettingsManager
     {
-
         [SerializeField] private TextMeshProUGUI _gameLabel;
         [SerializeField] private SolitaireKind _solitaireKind;
         [SerializeField] private TextMeshProUGUI _winsTxt;
