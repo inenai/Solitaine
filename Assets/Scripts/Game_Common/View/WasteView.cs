@@ -23,7 +23,7 @@ namespace Common
             return position;
         }
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
+        public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             //Debug.Log("WasteView refreshing...");
             if (cards.Count == 0)

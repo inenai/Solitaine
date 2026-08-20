@@ -6,6 +6,7 @@ using Common;
 using FreeCell;
 using Klondike;
 using Sawayama;
+using Spider;
 using UnityEngine;
 
 namespace Utils
@@ -27,12 +28,6 @@ namespace Utils
             return list;
         }
 
-        public static Stack<T> CloneStack<T>(Stack<T> stack)
-        {
-            Contract.Requires(stack != null);
-            return new Stack<T>(stack.Reverse());
-        }
-
         public static Color GetUIImageColor(SolitaireKind kind)
         {
             switch (kind)
@@ -43,6 +38,8 @@ namespace Utils
                     return new Color(70f / 255f, 5f / 255f, 14f / 255f);
                 case SolitaireKind.FREECELL:
                     return new Color(9f / 255f, 113f / 255f, 82f / 255f);
+                case SolitaireKind.SPIDER:
+                    return new Color(183f / 255f, 140f / 255f, 16f / 255f);
                 default:
                     return new Color(100f / 255f, 100f / 255f, 100f / 255f);
             }
@@ -58,6 +55,8 @@ namespace Utils
                     return new Color(120f / 255f, 55f / 255f, 64f / 255f);
                 case SolitaireKind.FREECELL:
                     return new Color(59f / 255f, 163f / 255f, 132f / 255f);
+                case SolitaireKind.SPIDER:
+                    return new Color(255f / 255f, 190f / 255f, 0f / 255f);
                 default:
                     return new Color(200f / 255f, 200f / 255f, 200f / 255f);
             }
@@ -75,6 +74,9 @@ namespace Utils
 
                 case SolitaireKind.FREECELL:
                     return FreeCellGameSettings.WinCount;
+
+                case SolitaireKind.SPIDER:
+                    return SpiderSettings.WinCount;
                 default:
                     throw new Exception($"Solitaire not yet fully supported by UI: {solitaireKind}");
             }

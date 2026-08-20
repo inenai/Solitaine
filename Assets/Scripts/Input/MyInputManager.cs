@@ -23,7 +23,7 @@ namespace Common
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
-      public const float DragDepth = 5f;
+      public const float DragDepth = 9f;
 
       private bool InputBlocked => _inputBlockers.Count > 0;
       private HashSet<string> _inputBlockers;

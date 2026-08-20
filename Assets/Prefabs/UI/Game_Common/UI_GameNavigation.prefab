@@ -2029,6 +2029,7 @@ GameObject:
   - component: {fileID: 6421053987908008977}
   - component: {fileID: 1266421097485495373}
   - component: {fileID: 4293509469238058888}
+  - component: {fileID: 3038301068000640602}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -2138,8 +2139,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameNavigator, Assembly-CSharp
+      - m_Target: {fileID: 3038301068000640602}
+        m_TargetAssemblyTypeName: Common.MainMenuButton, Assembly-CSharp
         m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -2170,6 +2171,18 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &3038301068000640602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295743154038711169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46a983439a06f374bac5fdc1ab4d5a69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.MainMenuButton
 --- !u!1 &7572544226075896566
 GameObject:
   m_ObjectHideFlags: 0

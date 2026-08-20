@@ -18,7 +18,7 @@ namespace Common
             _cardViews = new();
         }
 
-        private Card[] ReloadCards(Stack<Card> tableauCards)
+        private Card[] ReloadCards(CardPile tableauCards)
         {
             _cardViews.Clear();
             Card[] cards = tableauCards.Reverse().ToArray();
@@ -51,7 +51,7 @@ namespace Common
             triggerHighlight.transform.localScale = new Vector3(triggerHighlight.transform.localScale.x, GetHighlightYScale(), 1f);
         }
 
-        public override void Refresh(Stack<Card> tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
+        public override void Refresh(CardPile tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             //Debug.Log($"TableauView[{Index}] refreshing...");
 

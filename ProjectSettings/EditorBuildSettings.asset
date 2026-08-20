@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game_FreeCell.unity
     guid: 071c8d8d5ced68643a6c8f4e8c852d23
+  - enabled: 1
+    path: Assets/Scenes/Game_Spider.unity
+    guid: f5a6fabf459267345b8edbe3586d85e5
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: c1a954184bd52f245b8d71736c08bd83, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 1edbff30a74f1aa4ca571e578fa9ea4f, type: 2}

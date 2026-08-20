@@ -17,7 +17,7 @@ namespace Common
             _cardPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z + CardUtils.CardStackZOffset);
         }
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
+        public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             if (cards.Count > 1) throw new Exception($"A FreeCell can't contain more than one card. Tried to load {cards.Count}");
             if (cards.Count == 0)

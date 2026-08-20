@@ -1,19 +1,20 @@
+using Common;
 using UnityEngine;
 namespace FreeCell
 {
     public static class FreeCellGameSettings
     {
-        const string FreeCellWinCountKey = "FC_WIN_COUNT";
+
         public static int WinCount
         {
             get
             {
-                return PlayerPrefs.GetInt(FreeCellWinCountKey, 0);
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Fc_WinCountKey, 0);
             }
             set
             {
                 Log($"Win count set to {value}");
-                PlayerPrefs.SetInt(FreeCellWinCountKey, value);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Fc_WinCountKey, value);
                 PlayerPrefs.Save();
             }
         }

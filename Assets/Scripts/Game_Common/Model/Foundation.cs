@@ -1,17 +1,10 @@
-using System.Collections.Generic;
 using Utils;
 
 namespace Common
 {
-    public class Foundation
+    public class Foundation : CardPile
     {
-        public Stack<Card> Stack;
-        public CardSuit? Suit => Stack.Count == 0? null : Stack.Peek().Suit;
-
-        public Foundation()
-        {
-            Stack = new();
-        }
+        public CardSuit? Suit => Count == 0? null : Peek().Suit;
 
         public override string ToString()
         {

@@ -14,7 +14,7 @@ namespace Common
         protected int _index = -1;
         protected GameView _view;
 
-        public abstract void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone);
+        public abstract void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone);
 
         public void Init(GameView gameView, int index = -1)
         {
@@ -25,7 +25,7 @@ namespace Common
 
         protected abstract void OnInit();
 
-        protected List<CardView> StackCardsInPositionWithAnimation(Stack<Card> cards, Vector3 position, Transform parent, string cardPrefix, Card cardMoved, Vector3 originalCardPosition, Action onDone)
+        protected List<CardView> StackCardsInPositionWithAnimation(CardPile cards, Vector3 position, Transform parent, string cardPrefix, Card cardMoved, Vector3 originalCardPosition, Action onDone)
         {
             float zOffset = CardUtils.CardStackZOffset;
             CardView cardViewToAnimate = null;
@@ -63,7 +63,7 @@ namespace Common
             cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.GetFlightTime(originalCardPosition, cardViewToAnimateTargetPos), onDone);
         }
 
-        protected List<CardView> StackCardsInPosition(Stack<Card> cards, Vector3 position, Transform parent, string cardPrefix)
+        protected List<CardView> StackCardsInPosition(CardPile cards, Vector3 position, Transform parent, string cardPrefix)
         {
             float zOffset = CardUtils.CardStackZOffset;
             List<CardView> result = new();

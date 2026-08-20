@@ -1,9 +1,11 @@
 using UnityEngine;
 
-public class ExitButton : MonoBehaviour
-{
-   public void ExitGame()
+namespace Common{
+    public class ExitButton : MonoBehaviour
     {
-        GameNavigator.ExitApplication();
+        public void ExitGame()
+        {
+            GameNavigator.ExitApplication();
+        }
     }
 }

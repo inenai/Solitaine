@@ -51,17 +51,18 @@ namespace Klondike
             return false;
         }
 
-        public void RefreshStock(Stack<Card> stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
+        public override void RefreshStock(CardPile stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
         }
 
-        public void RefreshWaste(Stack<Card> wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
+
+        public override void RefreshWaste(CardPile wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _waste.Refresh(wasteCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
         }
 
-        public void RefreshFoundations(List<Stack<Card>> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
+        public override void RefreshFoundations(List<CardPile> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _refreshFoundationsCoroutinesRunning = 0;
             for (int i = 0; i < _foundations.Length; i++)
@@ -81,7 +82,7 @@ namespace Klondike
             onDone?.Invoke();
         }
 
-        public void RefreshTableaus(List<Stack<Card>> tableausCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
+        public override void RefreshTableaus(List<CardPile> tableausCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _refreshTableausCoroutinesRunning = 0;
             for (int i = 0; i < _tableaus.Length; i++)
@@ -100,5 +101,7 @@ namespace Klondike
             while (_refreshTableausCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
         }
+
+        public override void RefreshFreeCells(List<CardPile> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone) { }
     }
 }

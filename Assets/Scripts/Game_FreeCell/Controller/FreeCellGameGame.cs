@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Common;
 using Utils;
 
@@ -24,6 +23,7 @@ namespace FreeCell
         public FreeCellGameGame(List<Card> deck)
         {
             Log("Starting a Klondike game.");
+            CreateGameDeck();
             CreateState();
             RegisterToEvents();
             ShuffleAndDealDeck(deck);
@@ -48,7 +48,7 @@ namespace FreeCell
         private void ShuffleAndDealDeck(List<Card> deck)
         {
             Log("Shuffling and dealing...");
-            Stack<Card> deckStack = new Stack<Card>(CommonUtils.Shuffle(deck.ToArray()));
+            CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
             int tableauIndex = 0;
 
             while (deckStack.Count > 0)
@@ -100,7 +100,7 @@ namespace FreeCell
         #endregion
 
         #region Checks
-        protected override bool ValidTableauCardStack(Card child, Card parent)
+        protected override bool ValidTableauCardStackToPlace(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
 
@@ -121,16 +121,16 @@ namespace FreeCell
             {
                 case PileKind.FOUNDATION:
                     bool first = card.Value == 1
-                        && _state.Foundations[targetPileIndex].Stack.Count == 0;
+                        && _state.Foundations[targetPileIndex].Count == 0;
                     bool next = card.Value > 1
-                        && _state.Foundations[targetPileIndex].Stack.Count > 0
+                        && _state.Foundations[targetPileIndex].Count > 0
                         && _state.Foundations[targetPileIndex].Suit == card.Suit
-                        && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
+                        && _state.Foundations[targetPileIndex].Peek().Value == card.Value - 1;
                     return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
                     bool toEmptyTableau = _state.Tableaus[targetPileIndex].Count == 0;
 
-                    bool validStack = !toEmptyTableau && ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                    bool validStack = !toEmptyTableau && ValidTableauCardStackToPlace(card, _state.Tableaus[targetPileIndex].Peek());
                     bool fromTableau = sourcePileData.Kind == PileKind.TABLEAU;
                     bool hasRoom = HasRoomToMove(card, sourcePileData, toEmptyTableau);
 
@@ -164,7 +164,7 @@ namespace FreeCell
                 bool count = false;
                 for (int i = _state.Tableaus[sourcePileData.Index].Count - 1; i >= 0; i--)
                 {
-                    if (_state.Tableaus[sourcePileData.Index].ElementAt(i) == card)
+                    if (_state.Tableaus[sourcePileData.Index].ListCopy[i] == card)
                     {
                         count = true;
                     }

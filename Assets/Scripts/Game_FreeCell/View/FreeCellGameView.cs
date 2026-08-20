@@ -52,18 +52,18 @@ namespace FreeCell
             }
         }
 
-        public void RefreshFoundations(List<Stack<Card>> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
+        public override void RefreshFoundations(List<CardPile> foundationsCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
             _refreshFoundationsCoroutinesRunning = 0;
             for (int i = 0; i < _foundations.Length; i++)
             {
                 _refreshFoundationsCoroutinesRunning++;
-                _foundations[i].Refresh(list[i], cardMoved, originalCardPosition, immediate, () =>
+                _foundations[i].Refresh(foundationsCards[i], cardMoved, movedCardOriginalPosition, immediate, () =>
                 {
                     _refreshFoundationsCoroutinesRunning--;
                 });
             }
-            StartCoroutine(WaitForFoundationsRefreshedCR(refreshDone));
+            StartCoroutine(WaitForFoundationsRefreshedCR(onDone));
         }
 
         private IEnumerator WaitForFoundationsRefreshedCR(Action onDone)
@@ -72,7 +72,7 @@ namespace FreeCell
             onDone?.Invoke();
         }
 
-        public void RefreshFreeCells(List<Stack<Card>> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
+        public override void RefreshFreeCells(List<CardPile> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
         {
             _refreshFreeCellsCoroutinesRunning = 0;
             for (int i = 0; i < _freeCells.Length; i++)
@@ -92,7 +92,7 @@ namespace FreeCell
             onDone?.Invoke();
         }
 
-        public void RefreshTableaus(List<Stack<Card>> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
+        public override void RefreshTableaus(List<CardPile> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)
         {
             _refreshTableausCoroutinesRunning = 0;
             for (int i = 0; i < _tableaus.Length; i++)
@@ -111,5 +111,8 @@ namespace FreeCell
             while (_refreshTableausCoroutinesRunning > 0) yield return null;
             onDone?.Invoke();
         }
+
+        public override void RefreshStock(CardPile stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone) {}
+        public override void RefreshWaste(CardPile wasteCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone) {}
     }
 }

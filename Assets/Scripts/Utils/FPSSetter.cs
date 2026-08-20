@@ -1,11 +1,14 @@
 using UnityEngine;
 
-public class FPSSetter : MonoBehaviour
+namespace Utils
 {
-    void Start()
+    public class FPSSetter : MonoBehaviour
     {
+        void Start()
+        {
 #if UNITY_ANDROID
-        Application.targetFrameRate = 60;
+            Application.targetFrameRate = 60;
 #endif
+        }
     }
 }

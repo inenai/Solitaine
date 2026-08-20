@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Common;
 using static Utils.CommonUtils;
 using Utils;
-using UnityEngine;
 
 namespace Klondike
 {
@@ -62,7 +61,7 @@ namespace Klondike
         private void ShuffleAndDeal(List<Card> deck)
         {
             Log("Shuffling and dealing...");
-            Stack<Card> deckStack = new Stack<Card>(Shuffle(deck.ToArray()));
+            CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
 
             for (int i = 0; i < 7; i++)
             {
@@ -86,7 +85,7 @@ namespace Klondike
 
         #region Checks
 
-        protected override bool ValidTableauCardStack(Card child, Card parent)
+        protected override bool ValidTableauCardStackToPlace(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
 
@@ -112,17 +111,17 @@ namespace Klondike
                     bool tableauCardStackParent = sourcePileData.Kind == PileKind.TABLEAU
                         && _state.Tableaus[sourcePileData.Index].Peek() != card;
                     bool first = card.Value == 1
-                        && _state.Foundations[targetPileIndex].Stack.Count == 0;
+                        && _state.Foundations[targetPileIndex].Count == 0;
                     bool next = card.Value > 1
-                        && _state.Foundations[targetPileIndex].Stack.Count > 0
+                        && _state.Foundations[targetPileIndex].Count > 0
                         && _state.Foundations[targetPileIndex].Suit == card.Suit
-                        && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
+                        && _state.Foundations[targetPileIndex].Peek().Value == card.Value - 1;
                     return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
                     bool kingToEmpty = _state.Tableaus[targetPileIndex].Count == 0
                         && card.Value == 13;
                     bool validMove = _state.Tableaus[targetPileIndex].Count > 0 &&
-                        ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                        ValidTableauCardStackToPlace(card, _state.Tableaus[targetPileIndex].Peek());
                     return kingToEmpty || validMove;
             }
             return false;

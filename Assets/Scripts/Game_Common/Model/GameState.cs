@@ -6,10 +6,10 @@ namespace Common
 {
     public abstract class GameState
     {
-        public Stack<Card> StockPile;
-        public Stack<Card> WastePile;
-        public Stack<Card>[] FreeCells;
-        public Stack<Card>[] Tableaus;
+        public CardPile StockPile;
+        public CardPile WastePile;
+        public CardPile[] FreeCells;
+        public Tableau[] Tableaus;
         public Foundation[] Foundations;
 
         Stack<GameCommand> _doneMoves;
@@ -22,15 +22,15 @@ namespace Common
 
         public void OnWin()
         {
-            foreach (Foundation f in Foundations)
+            foreach (CardPile f in Foundations)
             {
-                foreach (Card card in f.Stack)
+                foreach (Card card in f)
                 {
                     card.FreeCard(false);
                 }
             }
         }
-        protected abstract void ApplyConfig();
+        protected virtual void ApplyConfig(){}
         public virtual void OnRestock(bool undo = false){}
 
         public GameState(Game game)
@@ -92,30 +92,30 @@ namespace Common
 
         private void InitTableau(int amount)
         {
-            Tableaus = new Stack<Card>[amount];
+            Tableaus = new Tableau[amount];
             for (int i = 0; i < amount; i++)
             {
-                Tableaus[i] = new Stack<Card>();
+                Tableaus[i] = new Tableau();
             }
         }
 
         private void InitFreeCells(int amount)
         {
-            FreeCells = new Stack<Card>[amount];
+            FreeCells = new CardPile[amount];
             for (int i = 0; i < amount; i++)
             {
-                FreeCells[i] = new Stack<Card>();
+                FreeCells[i] = new CardPile();
             }
         }
 
         private void InitStock()
         {
-            StockPile = new Stack<Card>();
+            StockPile = new CardPile();
         }
 
         private void InitWaste()
         {
-            WastePile = new Stack<Card>();
+            WastePile = new CardPile();
         }
 
         public void LogState()
@@ -143,8 +143,8 @@ namespace Common
                 Debug.Log("Foundations:");
                 for (int i = 0; i < Foundations.Length; i++)
                 {
-                    Debug.Log($"  F{i}: {string.Join(" ", Foundations[i].Stack)}");
-                    if (Foundations[i].Stack.Count > 0) Debug.Log($"Top card in F{i} is: {Foundations[i].Stack.Peek()}");
+                    Debug.Log($"  F{i}: {string.Join(" ", Foundations[i])}");
+                    if (Foundations[i].Count > 0) Debug.Log($"Top card in F{i} is: {Foundations[i].Peek()}");
                 }
             }
 
@@ -192,7 +192,7 @@ namespace Common
             {
                 for (int i = 0; i < Foundations.Length; i++)
                 {
-                    if (Foundations[i].Stack.Contains(card))
+                    if (Foundations[i].Contains(card))
                     {
                         kind = PileKind.FOUNDATION;
                         index = i;
@@ -238,7 +238,7 @@ namespace Common
             return new PileData(kind, index);
         }
 
-        public Stack<Card> GetCardStack(PileKind kind, int index = -1)
+        public CardPile GetCardStack(PileKind kind, int index = -1)
         {
             switch (kind)
             {
@@ -247,7 +247,7 @@ namespace Common
                 case PileKind.STOCK:
                     return StockPile;
                 case PileKind.FOUNDATION:
-                    return Foundations[index].Stack;
+                    return Foundations[index];
                 case PileKind.TABLEAU:
                     return Tableaus[index];
                 case PileKind.FREECELL:
