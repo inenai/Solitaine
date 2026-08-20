@@ -9,7 +9,7 @@ namespace Common
         public CardPile StockPile;
         public CardPile WastePile;
         public CardPile[] FreeCells;
-        public Tableau[] Tableaus;
+        public CardPile[] Tableaus;
         public Foundation[] Foundations;
 
         Stack<GameCommand> _doneMoves;
@@ -63,8 +63,8 @@ namespace Common
         {
             if (_doneMoves.Count == 0) return false;
             GameCommand c = _doneMoves.Pop();
-            foreach (GameCommandAction a in c.Actions)
-                a.Execute(this, undo: true);
+            for (int i = c.Actions.Count -1; i >= 0; i--)
+                c.Actions[i].Execute(this, undo: true);
             _undoneMoves.Push(c);
             EventManager.OnStateChanged?.Invoke();
             return true;
@@ -92,10 +92,10 @@ namespace Common
 
         private void InitTableau(int amount)
         {
-            Tableaus = new Tableau[amount];
+            Tableaus = new CardPile[amount];
             for (int i = 0; i < amount; i++)
             {
-                Tableaus[i] = new Tableau();
+                Tableaus[i] = new CardPile();
             }
         }
 
@@ -121,11 +121,11 @@ namespace Common
         public void LogState()
         {
             if (StockPile != null)
-                Debug.Log($"Stock ({StockPile.Count}): {string.Join(" ", StockPile)}");
+                Debug.Log($"Stock ({StockPile.Count}): {StockPile}");
             //if (StockPile.Count > 0) Debug.Log($"Top card in stock is: {StockPile.Peek()}");
 
             if (WastePile != null)
-                Debug.Log($"Waste ({WastePile.Count}): {string.Join(" ", WastePile)}");
+                Debug.Log($"Waste ({WastePile.Count}): {WastePile}");
             //if (WastePile.Count > 0) Debug.Log($"Top card in waste is: {WastePile.Peek()}");
 
             if (FreeCells != null && FreeCells.Length > 0)
@@ -133,8 +133,8 @@ namespace Common
                 Debug.Log("FreeCells:");
                 for (int i = 0; i < FreeCells.Length; i++)
                 {
-                    Debug.Log($"  FC{i}: {string.Join(" ", FreeCells[i])}");
-                    if (FreeCells[i] != null) Debug.Log($"Card in FC{i} is: {FreeCells[i]}");
+                    Debug.Log($"  FC{i}: {FreeCells[i]}");
+                    if (FreeCells[i].Count > 0) Debug.Log($"Card in FC{i} is: {FreeCells[i].Peek()}");
                 }
             }
 
@@ -143,7 +143,7 @@ namespace Common
                 Debug.Log("Foundations:");
                 for (int i = 0; i < Foundations.Length; i++)
                 {
-                    Debug.Log($"  F{i}: {string.Join(" ", Foundations[i])}");
+                    Debug.Log($"  F{i}: {Foundations[i]}");
                     if (Foundations[i].Count > 0) Debug.Log($"Top card in F{i} is: {Foundations[i].Peek()}");
                 }
             }
@@ -153,7 +153,7 @@ namespace Common
                 Debug.Log("Tableaus:");
                 for (int i = 0; i < Tableaus.Length; i++)
                 {
-                    Debug.Log($"  T{i}: {string.Join(" ", Tableaus[i])}");
+                    Debug.Log($"  T{i}: {Tableaus[i]}");
                     if (Tableaus[i].Count > 0) Debug.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
                 }
             }

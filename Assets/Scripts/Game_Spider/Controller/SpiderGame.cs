@@ -134,19 +134,19 @@ namespace Spider
                 int lastValue = 0;
                 for (int j = 0; j < State.Tableaus[i].Count; j++)
                 {
-                    if (State.Tableaus[i].ListCopy[j].Value == 13)
+                    if (State.Tableaus[i].ElementAt(j).Value == 13)
                     {
-                        validCard = State.Tableaus[i].ListCopy[j];
+                        validCard = State.Tableaus[i].ElementAt(j);
                         lastValue = 13;
                         continue;
                     }
 
                     if (validCard == null) continue;
 
-                    if (State.Tableaus[i].ListCopy[j].Suit == validCard.Suit
-                    && State.Tableaus[i].ListCopy[j].Value == lastValue - 1)
+                    if (State.Tableaus[i].ElementAt(j).Suit == validCard.Suit
+                    && State.Tableaus[i].ElementAt(j).Value == lastValue - 1)
                     {
-                        lastValue = State.Tableaus[i].ListCopy[j].Value;
+                        lastValue = State.Tableaus[i].ElementAt(j).Value;
                     }
                     else
                     {
@@ -230,12 +230,12 @@ namespace Spider
             if (emptyTableau)
                 return null;
 
-            Queue<GameCommandAction> commands = new();
+            List<GameCommandAction> commands = new();
             GameCommandAction gca = null;
 
             for (int i = 0; i < TableausAmount; i++)
             {
-                foreach (Card card in State.Tableaus[i].ListCopy)
+                foreach (Card card in State.Tableaus[i])
                 {
                     if (card.Free)
                     {
@@ -244,7 +244,7 @@ namespace Spider
                             cardFreed: FreedAction.LOCKED
                         );
                         gca.Execute(State);
-                        commands.Enqueue(gca);
+                        commands.Add(gca);
                     }
                 }
 
@@ -253,14 +253,14 @@ namespace Spider
                        targetPile: PileKind.TABLEAU, targetIndex: i
                   );
                 gca.Execute(State);
-                commands.Enqueue(gca);
+                commands.Add(gca);
 
                 gca = new GameCommandActionReveal(
                     State.Tableaus[i].Peek(),
                     cardRevealed: RevealedAction.REVEALED
                 );
                 gca.Execute(State);
-                commands.Enqueue(gca);
+                commands.Add(gca);
 
                 gca = new GameCommandActionFree(
                   State.Tableaus[i].Peek(),
@@ -268,14 +268,9 @@ namespace Spider
                 );
 
                 gca.Execute(State);
-                commands.Enqueue(gca);
+                commands.Add(gca);
             }
-
-            Queue<GameCommandAction> extraCommands = CommonInner_UpdateFreeCards();
-            while (extraCommands.Count > 0)
-            {
-                commands.Enqueue(extraCommands.Dequeue());
-            }
+            commands.AddRange(CommonInner_UpdateFreeCards());
 
             return new GameCommand(commands);
         }
@@ -366,7 +361,7 @@ namespace Spider
 
             if (command is { Valid: true } && State.Tableaus[targetPileIndex].Count > 1)
             {
-                foreach (Card tcard in State.Tableaus[targetPileIndex].ListCopy)
+                foreach (Card tcard in State.Tableaus[targetPileIndex])
                 {
                     if (tcard != card && tcard.Free)
                     {
@@ -375,47 +370,43 @@ namespace Spider
                             cardFreed: FreedAction.LOCKED
                         );
                         gca.Execute(State);
-                        command.Enqueue(gca);
+                        command.AddAction(gca);
                     }
                 }
 
-                Queue<GameCommandAction> extraCommands = CommonInner_UpdateFreeCards();
-                while (extraCommands.Count > 0)
-                {
-                    command.Enqueue(extraCommands.Dequeue());
-                }
+                command.AddRange(CommonInner_UpdateFreeCards());
             }
             return command;
         }
 
-        protected override Queue<GameCommandAction> CommonInner_UpdateFreeCards()
+        protected override List<GameCommandAction> CommonInner_UpdateFreeCards()
         {
-            Queue<GameCommandAction> commands = new();
+            List<GameCommandAction> commands = new();
             for (int i = 0; i < TableausAmount; i++)
             {
-                for (int j = State.Tableaus[i].Count - 1; j >= 0; j--)
+                for (int j = 0; j < State.Tableaus[i].Count; j++)
                 {
-                    Card currentCard = State.Tableaus[i].ListCopy[j];
+                    Card currentCard = State.Tableaus[i].ElementAt(j);
                     if (currentCard.Free) continue;
                     if (!currentCard.Revealed) continue;
 
-                    if (j == State.Tableaus[i].Count - 1)
+                    if (j == 0)
                     {
                         GameCommandAction a = new GameCommandActionFree(
                              currentCard,
                              cardFreed: FreedAction.FREED);
                         a.Execute(State);
-                        commands.Enqueue(a);
+                        commands.Add(a);
                     }
                     else
                     {
-                        if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ListCopy[j + 1], currentCard))
+                        if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ElementAt(j - 1), currentCard))
                         {
                             GameCommandAction a = new GameCommandActionFree(
                                 currentCard,
                                 cardFreed: FreedAction.FREED);
                             a.Execute(State);
-                            commands.Enqueue(a);
+                            commands.Add(a);
                         }
                         else break;
                     }

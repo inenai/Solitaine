@@ -294,7 +294,7 @@ public abstract class Game
     private GameCommand CommonInner_TryMoveCardToFoundationIndex(Card card, PileData sourcePileData, int targetPileIndex)
     {
         Log($"INNER CommonInner_TryMoveCardToFoundationIndex {card} > F[{targetPileIndex}]");
-        Queue<GameCommandAction> commandActions = new();
+        List<GameCommandAction> commandActions = new();
 
         if (CanAddCardToPile(card, PileKind.FOUNDATION, targetPileIndex))
         {
@@ -313,7 +313,7 @@ public abstract class Game
                         targetPile: PileKind.FOUNDATION, targetIndex: targetPileIndex
                     );
                     ca.Execute(State);
-                    commandActions.Enqueue(ca);
+                    commandActions.Add(ca);
 
                     if (!State.FoundationCardsFree)
                     {
@@ -322,7 +322,7 @@ public abstract class Game
                             cardFreed: FreedAction.LOCKED
                         );
                         ca.Execute(State);
-                        commandActions.Enqueue(ca);
+                        commandActions.Add(ca);
                     }
                 }
             }
@@ -333,7 +333,7 @@ public abstract class Game
                     targetPile: PileKind.FOUNDATION, targetIndex: targetPileIndex
                 );
                 ca.Execute(State);
-                commandActions.Enqueue(ca);
+                commandActions.Add(ca);
 
                 if (!State.FoundationCardsFree)
                 {
@@ -342,17 +342,11 @@ public abstract class Game
                         cardFreed: FreedAction.LOCKED
                     );
                     ca.Execute(State);
-                    commandActions.Enqueue(ca);
+                    commandActions.Add(ca);
                 }
             }
 
-            Queue<GameCommandAction> extraMoves = CommonInner_AfterRemovingCardFromPile(sourcePileData);
-            while (extraMoves.Count > 0)
-            {
-                ca = extraMoves.Dequeue();
-                ca.Execute(State);
-                commandActions.Enqueue(ca);
-            }
+            commandActions.AddRange(CommonInner_AfterRemovingCardFromPile(sourcePileData));
         }
         return new GameCommand(commandActions);
     }
@@ -387,7 +381,7 @@ public abstract class Game
     private GameCommand CommonInner_TryMoveCardToFreeCellIndex(Card card, PileData sourcePileData, int targetPileIndex)
     {
         Log($"INNER CommonInner_TryMoveCardToFreeCellIndex{card} > FC[{targetPileIndex}]");
-        Queue<GameCommandAction> commandActions = new();
+        List<GameCommandAction> commandActions = new();
         if (CanAddCardToPile(card, PileKind.FREECELL, targetPileIndex))
         {
             GameCommandAction a = new GameCommandActionMove(
@@ -395,13 +389,10 @@ public abstract class Game
                  targetPile: PileKind.FREECELL, targetIndex: targetPileIndex
              );
             a.Execute(State);
-            commandActions.Enqueue(a);
+            commandActions.Add(a);
 
-            Queue<GameCommandAction> extraMoves = CommonInner_AfterRemovingCardFromPile(sourcePileData);
-            while (extraMoves.Count > 0)
-            {
-                commandActions.Enqueue(extraMoves.Dequeue());
-            }
+            commandActions.AddRange(CommonInner_AfterRemovingCardFromPile(sourcePileData));
+
         }
         return new GameCommand(commandActions);
     }
@@ -469,7 +460,7 @@ public abstract class Game
     protected virtual GameCommand CommonInner_TryMoveCardsToTableauIndex(Card card, PileData sourcePileData, int targetPileIndex)
     {
         Log($"INNER TryMoveCardsToTableauIndex {card} > T[{targetPileIndex}]");
-        Queue<GameCommandAction> commandActions = new();
+        List<GameCommandAction> commandActions = new();
 
         if (CanAddCardToPile(card, PileKind.TABLEAU, targetPileIndex)) //VALIDATION DONE
         {
@@ -482,7 +473,7 @@ public abstract class Game
                         targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
                     );
                     moveStackAction.Execute(State);
-                    commandActions.Enqueue(moveStackAction);
+                    commandActions.Add(moveStackAction);
                     break;
                 case PileKind.FOUNDATION:
                 case PileKind.FREECELL:
@@ -492,22 +483,18 @@ public abstract class Game
                                targetPile: PileKind.TABLEAU, targetIndex: targetPileIndex
                            );
                     moveAction.Execute(State);
-                    commandActions.Enqueue(moveAction);
+                    commandActions.Add(moveAction);
                     break;
             }
-            Queue<GameCommandAction> extraCommands = CommonInner_AfterRemovingCardFromPile(sourcePileData);
-            while (extraCommands.Count > 0)
-            {
-                commandActions.Enqueue(extraCommands.Dequeue());
-            }
+            commandActions.AddRange(CommonInner_AfterRemovingCardFromPile(sourcePileData));
         }
         return new GameCommand(commandActions);
     }
 
-    protected Queue<GameCommandAction> CommonInner_AfterRemovingCardFromPile(PileData pileData)
+    protected List<GameCommandAction> CommonInner_AfterRemovingCardFromPile(PileData pileData)
     {
         Log($"INNER RemovedCardFromPile {pileData.Kind}[{pileData.Index}]");
-        Queue<GameCommandAction> result = new();
+        List<GameCommandAction> result = new();
 
         switch (pileData.Kind)
         {
@@ -519,7 +506,7 @@ public abstract class Game
                         cardFreed: FreedAction.FREED
                     );
                     a.Execute(State);
-                    result.Enqueue(a);
+                    result.Add(a);
                 }
                 break;
             case PileKind.FOUNDATION:
@@ -530,7 +517,7 @@ public abstract class Game
                         cardFreed: FreedAction.FREED
                     );
                     a.Execute(State);
-                    result.Enqueue(a);
+                    result.Add(a);
                 }
                 break;
             case PileKind.TABLEAU:
@@ -543,7 +530,7 @@ public abstract class Game
                             tCard,
                             cardRevealed: RevealedAction.REVEALED);
                         a.Execute(State);
-                        result.Enqueue(a);
+                        result.Add(a);
                     }
                     if (!tCard.Free)
                     {
@@ -551,27 +538,24 @@ public abstract class Game
                             tCard,
                             cardFreed: FreedAction.FREED);
                         a.Execute(State);
-                        result.Enqueue(a);
+                        result.Add(a);
                     }
                 }
-                Queue<GameCommandAction> extraCommands = CommonInner_UpdateFreeCards();
-                while (extraCommands.Count > 0)
-                {
-                    result.Enqueue(extraCommands.Dequeue());
-                }
+
+                result.AddRange(CommonInner_UpdateFreeCards());
                 break;
         }
         return result;
     }
 
-    protected virtual Queue<GameCommandAction> CommonInner_UpdateFreeCards()
+    protected virtual List<GameCommandAction> CommonInner_UpdateFreeCards()
     {
-        Queue<GameCommandAction> commands = new();
+        List<GameCommandAction> commands = new();
         for (int i = 0; i < TableausAmount; i++)
         {
             for (int j = State.Tableaus[i].Count - 1; j >=0 ; j--)
             {
-                Card currentCard = State.Tableaus[i].ListCopy[j];
+                Card currentCard = State.Tableaus[i].ElementAt(j);
                 if (currentCard.Free) continue;
                 if (!currentCard.Revealed) continue;
 
@@ -581,17 +565,17 @@ public abstract class Game
                          currentCard,
                          cardFreed: FreedAction.FREED);
                     a.Execute(State);
-                    commands.Enqueue(a);
+                    commands.Add(a);
                 }
                 else
                 {
-                    if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ListCopy[j+1], currentCard))
+                    if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ElementAt(j+1), currentCard))
                     {
                         GameCommandAction a = new GameCommandActionFree(
                             currentCard,
                             cardFreed: FreedAction.FREED);
                         a.Execute(State);
-                        commands.Enqueue(a);
+                        commands.Add(a);
                     }
                     else break;
                 }
@@ -610,7 +594,7 @@ public abstract class Game
             return null;
         }
 
-        Queue<GameCommandAction> commands = new();
+        List<GameCommandAction> commands = new();
 
         if (State.WastePile.TryPeek(out var topCard))
         {
@@ -619,7 +603,7 @@ public abstract class Game
                 cardFreed: FreedAction.LOCKED
             );
             a.Execute(State);
-            commands.Enqueue(a);
+            commands.Add(a);
         }
 
         int stockFinalAmount = Mathf.Max(0, State.StockPile.Count - DrawCount);
@@ -630,14 +614,14 @@ public abstract class Game
                    targetPile: PileKind.WASTE
               );
             a.Execute(State);
-            commands.Enqueue(a);
+            commands.Add(a);
 
             a = new GameCommandActionReveal(
                 State.WastePile.Peek(),
                 cardRevealed: RevealedAction.REVEALED
             );
             a.Execute(State);
-            commands.Enqueue(a);
+            commands.Add(a);
 
             if (i == stockFinalAmount)
             {
@@ -646,7 +630,7 @@ public abstract class Game
                   cardFreed: FreedAction.FREED
                );
                 a.Execute(State);
-                commands.Enqueue(a);
+                commands.Add(a);
             }
         }
         return new GameCommand(commands);
@@ -656,12 +640,12 @@ public abstract class Game
     {
         Log("INNER AttemptRestock");
 
-        Queue<GameCommandAction> commands = new();
+        List<GameCommandAction> commands = new();
         if (State.WastePile.Count > 0 && State.AvailableRestocks != 0)
         {
             GameCommandAction a = new GameCommandActionRestock();
             a.Execute(State);
-            commands.Enqueue(a);
+            commands.Add(a);
         }
         return new GameCommand(commands);
     }

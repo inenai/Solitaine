@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,24 +6,31 @@ namespace Common
 {
     public class GameCommand
     {
-        public Queue<GameCommandAction> Actions => _actions;
-        private Queue<GameCommandAction> _actions;
+        public List<GameCommandAction> Actions => _actions;
+        private List<GameCommandAction> _actions;
         public bool Valid => _actions != null && _actions.Count > 0;
 
         public GameCommand(GameCommandAction action)
         {
-            _actions = new();
-            _actions.Enqueue(action);
+            _actions = new()
+            {
+                action
+            };
         }
 
-        public GameCommand(Queue<GameCommandAction> actions)
+        public GameCommand(List<GameCommandAction> actions)
         {
             _actions = actions;
         }
 
-        public void Enqueue(GameCommandAction gca)
+        public void AddAction(GameCommandAction gca)
         {
-            _actions.Enqueue(gca);
+            _actions.Add(gca);
+        }
+
+        internal void AddRange(List<GameCommandAction> gameCommandActions)
+        {
+            _actions.AddRange(gameCommandActions);
         }
     }
 

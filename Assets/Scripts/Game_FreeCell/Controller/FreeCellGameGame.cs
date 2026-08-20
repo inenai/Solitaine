@@ -164,7 +164,7 @@ namespace FreeCell
                 bool count = false;
                 for (int i = _state.Tableaus[sourcePileData.Index].Count - 1; i >= 0; i--)
                 {
-                    if (_state.Tableaus[sourcePileData.Index].ListCopy[i] == card)
+                    if (_state.Tableaus[sourcePileData.Index].ElementAt(i) == card)
                     {
                         count = true;
                     }

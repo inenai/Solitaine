@@ -1228,10 +1228,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -5710,9 +5710,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3853470834473177873, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3853470834473177873, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -215.79999
+      objectReference: {fileID: 0}
     - target: {fileID: 4775908184548764801, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
       propertyPath: m_Name
       value: UI_GameNavigation
+      objectReference: {fileID: 0}
+    - target: {fileID: 5906429216931844180, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 104.400024
+      objectReference: {fileID: 0}
+    - target: {fileID: 7010542441988853481, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -137.20001
       objectReference: {fileID: 0}
     - target: {fileID: 7365187364996395757, guid: b0088f939fd84094ab6031c08ceb3cbc, type: 3}
       propertyPath: m_AnchoredPosition.y
