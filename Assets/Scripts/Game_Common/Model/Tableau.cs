@@ -4,7 +4,7 @@ namespace Common
 {
     public class Tableau : CardPile
     {
-        public List<Card> ListCopy => new List<Card>(_list);
+        public List<Card> ListCopy =>_list;
         private List<Card> _list;
 
         public Tableau() : base()
