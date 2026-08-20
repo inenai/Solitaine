@@ -1,16 +1,16 @@
-using UnityEngine;
+using Common;
 
-public class SpiderGameState : MonoBehaviour
+namespace Spider
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class SpiderState : GameState
     {
-        
-    }
+        public SpiderState(Game game) : base(game)
+        {
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public override int AvailableRestocks => 0;
+
+        public override bool FoundationCardsFree => false;
+
     }
 }

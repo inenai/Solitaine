@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using Common;
-using UnityEngine;
 using Utils;
 
 namespace Sawayama
@@ -60,7 +58,7 @@ namespace Sawayama
         private void ShuffleAndDealDeck(List<Card> deck)
         {
             Log("Shuffling and dealing...");
-            Stack<Card> deckStack = new Stack<Card>(CommonUtils.Shuffle(deck.ToArray()));
+            CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
             _state.StockPile = deckStack;
             Deal();
         }
@@ -85,27 +83,12 @@ namespace Sawayama
         #endregion
 
         #region Checks
-        protected override bool ValidTableauCardStack(Card child, Card parent)
+        protected override bool ValidTableauCardStackToPlace(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
             //Debug.Log($"Valid Tableau Stack {child} > {parent}?");
             bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
             return !sameColor && child.Value == parent.Value - 1;
-        }
-
-        private bool CanMoveCardToAnyFoundation(Card card)
-        {
-            Log($"INNER CanMoveCardToAnyFoundation {card} > F*");
-            if (card.Value == 1) return true;
-
-            for (int i = 0; i < _state.Foundations.Length; i++)
-            {
-                if (_state.Foundations[i].Suit != card.Suit)
-                    continue;
-
-                return CanAddCardToPile(card, PileKind.FOUNDATION, i);
-            }
-            return false;
         }
 
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
@@ -128,16 +111,16 @@ namespace Sawayama
                     return false;
                 case PileKind.FOUNDATION:
                     bool first = card.Value == 1
-                        && _state.Foundations[targetPileIndex].Stack.Count == 0;
+                        && _state.Foundations[targetPileIndex].Count == 0;
                     bool next = card.Value > 1
-                        && _state.Foundations[targetPileIndex].Stack.Count > 0
+                        && _state.Foundations[targetPileIndex].Count > 0
                         && _state.Foundations[targetPileIndex].Suit == card.Suit
-                        && _state.Foundations[targetPileIndex].Stack.Peek().Value == card.Value - 1;
+                        && _state.Foundations[targetPileIndex].Peek().Value == card.Value - 1;
                     return !tableauCardStackParent && (first || next);
                 case PileKind.TABLEAU:
                     bool toEmpty = _state.Tableaus[targetPileIndex].Count == 0;
                     bool validMove = _state.Tableaus[targetPileIndex].Count > 0 &&
-                        ValidTableauCardStack(card, _state.Tableaus[targetPileIndex].Peek());
+                        ValidTableauCardStackToPlace(card, _state.Tableaus[targetPileIndex].Peek());
                     return toEmpty || validMove;
             }
             return false;

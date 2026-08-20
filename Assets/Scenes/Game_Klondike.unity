@@ -5157,8 +5157,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeController
   _input: {fileID: 1568374718}
   _ui: {fileID: 8029994113569653976}
+  _gameView: {fileID: 4588662690070100733}
   _defaultConfig: {fileID: 11400000, guid: c7b5101364730fb44a56f08c800279b4, type: 2}
-  _view: {fileID: 4588662690070100733}
 --- !u!4 &1806870792979596492
 Transform:
   m_ObjectHideFlags: 0
@@ -5885,7 +5885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3859236564969965394, guid: 04df250cb21277c498b64c32719c4df0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4
+      value: -8
       objectReference: {fileID: 0}
     - target: {fileID: 3859236564969965394, guid: 04df250cb21277c498b64c32719c4df0, type: 3}
       propertyPath: m_LocalRotation.w

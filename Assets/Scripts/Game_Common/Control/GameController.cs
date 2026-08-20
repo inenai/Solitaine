@@ -1,12 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Common;
 using UnityEngine;
+using Utils;
 
 public abstract class GameController : MonoBehaviour
 {
     [SerializeField] protected MyInputManager _input;
     [SerializeField] protected GameUI _ui;
+    [SerializeField] protected GameView _gameView;
 
     private const string GAME_BUSY_REASON = "IBR_GameProcessing";
     private const string MENU_OPENED_REASON = "IBR_MenuOpened";
@@ -21,26 +24,12 @@ public abstract class GameController : MonoBehaviour
         }
     }
 
-    protected int _viewsRefreshing = 0;
+    protected List<string> _viewsRefreshing = new();
     protected List<Card> _deck;
     protected Game _game;
-    protected GameView _gameView;
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
     private bool IsBusy => _status != GameStatus.LISTENING;
-
-    protected abstract void InitGameView();
-    protected abstract void CreateDeck();
-    protected abstract void CreateGame();
-    protected abstract void ResetView();
-    protected abstract void InitConfig();
-    protected abstract void UpdateWinsCount();
-    protected abstract void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false);
-
-    protected Card GetSolvableCard()
-    {
-        return _game.GetSolvableCard();
-    }
 
     #region Initialization
     void Start()
@@ -58,11 +47,11 @@ public abstract class GameController : MonoBehaviour
 
     private void Initialize(Action onDone)
     {
-        CreateDeck();
+        LoadDeck();
         RegisterToEvents();
         InitConfig();
         _ui.Init(this);
-        InitGameView();
+        _gameView.Init(this);
         LoadDeckView(onDone);
     }
 
@@ -70,7 +59,7 @@ public abstract class GameController : MonoBehaviour
     {
         ResetDeck();
         ResetView();
-        CreateGame();
+        LoadGame();
         _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
     }
@@ -104,8 +93,12 @@ public abstract class GameController : MonoBehaviour
 
     #region GameController
     public abstract bool IsRestockAvailable();
+    protected abstract void LoadDeck();
     protected abstract bool IsAutoMovesEnabled();
-    protected abstract void ResetSettingsToDefault();
+    protected abstract void UpdateWinsCount();
+    protected abstract void LoadGame();
+    protected virtual void InitConfig() { }
+    protected virtual void ResetSettingsToDefault() { }
 
     public bool InputAction_CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
     {
@@ -172,9 +165,94 @@ public abstract class GameController : MonoBehaviour
     {
         return _game.AutoAction_TryMoveCardToFoundationAutomatically(card);
     }
+
+    protected Card GetSolvableCard()
+    {
+        return _game.GetSolvableCard();
+    }
     #endregion
 
     #region View
+    protected void ResetView() {
+        _gameView.Reset();
+    }
+
+    protected void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
+    {
+        Debug.Log("RefreshViewTask.");
+
+        foreach (PileKind kind in pilesToRefresh)
+        {
+          //  string tag = kind.ToString();
+            switch (kind)
+            {
+                case PileKind.WASTE:
+                    if (!_game.HasWaste) break;
+                    _viewsRefreshing.Add(kind.ToString());
+                    _gameView.RefreshWaste(
+                        CardUtils.CloneCardPile(_game.State.WastePile),
+                        cardMoved,
+                        originalCardPosition,
+                        immediate,
+                        () => {_viewsRefreshing.Remove(kind.ToString()); });
+                    break;
+
+                case PileKind.STOCK:
+                    if (!_game.HasStock) break;
+                    _viewsRefreshing.Add(kind.ToString());
+                    _gameView.RefreshStock(
+                        CardUtils.CloneCardPile(_game.State.StockPile),
+                        cardMoved,
+                        originalCardPosition,
+                        immediate,
+                        () => { _viewsRefreshing.Remove(kind.ToString()); });
+                    break;
+
+                case PileKind.FOUNDATION:
+                    if (_game.FoundationsAmount == 0) break;
+                    _viewsRefreshing.Add(kind.ToString());
+                    _gameView.RefreshFoundations(
+                        CardUtils.GetClonedCardPiles(_game.State.Foundations),
+                        cardMoved,
+                        originalCardPosition,
+                        immediate,
+                        () => { _viewsRefreshing.Remove(kind.ToString()); });
+                    break;
+
+                case PileKind.TABLEAU:
+                    if (_game.TableausAmount == 0) break;
+                    _viewsRefreshing.Add(kind.ToString());
+                    _gameView.RefreshTableaus(
+                        CardUtils.GetClonedCardPiles(_game.State.Tableaus),
+                        cardMoved,
+                        originalCardPosition,
+                        immediate,
+                        () => { _viewsRefreshing.Remove(kind.ToString()); });
+                    break;
+
+                case PileKind.FREECELL:
+                    if (_game.FreeCellsAmount == 0) break;
+                    _viewsRefreshing.Add(kind.ToString());
+                    _gameView.RefreshFreeCells(
+                        CardUtils.GetClonedCardPiles(_game.State.FreeCells),
+                        cardMoved,
+                        originalCardPosition,
+                        immediate,
+                        () => { _viewsRefreshing.Remove(kind.ToString()); });
+                    break;
+            }
+        }
+        Debug.Log("Await...");
+        StartCoroutine(WaitForViewsToBeRefreshed(onDone));
+    }
+
+    private IEnumerator WaitForViewsToBeRefreshed(Action onDone)
+    {
+        while (_viewsRefreshing.Count > 0) yield return null;
+        Debug.Log("Done.");
+        onDone?.Invoke();
+    }
+
     public bool IsCardInTargetPile(Card card, out TargetCardPileView result)
     {
         return _gameView.IsCardInATargetablePile(_game.State.GetCardPileOwnerData(card), out result);

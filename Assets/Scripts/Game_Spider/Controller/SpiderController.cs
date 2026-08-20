@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Common;
 using UnityEngine;
@@ -7,56 +6,29 @@ namespace Spider
 {
     public class SpiderController : GameController
     {
-        [SerializeField] private SpiderView _view;
-
         public override bool IsRestockAvailable()
         {
             return false;
         }
 
-        protected override void CreateDeck()
+        protected override void LoadDeck()
         {
-            throw new NotImplementedException();
+            _deck = SpiderGame.CreateGameDeck();
         }
 
-        protected override void CreateGame()
+        protected override void LoadGame()
         {
-            throw new NotImplementedException();
-        }
-
-        protected override void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void InitConfig()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void InitGameView()
-        {
-            throw new NotImplementedException();
+            _game = new SpiderGame(_deck);
         }
 
         protected override bool IsAutoMovesEnabled()
         {
-            throw new NotImplementedException();
-        }
-
-        protected override void ResetSettingsToDefault()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ResetView()
-        {
-            throw new NotImplementedException();
+            return true;
         }
 
         protected override void UpdateWinsCount()
         {
-            throw new NotImplementedException();
+            SpiderSettings.WinCount++;
         }
     }
 }

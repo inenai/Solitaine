@@ -12,8 +12,5 @@ namespace Sawayama
 
         public override bool FoundationCardsFree => false;
 
-        protected override void ApplyConfig()
-        {
-        }
     }
 }

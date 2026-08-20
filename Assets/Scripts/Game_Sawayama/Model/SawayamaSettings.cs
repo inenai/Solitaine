@@ -1,20 +1,20 @@
+using Common;
 using UnityEngine;
 
 namespace Sawayama
 {
     public static class SawayamaSettings
     {
-        const string SawayamaWinCountKey = "SW_WIN_COUNT";
         public static int WinCount
         {
             get
             {
-                return PlayerPrefs.GetInt(SawayamaWinCountKey, 0);
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Sw_WinCountKey, 0);
             }
             set
             {
                 Log($"Win count set to {value}");
-                PlayerPrefs.SetInt(SawayamaWinCountKey, value);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Sw_WinCountKey, value);
                 PlayerPrefs.Save();
             }
         }

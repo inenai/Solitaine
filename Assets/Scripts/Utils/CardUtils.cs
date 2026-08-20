@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using Common;
 using UnityEngine;
 
@@ -84,25 +86,20 @@ namespace Utils
             return CardTextureGetter.Instance.GetBlueDeck();
         }
 
-
-        public static List<Stack<Card>> GetClonedStacks(Foundation[] foundations)
+        public static List<CardPile> GetClonedCardPiles(CardPile[] stacks)
         {
-            List<Stack<Card>> stacks = new();
-            foreach (Foundation f in foundations)
+            List<CardPile> result = new();
+            foreach (CardPile s in stacks)
             {
-                stacks.Add(CommonUtils.CloneStack(f.Stack));
-            }
-            return stacks;
-        }
-
-        public static List<Stack<Card>> GetClonedStacks(Stack<Card>[] stacks)
-        {
-            List<Stack<Card>> result = new();
-            foreach (Stack<Card> s in stacks)
-            {
-                result.Add(CommonUtils.CloneStack(s));
+                result.Add(CloneCardPile(s));
             }
             return result;
+        }
+
+        public static CardPile CloneCardPile(CardPile stack)
+        {
+            Contract.Requires(stack != null);
+            return new CardPile(stack.Reverse());
         }
 
         public static CardSuit[] GetOppositeColorSuits(CardSuit suit)

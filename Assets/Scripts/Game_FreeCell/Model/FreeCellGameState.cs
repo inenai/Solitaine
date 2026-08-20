@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Common;
 
 namespace FreeCell
@@ -14,20 +13,15 @@ namespace FreeCell
 
         public override bool FoundationCardsFree => true;
 
-        protected override void ApplyConfig()
-        {
-
-        }
-
         public int GetFreeMovingSpaces()
         {
             int total = 0;
-            foreach (Stack<Card> freeCell in FreeCells)
+            foreach (CardPile freeCell in FreeCells)
             {
                 if (freeCell.Count == 0) total++;
             }
 
-            foreach (Stack<Card> tableau in Tableaus)
+            foreach (CardPile tableau in Tableaus)
             {
                 if (tableau.Count == 0) total++;
             }

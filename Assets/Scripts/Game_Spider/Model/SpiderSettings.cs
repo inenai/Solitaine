@@ -1,16 +1,27 @@
+using Common;
 using UnityEngine;
 
-public class SpiderSettings : MonoBehaviour
+namespace Spider
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class SpiderSettings : MonoBehaviour
     {
-        
-    }
+        public static int WinCount
+        {
+            get
+            {
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Sp_WinCountKey, 0);
+            }
+            set
+            {
+                Log($"Win count set to {value}");
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Sp_WinCountKey, value);
+                PlayerPrefs.Save();
+            }
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private static void Log(string message)
+        {
+            Debug.Log($"[SpiderSettings] {message}");
+        }
     }
 }

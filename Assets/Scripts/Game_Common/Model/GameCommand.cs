@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Common
@@ -19,6 +18,11 @@ namespace Common
         public GameCommand(Queue<GameCommandAction> actions)
         {
             _actions = actions;
+        }
+
+        public void Enqueue(GameCommandAction gca)
+        {
+            _actions.Enqueue(gca);
         }
     }
 
@@ -62,8 +66,8 @@ namespace Common
                 targetIndex = _sourceIndex;
             }
 
-            Stack<Card> source = s.GetCardStack(sourceKind, sourceIndex);
-            Stack<Card> target = s.GetCardStack(targetKind, targetIndex);
+            CardPile source = s.GetCardStack(sourceKind, sourceIndex);
+            CardPile target = s.GetCardStack(targetKind, targetIndex);
 
             Card card = source.Pop();
 
@@ -133,8 +137,8 @@ namespace Common
         {
             string message = undo ? "UNDOING " : "";
             Debug.Log($"[COMMAND] {message}Restock");
-            Stack<Card> source = undo ? s.GetCardStack(PileKind.STOCK) : s.GetCardStack(PileKind.WASTE);
-            Stack<Card> target = undo ? s.GetCardStack(PileKind.WASTE) : s.GetCardStack(PileKind.STOCK);
+            CardPile source = undo ? s.GetCardStack(PileKind.STOCK) : s.GetCardStack(PileKind.WASTE);
+            CardPile target = undo ? s.GetCardStack(PileKind.WASTE) : s.GetCardStack(PileKind.STOCK);
 
             while (source.Count > 0)
             {
@@ -184,9 +188,9 @@ namespace Common
                 targetIndex = _sourceIndex;
             }
 
-            Stack<Card> source = s.GetCardStack(sourceKind, sourceIndex);
-            Stack<Card> target = s.GetCardStack(targetKind, targetIndex);
-            Stack<Card> tempStack = new();
+            CardPile source = s.GetCardStack(sourceKind, sourceIndex);
+            CardPile target = s.GetCardStack(targetKind, targetIndex);
+            CardPile tempStack = new();
 
             Card next = source.Pop();
             while (next != _card)

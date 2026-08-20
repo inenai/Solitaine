@@ -14,7 +14,7 @@ namespace Common
 
         protected override void OnInit() { }
 
-        public override void Refresh(Stack<Card> cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
+        public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
             //Debug.Log("StockView refreshing...");
             if (_restockLocked != null)
@@ -29,13 +29,13 @@ namespace Common
 
             if (cardMoved == null)
             {
-                StackCardsInPosition(cards, _cardsRoot.position, transform, "Card_S_");
+                StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_");
                 //Debug.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
             }
 
-            StackCardsInPositionWithAnimation(cards, _cardsRoot.position, transform, "Card_S_", cardMoved, originalCardPosition, onDone);
+            StackCardsInPositionWithAnimation(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_", cardMoved, originalCardPosition, onDone);
         }
 
         public void OnClick()

@@ -1,33 +1,29 @@
+using Common;
 using UnityEngine;
 
 namespace Klondike
 {
     public static class KlondikeSettings
     {
-        const string SavedSettingsFlag = "KL_SAVED_SETTINGS";
-        const string DrawAmountKey = "KL_DRAW_AMOUNT";
-        const string AvailableRestocksKey = "KL_AVAILABLE_RESTOCKS";
-        const string FoundationCardsFreeKey = "KL_FOUNDATION_CARDS_FREE";
-        const string AutoMovesEnabledKey = "KL_AUTO_MOVES_ENABLED";
-        const string KlondikeWinCountKey = "KL_WIN_COUNT";
+
 
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
         public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;
         public const bool DEFAULT_AUTO_MOVES_ENABLED = true;
 
-        public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(SavedSettingsFlag, 0) != 0;
+        public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_SavedSettingsFlag, 0) != 0;
 
         public static int DrawAmount
         {
             get
             {
-                return PlayerPrefs.GetInt(DrawAmountKey, DEFAULT_DRAW_AMOUNT);
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_DrawAmountKey, DEFAULT_DRAW_AMOUNT);
             }
             set
             {
                 Log($"Draw amount set to {value}");
-                PlayerPrefs.SetInt(DrawAmountKey, value);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_DrawAmountKey, value);
                 Save();
             }
         }
@@ -36,12 +32,12 @@ namespace Klondike
         {
             get
             {
-                return PlayerPrefs.GetInt(AvailableRestocksKey, DEFAULT_RESTOCKS);
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_AvailableRestocksKey, DEFAULT_RESTOCKS);
             }
             set
             {
                 Log($"Available restocks set to {value}");
-                PlayerPrefs.SetInt(AvailableRestocksKey, value);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_AvailableRestocksKey, value);
                 Save();
             }
         }
@@ -50,12 +46,12 @@ namespace Klondike
         {
             get
             {
-                return PlayerPrefs.GetInt(FoundationCardsFreeKey, DEFAULT_FOUNDATION_CARDS_FREE ? 1 : 0) != 0;
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_FoundationCardsFreeKey, DEFAULT_FOUNDATION_CARDS_FREE ? 1 : 0) != 0;
             }
             set
             {
                 Log($"Free foundations set to {value}");
-                PlayerPrefs.SetInt(AvailableRestocksKey, value ? 1 : 0);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_AvailableRestocksKey, value ? 1 : 0);
                 Save();
             }
         }
@@ -64,12 +60,12 @@ namespace Klondike
         {
             get
             {
-                return PlayerPrefs.GetInt(KlondikeWinCountKey, 0);
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_WinCountKey, 0);
             }
             set
             {
                 Log($"Win count set to {value}");
-                PlayerPrefs.SetInt(KlondikeWinCountKey, value);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_WinCountKey, value);
                 Save();
             }
         }
@@ -78,28 +74,28 @@ namespace Klondike
         {
             get
             {
-                return PlayerPrefs.GetInt(AutoMovesEnabledKey, DEFAULT_AUTO_MOVES_ENABLED ? 1 : 0) != 0;
+                return PlayerPrefs.GetInt(PlayerPrefsKeys.Kl_AutoMovesEnabledKey, DEFAULT_AUTO_MOVES_ENABLED ? 1 : 0) != 0;
             }
             set
             {
                 Log($"Auto moves enabled set to {value}");
-                PlayerPrefs.SetInt(AutoMovesEnabledKey, value ? 1 : 0);
+                PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_AutoMovesEnabledKey, value ? 1 : 0);
                 Save();
             }
         }
 
         private static void Save()
         {
-            PlayerPrefs.SetInt(SavedSettingsFlag, 1);
+            PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_SavedSettingsFlag, 1);
             PlayerPrefs.Save();
         }
 
         public static void Reset(KlondikeConfig defaultConfig)
         {
-            PlayerPrefs.SetInt(DrawAmountKey, defaultConfig.DrawAmount);
-            PlayerPrefs.SetInt(AvailableRestocksKey, defaultConfig.AvailableRestocks);
-            PlayerPrefs.SetInt(FoundationCardsFreeKey, defaultConfig.FoundationCardsFree ? 1 : 0);
-            PlayerPrefs.SetInt(AutoMovesEnabledKey, defaultConfig.AutoMovesEnabled ? 1 : 0);
+            PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_DrawAmountKey, defaultConfig.DrawAmount);
+            PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_AvailableRestocksKey, defaultConfig.AvailableRestocks);
+            PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_FoundationCardsFreeKey, defaultConfig.FoundationCardsFree ? 1 : 0);
+            PlayerPrefs.SetInt(PlayerPrefsKeys.Kl_AutoMovesEnabledKey, defaultConfig.AutoMovesEnabled ? 1 : 0);
             Save();
         }
 

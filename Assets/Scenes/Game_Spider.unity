@@ -1549,7 +1549,7 @@ Transform:
   m_GameObject: {fileID: 377623063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.51, y: -3.74, z: 0}
+  m_LocalPosition: {x: -4.466, y: -3.758, z: 0}
   m_LocalScale: {x: 1.26, y: 1.76, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5277,7 +5277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3859236564969965394, guid: 04df250cb21277c498b64c32719c4df0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -8
       objectReference: {fileID: 0}
     - target: {fileID: 3859236564969965394, guid: 04df250cb21277c498b64c32719c4df0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10500,7 +10500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpiderGameController
   _input: {fileID: 1568374718}
   _ui: {fileID: 8029994113569653976}
-  _view: {fileID: 2809217457334832829}
+  _gameView: {fileID: 2809217457334832829}
 --- !u!212 &4109343283833817427
 SpriteRenderer:
   serializedVersion: 2
