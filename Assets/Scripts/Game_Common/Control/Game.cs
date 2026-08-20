@@ -306,7 +306,7 @@ public abstract class Game
                 Card target = null;
                 while (target != card)
                 {
-                    target = State.Tableaus[targetPileIndex].Peek();
+                    target = State.Tableaus[sourcePileData.Index].Peek();
 
                     ca = new GameCommandActionMove(
                         sourcePile: PileKind.TABLEAU, sourceIndex: sourcePileData.Index,

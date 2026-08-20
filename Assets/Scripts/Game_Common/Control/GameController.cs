@@ -165,11 +165,6 @@ public abstract class GameController : MonoBehaviour
     {
         return _game.AutoAction_TryMoveCardToFoundationAutomatically(card);
     }
-
-    protected Card GetSolvableCard()
-    {
-        return _game.GetSolvableCard();
-    }
     #endregion
 
     #region View
@@ -280,7 +275,7 @@ public abstract class GameController : MonoBehaviour
             {
                 if (!holdAutoMoves && IsAutoMovesEnabled())
                 {
-                    Card solvableCard = GetSolvableCard();
+                    Card solvableCard = _game.GetSolvableCard();
                     if (solvableCard == null)
                     {
                         Debug.Log("No auto moves availables.");

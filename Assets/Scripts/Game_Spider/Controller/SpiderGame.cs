@@ -42,9 +42,7 @@ namespace Spider
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
         {
             PileData sourcePileData = State.GetCardPileOwnerData(card);
-            if (targetPile != PileKind.TABLEAU)
-                return false;
-            if (sourcePileData.Index == targetPileIndex)
+            if (sourcePileData.Kind == targetPile && sourcePileData.Index == targetPileIndex)
                 return false;
 
             switch (targetPile)
@@ -54,6 +52,9 @@ namespace Spider
                     bool validStack = !toEmptyTableau && ValidTableauCardStackToPlace(card, _state.Tableaus[targetPileIndex].Peek());
 
                     return toEmptyTableau || validStack;
+                case PileKind.FOUNDATION:
+                    bool toEmptyFoundation = _state.Foundations[targetPileIndex].Count == 0;
+                    return toEmptyFoundation;
             }
             return false;
         }
@@ -70,11 +71,7 @@ namespace Spider
         {
             for (int i = 1; i <= 13; i++)
             {
-                deck.Add(new Card(CardSuit.HEARTS, i));
-            }
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.DIAMONDS, i));
+                deck.Add(new Card(CardSuit.SPADES, i));
             }
             for (int i = 1; i <= 13; i++)
             {
@@ -82,7 +79,11 @@ namespace Spider
             }
             for (int i = 1; i <= 13; i++)
             {
-                deck.Add(new Card(CardSuit.CLUBS, i));
+                deck.Add(new Card(CardSuit.SPADES, i));
+            }
+            for (int i = 1; i <= 13; i++)
+            {
+                deck.Add(new Card(CardSuit.SPADES, i));
             }
         }
 
@@ -158,6 +159,28 @@ namespace Spider
             }
 
             return null;
+        }
+
+        public override List<PileKind> GameAction_TrySmartMoveCard(Card card, PileData sourcePileData)
+        {
+            Log($"USER GameAction_TrySmartMoveCard {card}");
+            List<PileKind> affectedPiles = new List<PileKind>();
+
+            ExecuteAction(() =>
+            {
+                GameCommand command = default;
+
+                command = CommonInner_TryMoveCardToAnyTableau(card, sourcePileData);
+
+                if (command is { Valid: true })
+                {
+                    affectedPiles.Add(PileKind.TABLEAU);
+                }
+
+                return command;
+            });
+
+            return affectedPiles;
         }
 
         protected override List<PileKind> CommonGameAction_DrawFromStockOrRestock()
