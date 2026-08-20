@@ -6,7 +6,19 @@ namespace Common
     {
         [SerializeField] public SolitaireKind Kind;
         public abstract void Save();
-        public abstract void OnEnabled();
+        void Awake()
+        {
+            ApplyTints();
+        }
+
+        private void ApplyTints()
+        {
+            UIColorTinter[] tinters = GetComponentsInChildren<UIColorTinter>(true);
+            foreach (UIColorTinter tinter in tinters)
+            {
+                tinter.SetColor(Kind);
+            }
+        }
 
     }
 }

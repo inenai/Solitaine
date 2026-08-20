@@ -4,7 +4,6 @@ namespace Common
 {
     public class BaseSettingsScreen : MonoBehaviour
     {
-
         private GameSettingsScreen _screen;
 
         void Awake()
@@ -15,7 +14,6 @@ namespace Common
         void OnEnable()
         {
             EventManager.OnMenuOpened?.Invoke();
-            _screen.OnEnabled();
         }
 
         public void SaveAndClose()

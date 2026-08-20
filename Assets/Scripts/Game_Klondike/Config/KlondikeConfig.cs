@@ -5,13 +5,13 @@ namespace Klondike
     [CreateAssetMenu(fileName = "KlondikeConfig", menuName = "Solitaine/Create Klondike config asset")]
     public class KlondikeConfig : ScriptableObject
     {
-        [SerializeField] int _drawAmount = 3;
+        [SerializeField] int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         /// <summary>
         /// -1 for infinite
         /// </summary>
-        [SerializeField] int _availableRestocks = -1;
-        [SerializeField] bool _foundationCardsFree = false;
-        [SerializeField] bool _autoMovesEnabled = false;
+        [SerializeField] int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
+        [SerializeField] bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
+        [SerializeField] bool _autoMovesEnabled = KlondikeSettings.DEFAULT_AUTO_MOVES_ENABLED;
 
         public int DrawAmount => _drawAmount;
         public int AvailableRestocks => _availableRestocks;

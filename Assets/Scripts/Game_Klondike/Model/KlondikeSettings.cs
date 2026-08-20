@@ -5,8 +5,6 @@ namespace Klondike
 {
     public static class KlondikeSettings
     {
-
-
         public const int DEFAULT_RESTOCKS = -1;
         public const int DEFAULT_DRAW_AMOUNT = 3;
         public const bool DEFAULT_FOUNDATION_CARDS_FREE = false;

@@ -55,7 +55,7 @@ public abstract class GameController : MonoBehaviour
         LoadDeckView(onDone);
     }
 
-    private void StartNewGame(Action onDone)
+    protected virtual void StartNewGame(Action onDone)
     {
         ResetDeck();
         ResetView();

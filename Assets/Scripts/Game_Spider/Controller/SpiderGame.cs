@@ -73,17 +73,20 @@ namespace Spider
             {
                 deck.Add(new Card(CardSuit.SPADES, i));
             }
+            CardSuit suit = SpiderSettings.SuitsAmount > 1 ? CardSuit.HEARTS : CardSuit.SPADES;
             for (int i = 1; i <= 13; i++)
             {
-                deck.Add(new Card(CardSuit.SPADES, i));
+                deck.Add(new Card(suit, i));
             }
+            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.DIAMONDS : CardSuit.SPADES;
             for (int i = 1; i <= 13; i++)
             {
-                deck.Add(new Card(CardSuit.SPADES, i));
+                deck.Add(new Card(suit, i));
             }
+            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.CLUBS : CardSuit.SPADES;
             for (int i = 1; i <= 13; i++)
             {
-                deck.Add(new Card(CardSuit.SPADES, i));
+                deck.Add(new Card(suit, i));
             }
         }
 
