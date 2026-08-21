@@ -548,18 +548,19 @@ public abstract class Game
         return result;
     }
 
-    protected virtual List<GameCommandAction> CommonInner_UpdateFreeCards()
+    protected List<GameCommandAction> CommonInner_UpdateFreeCards()
     {
         List<GameCommandAction> commands = new();
         for (int i = 0; i < TableausAmount; i++)
         {
-            for (int j = State.Tableaus[i].Count - 1; j >=0 ; j--)
+            for (int j = 0; j < State.Tableaus[i].Count; j++)  //Bottom (FRONT) -->> TOP (BACK)
             {
                 Card currentCard = State.Tableaus[i].ElementAt(j);
+                Debug.Log($"INE-SPIDER T{i} checking {currentCard}");
                 if (currentCard.Free) continue;
                 if (!currentCard.Revealed) continue;
 
-                if (j == State.Tableaus[i].Count - 1)
+                if (j == 0) //BOTTOM, FRONT-MOST CARD
                 {
                     GameCommandAction a = new GameCommandActionFree(
                          currentCard,
@@ -567,18 +568,15 @@ public abstract class Game
                     a.Execute(State);
                     commands.Add(a);
                 }
-                else
+                else if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ElementAt(j - 1), currentCard))
                 {
-                    if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ElementAt(j+1), currentCard))
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                            currentCard,
-                            cardFreed: FreedAction.FREED);
-                        a.Execute(State);
-                        commands.Add(a);
-                    }
-                    else break;
+                    GameCommandAction a = new GameCommandActionFree(
+                        currentCard,
+                        cardFreed: FreedAction.FREED);
+                    a.Execute(State);
+                    commands.Add(a);
                 }
+                else break;
             }
         }
         return commands;

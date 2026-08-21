@@ -378,38 +378,5 @@ namespace Spider
             }
             return command;
         }
-
-        protected override List<GameCommandAction> CommonInner_UpdateFreeCards()
-        {
-            List<GameCommandAction> commands = new();
-            for (int i = 0; i < TableausAmount; i++)
-            {
-                for (int j = 0; j < State.Tableaus[i].Count; j++)  //Bottom (FRONT) -->> TOP (BACK)
-                {
-                    Card currentCard = State.Tableaus[i].ElementAt(j);
-                    if (currentCard.Free) continue;
-                    if (!currentCard.Revealed) continue;
-
-                    if (j == 0) //BOTTOM, FRONT-MOST CARD
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                             currentCard,
-                             cardFreed: FreedAction.FREED);
-                        a.Execute(State);
-                        commands.Add(a);
-                    }
-                    else if (ValidTableauCardStackToMoveAround(State.Tableaus[i].ElementAt(j - 1), currentCard))
-                    {
-                        GameCommandAction a = new GameCommandActionFree(
-                            currentCard,
-                            cardFreed: FreedAction.FREED);
-                        a.Execute(State);
-                        commands.Add(a);
-                    }
-                    else break;
-                }
-            }
-            return commands;
-        }
     }
 }
