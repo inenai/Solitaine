@@ -439,7 +439,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1803005316566269156}
-  - {fileID: 1149589082162016843}
   m_Father: {fileID: 2615307394383609374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
@@ -1796,6 +1795,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1149589082162016843}
   - {fileID: 6404016707387207980}
   - {fileID: 6879580062146641761}
   - {fileID: 4175638533180595758}
@@ -2460,11 +2460,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6404016707387207980}
+  m_Father: {fileID: 2615307394383609374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -206.18506, y: -118}
+  m_AnchoredPosition: {x: -0.000061035156, y: 19}
   m_SizeDelta: {x: 395.2, y: 145.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3817571966448583342
@@ -2495,18 +2495,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Left-click / Space: Pick up / drag
-
-    Right-click: Cancel drag
-
-    Double-click
-    / C: Auto-move
-
-    D: Draw
-
-    R: Restart
-
-'
+  m_text: "\xB7 Left-click / Space: Pick up / drag\n\xB7 Right-click: Cancel drag\n\xB7
+    Double-click / C: Auto-move\n\xB7 D: Draw\n\xB7 R: Restart\n\xB7 Z / Ctrl+Z:
+    Undo\n\xB7 X: Redo\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2533,20 +2524,20 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 27.5
-  m_fontSizeBase: 36
+  m_fontSize: 18.83
+  m_fontSizeBase: 18.83
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 14.18
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
