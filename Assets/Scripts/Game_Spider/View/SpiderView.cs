@@ -64,7 +64,7 @@ namespace Spider
 
         public override void RefreshStock(CardPile stockCards, Card cardMoved, Vector3 movedCardOriginalPosition, bool immediate, Action onDone)
         {
-            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, immediate, onDone);
+            _stock.Refresh(stockCards, cardMoved, movedCardOriginalPosition, immediate, onDone, _tableaus.Length);
         }
 
         public override void RefreshTableaus(List<CardPile> list, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action refreshDone)

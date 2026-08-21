@@ -10,7 +10,7 @@ namespace Common
 
         protected override void OnInit(){}
 
-        public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
+        public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone, int displaceEvery = 0)
         {
             //Logs.Log($"Foundation[{Index}] refreshing...");
             if (cards.Count == 0)
