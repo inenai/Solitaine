@@ -556,7 +556,6 @@ public abstract class Game
             for (int j = 0; j < State.Tableaus[i].Count; j++)  //Bottom (FRONT) -->> TOP (BACK)
             {
                 Card currentCard = State.Tableaus[i].ElementAt(j);
-                Debug.Log($"INE-SPIDER T{i} checking {currentCard}");
                 if (currentCard.Free) continue;
                 if (!currentCard.Revealed) continue;
 
