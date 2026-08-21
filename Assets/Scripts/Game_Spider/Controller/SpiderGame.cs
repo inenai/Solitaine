@@ -135,18 +135,19 @@ namespace Spider
                 int lastValue = 0;
                 for (int j = 0; j < State.Tableaus[i].Count; j++)
                 {
-                    if (State.Tableaus[i].ElementAt(j).Value == 13)
+                    if (State.Tableaus[i].ElementAt(j).Value == 1)
                     {
                         validCard = State.Tableaus[i].ElementAt(j);
-                        lastValue = 13;
+                        lastValue = 1;
                         continue;
                     }
 
                     if (validCard == null) continue;
 
                     if (State.Tableaus[i].ElementAt(j).Suit == validCard.Suit
-                    && State.Tableaus[i].ElementAt(j).Value == lastValue - 1)
+                    && State.Tableaus[i].ElementAt(j).Value == lastValue + 1)
                     {
+                        validCard = State.Tableaus[i].ElementAt(j);
                         lastValue = State.Tableaus[i].ElementAt(j).Value;
                     }
                     else
@@ -154,14 +155,13 @@ namespace Spider
                         validCard = null;
                         lastValue = 0;
                     }
-                }
 
-                if (lastValue == 1)
-                {
-                    return validCard;
+                    if (lastValue == 13)
+                    {
+                        return validCard;
+                    }
                 }
             }
-
             return null;
         }
 
