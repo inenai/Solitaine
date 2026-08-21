@@ -9,7 +9,6 @@ namespace Common
     {
         [SerializeField] private TextMeshProUGUI _gameLabel;
         [SerializeField] private SolitaireKind _solitaireKind;
-        [SerializeField] private TextMeshProUGUI _winsTxt;
         [SerializeField] private BaseSettingsScreen _settingsScreen;
         [SerializeField] private GameObject _controlsBtn;
         [SerializeField] private GameObject _controlsScreen;
@@ -25,8 +24,7 @@ namespace Common
             _controlsBtn.SetActive(false);
 #endif
             _controller = controller;
-            _gameLabel.text = _solitaireKind.ToString();
-            UpdateWins();
+            UpdateGameLabel();
         }
 
         private void ApplyTints()
@@ -40,7 +38,7 @@ namespace Common
 
         public void OnGameWon()
         {
-            UpdateWins();
+            UpdateGameLabel();
         }
 
         public void OpenSettings()
@@ -53,10 +51,10 @@ namespace Common
             _controller.RestartGame();
         }
 
-        private void UpdateWins()
+        private void UpdateGameLabel()
         {
             int wins = CommonUtils.GetWinsFor(_solitaireKind);
-            _winsTxt.text = $"Wins: {wins}";
+            _gameLabel.text = _solitaireKind.ToString() + " " + $"Wins: {wins}";
         }
 
         public void OpenControlsScreen()
