@@ -33,7 +33,10 @@ namespace Common
                 return;
             }
 
-            _cardViews = StackCardsInPosition(cards, GetPosition(0,0), transform, "Card_W_");
+            _cardViews = StackCardsInPosition(cards, GetPosition(0, 0), transform, "Card_W_", cardMoved);
+
+            CardView cardViewToAnimate = null;
+            Vector3 cardViewToAnimateTargetPos = default;
 
             int amount = _cardViews.Count;
             for (int i = amount - 1; i >= amount - _maxCardsInView; i--)
@@ -52,10 +55,23 @@ namespace Common
                 _cardViews[i].transform.position = GetPosition(i, cardSlotIndex);
 
                 Logs.Log($"Card {_cardViews[i].Card} index {i} to card slot {cardSlotIndex}");
+
+                bool isCardMoved = _cardViews[i].Card == cardMoved;
+                if (isCardMoved && !immediate)
+                {
+                    cardViewToAnimate = _cardViews[i];
+                    cardViewToAnimateTargetPos = _cardViews[i].transform.position;
+                }
             }
 
-            //Logs.Log("WasteView refreshed.");
-            onDone?.Invoke();
+            if (cardViewToAnimate == null)
+            {
+                //Logs.Log($"WasteView[{Index}] refreshed.");
+                onDone?.Invoke();
+                return;
+            }
+
+            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, onDone);
         }
     }
 }

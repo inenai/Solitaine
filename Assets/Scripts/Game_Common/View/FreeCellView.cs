@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 
@@ -7,9 +6,7 @@ namespace Common
 {
     public class FreeCellView : TargetCardPileView
     {
-
         public override PileKind PileKind => PileKind.FREECELL;
-        private CardView _cardView;
         private Vector3 _cardPosition;
 
         protected override void OnInit()
@@ -27,22 +24,16 @@ namespace Common
                 return;
             }
 
-            _cardView = StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_")[0];
+            Card card = cards.ElementAt(0);
 
-            if (cardMoved != cards.Peek())
+            if (immediate || cardMoved != card)
             {
-                //Logs.Log($"TableauView[{Index}] refreshed.");
+                StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_");
                 onDone?.Invoke();
                 return;
             }
 
-            if (immediate)
-            {
-                onDone?.Invoke();
-                return;
-            }
-
-            AnimateCardMoved(_cardView, originalCardPosition, _cardPosition, onDone);
+            AnimateCardMoved(_view.Deck.GetCardView(card), originalCardPosition, _cardPosition, onDone);
         }
     }
 }

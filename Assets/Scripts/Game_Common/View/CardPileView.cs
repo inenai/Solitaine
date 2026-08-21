@@ -7,7 +7,7 @@ namespace Common
 {
     public abstract class CardPileView : MonoBehaviour
     {
-        [SerializeField] private float _xStackOffset = 0.12f;
+        [SerializeField] protected float _xStackOffset = 0.12f;
         public abstract PileKind PileKind { get; }
         public int Index => _index;
 
@@ -32,25 +32,25 @@ namespace Common
             Vector3 cardViewToAnimateTargetPos = default;
             List<CardView> result = new();
             int counter = displaceEvery;
+            float displaceMult = 0f;
 
             foreach (Card card in cards.Reverse())
             {
-                CardView cv = _view.Deck.GetCardView(card);
-                cv.transform.SetParent(parent);
-                cv.transform.position = new Vector3(position.x, position.y, position.z + zOffset);
+                Vector3 newPos = new Vector3(position.x + displaceMult, position.y, position.z + zOffset);
+                CardView cv = StackCardInPosition(card, newPos, parent, cardPrefix);
 
                 if (displaceEvery > 0)
                 {
                     if (counter == 0)
                     {
-                        cv.transform.position = new Vector3(cv.transform.position.x + _xStackOffset, cv.transform.position.y, cv.transform.position.z);
+                        displaceMult += _xStackOffset;
                         counter = displaceEvery;
                     }
                     counter--;
                 }
 
                 zOffset += CardUtils.CardStackZOffset;
-                cv.gameObject.name = $"{cardPrefix}{card}";
+
                 cv.PlayRevealIfNeeded();
                 result.Add(cv);
                 if (card == cardMoved)
@@ -76,18 +76,25 @@ namespace Common
             cardViewToAnimate.AnimateCard(cardViewToAnimateTargetPos, CardView.GetFlightTime(originalCardPosition, cardViewToAnimateTargetPos), onDone);
         }
 
-        protected List<CardView> StackCardsInPosition(CardPile cards, Vector3 position, Transform parent, string cardPrefix, int displaceEvery = 0)
+        protected CardView StackCardInPosition(Card card, Vector3 position, Transform parent, string cardPrefix)
+        {
+            CardView cv = _view.Deck.GetCardView(card);
+            cv.transform.SetParent(parent);
+            cv.transform.position = position;
+            cv.gameObject.name = $"{cardPrefix}{card}";
+            return cv;
+        }
+
+        protected List<CardView> StackCardsInPosition(CardPile cards, Vector3 position, Transform parent, string cardPrefix, Card excludedFromFlip = null, int displaceEvery = 0)
         {
             float zOffset = CardUtils.CardStackZOffset;
             List<CardView> result = new();
             int counter = displaceEvery;
             float displaceMult = 0f;
-
-            foreach (Card card in cards.Reverse())
+            foreach (Card card in cards.Reverse()) //REVERSE?
             {
-                CardView cv = _view.Deck.GetCardView(card);
-                cv.transform.SetParent(parent);
-                cv.transform.position = new Vector3(position.x + displaceMult, position.y, position.z + zOffset);
+                Vector3 newPos = new Vector3(position.x + displaceMult, position.y, position.z + zOffset);
+                CardView cv = StackCardInPosition(card, newPos, parent, cardPrefix);
 
                 if (displaceEvery > 0)
                 {
@@ -98,10 +105,10 @@ namespace Common
                     }
                     counter--;
                 }
-
                 zOffset += CardUtils.CardStackZOffset;
-                cv.gameObject.name = $"{cardPrefix}{card}";
-                cv.RefreshRevealedState();
+
+                if (excludedFromFlip != card)
+                    cv.RefreshRevealedState();
                 result.Add(cv);
             }
             return result;

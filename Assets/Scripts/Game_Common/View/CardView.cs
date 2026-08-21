@@ -311,7 +311,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     private IEnumerator PlayRevealCR()
     {
-        float duration = 0.1f;
+        float duration = 0.3f;
         float elapsed = 0f;
         while (elapsed < duration)
         {

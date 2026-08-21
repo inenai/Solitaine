@@ -26,9 +26,9 @@ namespace Common
                 return;
             }
 
-            if (cardMoved == null)
+            if (immediate || cardMoved == null)
             {
-                StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_", displaceEvery);
+                StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_", cardMoved, displaceEvery);
                 //Logs.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
