@@ -10,7 +10,7 @@ namespace Utils
     {
         public static string CardPrefabAddressText = "CARD_PREFAB_TEXT";
         public static string CardPrefabAddressSprite = "CARD_PREFAB";
-        public const float CardStackZOffset = -0.1f;
+        public const float CardStackZOffset = -0.05f;
 
         public static string GetSuitStr(CardSuit suit)
         {
