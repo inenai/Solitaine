@@ -2496,8 +2496,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\xB7 Left-click / Space: Pick up / drag\n\xB7 Right-click: Cancel drag\n\xB7
-    Double-click / C: Auto-move\n\xB7 D: Draw\n\xB7 R: Restart\n\xB7 Z / Ctrl+Z:
-    Undo\n\xB7 X: Redo\n"
+    Double-click / C: Auto-move\n\xB7 D: Draw\n\xB7 R: Restart\n\xB7 Z: Undo\n\xB7
+    X: Redo\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
