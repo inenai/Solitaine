@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using static Utils.CommonUtils;
 using Common;
 using UnityEngine;
+using System;
 
 namespace Spider
 {
@@ -277,16 +278,12 @@ namespace Spider
 
         protected override GameCommand CommonInner_TryMoveCardToAnyTableau(Card card, PileData sourcePileData)
         {
-            int excludeIndex = -99;
-            if (sourcePileData.Kind == PileKind.TABLEAU)
+            if (sourcePileData.Kind != PileKind.TABLEAU)
             {
-                excludeIndex = sourcePileData.Index;
-                Log($"INNER CommonInner_TryMoveCardToAnyTableau {card} (except to T[{excludeIndex}])");
+                throw new InvalidOperationException("In Spider, you shouldn't be sending cards to an arbitrary tableau except from another tableau.");
             }
-            else
-            {
-                Log($"INNER CommonInner_TryMoveCardToAnyTableau {card} > T*");
-            }
+
+            int excludeIndex = sourcePileData.Index;
 
             GameCommand command = default;
 
@@ -294,10 +291,15 @@ namespace Spider
             List<int> sameSuitCandidates = new();
             List<int> compatibleFullCandidates = new();
 
-            for (int i = 0; i < State.Tableaus.Length; i++)
+            for (int i = excludeIndex + 1; i < State.Tableaus.Length + 1; i++)
             {
-                if (i == excludeIndex) continue;
+                if (i == State.Tableaus.Length)
+                {
+                    i = -1;
+                    continue;
+                }
 
+                if (i == excludeIndex) break;
                 if (CanAddCardToPile(card, PileKind.TABLEAU, i))
                 {
                     if (State.Tableaus[i].Count > 0)
