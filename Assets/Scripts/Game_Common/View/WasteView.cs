@@ -25,10 +25,10 @@ namespace Common
 
         public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            //Debug.Log("WasteView refreshing...");
+            //Logs.Log("WasteView refreshing...");
             if (cards.Count == 0)
             {
-                //Debug.Log("WasteView refreshed.");
+                //Logs.Log("WasteView refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -51,10 +51,10 @@ namespace Common
 
                 _cardViews[i].transform.position = GetPosition(i, cardSlotIndex);
 
-                Debug.Log($"Card {_cardViews[i].Card} index {i} to card slot {cardSlotIndex}");
+                Logs.Log($"Card {_cardViews[i].Card} index {i} to card slot {cardSlotIndex}");
             }
 
-            //Debug.Log("WasteView refreshed.");
+            //Logs.Log("WasteView refreshed.");
             onDone?.Invoke();
         }
     }

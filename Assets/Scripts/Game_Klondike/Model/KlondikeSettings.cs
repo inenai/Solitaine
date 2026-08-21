@@ -99,7 +99,7 @@ namespace Klondike
 
         private static void Log(string message)
         {
-            Debug.Log($"[KlondikeSettings] {message}");
+            Logs.Log($"[KlondikeSettings] {message}");
         }
     }
 }

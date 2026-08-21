@@ -26,7 +26,7 @@ namespace Spider
 
         private void InitToggleGroups()
         {
-            Debug.Log("[Settings] Initializing values");
+            Logs.Log("[Settings] Initializing values");
             _suitsToggleGroup.RegisterToggle(_oneSuitToggle);
             _suitsToggleGroup.RegisterToggle(_twoSuitsToggle);
             _suitsToggleGroup.RegisterToggle(_fourSuitsToggle);

@@ -1,5 +1,6 @@
 using Common;
 using UnityEngine;
+using Utils;
 
 namespace Sawayama
 {
@@ -21,7 +22,7 @@ namespace Sawayama
 
         private static void Log(string message)
         {
-            Debug.Log($"[SawayamaSettings] {message}");
+            Logs.Log($"[SawayamaSettings] {message}");
         }
     }
 }

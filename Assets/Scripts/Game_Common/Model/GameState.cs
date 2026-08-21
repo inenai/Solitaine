@@ -52,7 +52,7 @@ namespace Common
 
         public void SaveCommand(GameCommand command)
         {
-            Debug.Log("SAVING COMMAND");
+            Logs.Log("SAVING COMMAND");
             if (_doneMoves == null) _doneMoves = new();
             _undoneMoves.Clear();
             _doneMoves.Push(command);
@@ -121,51 +121,51 @@ namespace Common
         public void LogState()
         {
             if (StockPile != null)
-                Debug.Log($"Stock ({StockPile.Count}): {StockPile}");
-            //if (StockPile.Count > 0) Debug.Log($"Top card in stock is: {StockPile.Peek()}");
+                Logs.Log($"Stock ({StockPile.Count}): {StockPile}");
+            //if (StockPile.Count > 0) Logs.Log($"Top card in stock is: {StockPile.Peek()}");
 
             if (WastePile != null)
-                Debug.Log($"Waste ({WastePile.Count}): {WastePile}");
-            //if (WastePile.Count > 0) Debug.Log($"Top card in waste is: {WastePile.Peek()}");
+                Logs.Log($"Waste ({WastePile.Count}): {WastePile}");
+            //if (WastePile.Count > 0) Logs.Log($"Top card in waste is: {WastePile.Peek()}");
 
             if (FreeCells != null && FreeCells.Length > 0)
             {
-                Debug.Log("FreeCells:");
+                Logs.Log("FreeCells:");
                 for (int i = 0; i < FreeCells.Length; i++)
                 {
-                    Debug.Log($"  FC{i}: {FreeCells[i]}");
-                    if (FreeCells[i].Count > 0) Debug.Log($"Card in FC{i} is: {FreeCells[i].Peek()}");
+                    Logs.Log($"  FC{i}: {FreeCells[i]}");
+                    if (FreeCells[i].Count > 0) Logs.Log($"Card in FC{i} is: {FreeCells[i].Peek()}");
                 }
             }
 
             if (Foundations != null && Foundations.Length > 0)
             {
-                Debug.Log("Foundations:");
+                Logs.Log("Foundations:");
                 for (int i = 0; i < Foundations.Length; i++)
                 {
-                    Debug.Log($"  F{i}: {Foundations[i]}");
-                    if (Foundations[i].Count > 0) Debug.Log($"Top card in F{i} is: {Foundations[i].Peek()}");
+                    Logs.Log($"  F{i}: {Foundations[i]}");
+                    if (Foundations[i].Count > 0) Logs.Log($"Top card in F{i} is: {Foundations[i].Peek()}");
                 }
             }
 
             if (Tableaus != null && Tableaus.Length > 0)
             {
-                Debug.Log("Tableaus:");
+                Logs.Log("Tableaus:");
                 for (int i = 0; i < Tableaus.Length; i++)
                 {
-                    Debug.Log($"  T{i}: {Tableaus[i]}");
-                    if (Tableaus[i].Count > 0) Debug.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
+                    Logs.Log($"  T{i}: {Tableaus[i]}");
+                    if (Tableaus[i].Count > 0) Logs.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
                 }
             }
 
             if (_doneMoves != null)
             {
-                Debug.Log($"UNDOs available: {_doneMoves.Count}");
+                Logs.Log($"UNDOs available: {_doneMoves.Count}");
             }
 
             if (_undoneMoves != null)
             {
-                Debug.Log($"REDOs available: {_undoneMoves.Count}");
+                Logs.Log($"REDOs available: {_undoneMoves.Count}");
             }
         }
 
@@ -234,7 +234,7 @@ namespace Common
             {
                 throw new Exception($"Card {card} not found in any pile!");
             }
-            //Debug.Log($"Card {card} found in {kind}[{index}]");
+            //Logs.Log($"Card {card} found in {kind}[{index}]");
             return new PileData(kind, index);
         }
 

@@ -32,7 +32,7 @@ namespace Klondike
 
         private void InitToggleGroups()
         {
-           // Debug.Log("[Settings] Initializing values");
+           // Logs.Log("[Settings] Initializing values");
             _drawOption.RegisterToggle(_draw1Toggle);
             _drawOption.RegisterToggle(_draw3Toggle);
 
@@ -40,13 +40,13 @@ namespace Klondike
             {
                 _draw1Toggle.isOn = true;
                 _drawOption.NotifyToggleOn(_draw1Toggle);
-                //Debug.Log("[Settings] Draw amount is 1, turn on toggle for \"Draw: One\"");
+                //Logs.Log("[Settings] Draw amount is 1, turn on toggle for \"Draw: One\"");
             }
             if (KlondikeSettings.DrawAmount == 3)
             {
                 _draw3Toggle.isOn = true;
                 _drawOption.NotifyToggleOn(_draw3Toggle);
-                //Debug.Log("[Settings] Draw amount is 3, turn on toggle for \"Draw: Three\"");
+                //Logs.Log("[Settings] Draw amount is 3, turn on toggle for \"Draw: Three\"");
             }
 
             _restockOption.RegisterToggle(_restock3Toggle);
@@ -56,13 +56,13 @@ namespace Klondike
             {
                 _restock3Toggle.isOn = true;
                 _restockOption.NotifyToggleOn(_restock3Toggle);
-                //Debug.Log("[Settings] Available Restocks is 3, turn on toggle for \"Restock: Three\"");
+                //Logs.Log("[Settings] Available Restocks is 3, turn on toggle for \"Restock: Three\"");
             }
             if (KlondikeSettings.AvailableRestocks == -1)
             {
                 _restockInfToggle.isOn = true;
                 _restockOption.NotifyToggleOn(_restockInfToggle);
-                //Debug.Log("[Settings] Available Restocks is -1, turn on toggle for \"Restock: Unlimited\"");
+                //Logs.Log("[Settings] Available Restocks is -1, turn on toggle for \"Restock: Unlimited\"");
             }
         }
 

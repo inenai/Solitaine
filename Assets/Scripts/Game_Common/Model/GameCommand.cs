@@ -57,7 +57,7 @@ namespace Common
         public override void Execute(GameState s, bool undo = false)
         {
             string message = undo ? "UNDOING " : "";
-            Debug.Log($"[COMMAND] {message}Move from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
+            Logs.Log($"[COMMAND] {message}Move from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
 
             PileKind sourceKind = _sourcePile;
             int sourceIndex = _sourceIndex;
@@ -98,7 +98,7 @@ namespace Common
         {
             string message = undo ? "UNDOING " : "";
             string revealMessage = _revealed == RevealedAction.REVEALED ? "Reveal" : _revealed == RevealedAction.HID ? "Hide" : "No change!!!";
-            Debug.Log($"[COMMAND] {message}{revealMessage} card {_card}");
+            Logs.Log($"[COMMAND] {message}{revealMessage} card {_card}");
             switch (_revealed)
             {
                 case RevealedAction.REVEALED:
@@ -126,7 +126,7 @@ namespace Common
         {
             string message = undo ? "UNDOING " : "";
             string freedMessage = _freed == FreedAction.FREED ? "Free" : _freed == FreedAction.LOCKED ? "Lock" : "No change!!!";
-            Debug.Log($"[COMMAND] {message}{freedMessage} card {_card}");
+            Logs.Log($"[COMMAND] {message}{freedMessage} card {_card}");
             switch (_freed)
             {
                 case FreedAction.FREED:
@@ -144,7 +144,7 @@ namespace Common
         public override void Execute(GameState s, bool undo = false)
         {
             string message = undo ? "UNDOING " : "";
-            Debug.Log($"[COMMAND] {message}Restock");
+            Logs.Log($"[COMMAND] {message}Restock");
             CardPile source = undo ? s.GetCardStack(PileKind.STOCK) : s.GetCardStack(PileKind.WASTE);
             CardPile target = undo ? s.GetCardStack(PileKind.WASTE) : s.GetCardStack(PileKind.STOCK);
 
@@ -179,7 +179,7 @@ namespace Common
         public override void Execute(GameState s, bool undo = false)
         {
             string message = undo ? "UNDOING " : "";
-            Debug.Log($"[COMMAND] {message}Move card {_card} stack from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
+            Logs.Log($"[COMMAND] {message}Move card {_card} stack from {_sourcePile}[{_sourceIndex}] to {_targetPile}[{_targetIndex}]");
 
             PileKind sourceKind = _sourcePile;
             int sourceIndex = _sourceIndex;

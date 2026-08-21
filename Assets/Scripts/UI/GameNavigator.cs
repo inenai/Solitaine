@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utils;
 
 namespace Common
 {
@@ -13,7 +14,7 @@ namespace Common
 
         public static void ExitApplication()
         {
-            Debug.Log("Quitting application.");
+            Logs.Log("Quitting application.");
             Application.Quit();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

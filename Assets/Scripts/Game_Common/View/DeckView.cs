@@ -23,7 +23,7 @@ public class DeckView
 
     public void Load(List<Card> cards, Action onDone)
     {
-        Debug.Log($"Load. Loading {cards.Count} cards...");
+        Logs.Log($"Load. Loading {cards.Count} cards...");
         if (cards.Count != _cardViews.Length)
         {
             throw new Exception("Scene has not enough pre-loaded cards!!!");
@@ -64,15 +64,15 @@ public class DeckView
 
     // private void CreateCardUI(Transform transform, Card card, float zOffset, Action onDone)
     // {
-    //     //Debug.Log($"Create card {card}...");
+    //     //Logs.Log($"Create card {card}...");
     //     AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
     //     {
     //         InitCardGameObject(gameObject, card, zOffset);
     //         onDone?.Invoke();
-    //         //Debug.Log($"Create card {card} done.");
+    //         //Logs.Log($"Create card {card} done.");
     //     }, (errorMessage) =>
     //     {
-    //         Debug.LogError(errorMessage);
+    //         Logs.LogError(errorMessage);
     //         onDone?.Invoke();
     //     });
     // }

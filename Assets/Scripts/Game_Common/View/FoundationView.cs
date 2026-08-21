@@ -12,10 +12,10 @@ namespace Common
 
         public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            //Debug.Log($"Foundation[{Index}] refreshing...");
+            //Logs.Log($"Foundation[{Index}] refreshing...");
             if (cards.Count == 0)
             {
-                //Debug.Log($"Foundation[{Index}] refreshed.");
+                //Logs.Log($"Foundation[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -23,14 +23,14 @@ namespace Common
             if (immediate)
             {
                 StackCardsInPosition(cards, transform.position, transform, $"Card_F{Index}_");
-                //Debug.Log($"Foundation[{Index}] refreshed.");
+                //Logs.Log($"Foundation[{Index}] refreshed.");
                 onDone?.Invoke();
             }
             else
             {
                 StackCardsInPositionWithAnimation(cards, transform.position, transform, $"Card_F{Index}_", cardMoved, originalCardPosition, () =>
                 {
-                    //Debug.Log($"Foundation[{Index}] refreshed.");
+                    //Logs.Log($"Foundation[{Index}] refreshed.");
                     onDone?.Invoke();
                 });
             }

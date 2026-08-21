@@ -93,12 +93,12 @@ public abstract class Game
     #region utils
     protected void Log(string message)
     {
-        Debug.Log($"[{DebugTag}] {message}");
+        Logs.Log($"[{DebugTag}] {message}");
     }
 
     public void Log()
     {
-        Debug.Log("=== SOLITAIRE STATE ===");
+        Logs.Log("=== SOLITAIRE STATE ===");
         State.LogState();
     }
     #endregion
@@ -709,7 +709,7 @@ public abstract class Game
 
     public virtual Card GetSolvableCard()
     {
-        Debug.Log("Looking for automatic move");
+        Logs.Log("Looking for automatic move");
 
         Card card;
         if (HasWaste)
@@ -718,10 +718,10 @@ public abstract class Game
 
             if (card != null && IsSafeToMoveCardToFoundation(card))
             {
-                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                Logs.Log($"Safe to move {card} to foundation. Can move?");
                 if (CanMoveCardToAnyFoundation(card))
                 {
-                    Debug.Log($"{card} can be moved from waste to foundation.");
+                    Logs.Log($"{card} can be moved from waste to foundation.");
                     return card;
                 }
             }
@@ -732,10 +732,10 @@ public abstract class Game
             State.FreeCells[i].TryPeek(out card);
             if (card != null && IsSafeToMoveCardToFoundation(card))
             {
-                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                Logs.Log($"Safe to move {card} to foundation. Can move?");
                 if (CanMoveCardToAnyFoundation(card))
                 {
-                    Debug.Log($"{card} can be moved from free cell[{i}] to foundation.");
+                    Logs.Log($"{card} can be moved from free cell[{i}] to foundation.");
 
                     return card;
                 }
@@ -747,10 +747,10 @@ public abstract class Game
             State.Tableaus[i].TryPeek(out card);
             if (card != null && IsSafeToMoveCardToFoundation(card))
             {
-                Debug.Log($"Safe to move {card} to foundation. Can move?");
+                Logs.Log($"Safe to move {card} to foundation. Can move?");
                 if (CanMoveCardToAnyFoundation(card))
                 {
-                    Debug.Log($"{card} can be moved from tableau[{i}] to foundation.");
+                    Logs.Log($"{card} can be moved from tableau[{i}] to foundation.");
 
                     return card;
                 }

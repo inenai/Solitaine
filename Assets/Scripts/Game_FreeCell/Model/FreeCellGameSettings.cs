@@ -21,7 +21,7 @@ namespace FreeCell
 
         private static void Log(string message)
         {
-            Debug.Log($"[FreeCellSettings] {message}");
+            Logs.Log($"[FreeCellSettings] {message}");
         }
     }
 }

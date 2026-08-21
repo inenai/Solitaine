@@ -16,13 +16,13 @@ namespace Common
 
         public override void Refresh(CardPile cards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            //Debug.Log("StockView refreshing...");
+            //Logs.Log("StockView refreshing...");
             if (_restockLocked != null)
                 _restockLocked.SetActive(!_view.Controller.IsRestockAvailable());
 
             if (cards.Count == 0)
             {
-                //Debug.Log("StockView refreshed.");
+                //Logs.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -30,7 +30,7 @@ namespace Common
             if (cardMoved == null)
             {
                 StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_");
-                //Debug.Log("StockView refreshed.");
+                //Logs.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;
             }
@@ -40,7 +40,7 @@ namespace Common
 
         public void OnClick()
         {
-            Debug.Log($"Stock pile clicked!");
+            Logs.Log($"Stock pile clicked!");
             _view.Controller.InputAction_PileClicked(PileKind.STOCK, -1);
         }
 

@@ -75,8 +75,8 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     private void Log(string message)
     {
-        if (Card == null) Debug.Log($"[CARDUI] {message}");
-        else Debug.Log($"[CARDUI][{Card}] {message}");
+        if (Card == null) Logs.Log($"[CARDUI] {message}");
+        else Logs.Log($"[CARDUI][{Card}] {message}");
     }
 
     #region IDrag
@@ -170,7 +170,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         if (!_overlappingColliders.Contains(collision)) {
             _overlappingColliders.Add(collision);
             // if (collision.GetComponent<CardUI>() != null)
-            //     Debug.Log($"Colliding with {collision.GetComponent<CardUI>().Card}");
+            //     Logs.Log($"Colliding with {collision.GetComponent<CardUI>().Card}");
         }
 
         UpdateClosestTarget();
@@ -242,7 +242,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     public IEnumerator AnimateCardCR(Vector3 targetPosition, float duration, Action onDone)
     {
-        Debug.Log($"Card {_card} animating...");
+        Logs.Log($"Card {_card} animating...");
         _animating = true;
 
         Vector3 start = new Vector3(transform.position.x, transform.position.y, -MyInputManager.DragDepth);
@@ -263,7 +263,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
         RefreshRevealedState();
 
         _animating = false;
-        Debug.Log($"Card {_card} animated.");
+        Logs.Log($"Card {_card} animated.");
         _animateCardCR = null;
         onDone?.Invoke();
     }

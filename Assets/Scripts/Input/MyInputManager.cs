@@ -235,7 +235,7 @@ namespace Common
 
       private void Action_PointerPressed(InputAction.CallbackContext context)
       {
-         // Debug.Log("[InputManager] Pointer pressed");
+         // Logs.Log("[InputManager] Pointer pressed");
          if (InputBlocked) return;
          _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
 
@@ -244,7 +244,7 @@ namespace Common
 
          if (hit.collider != null)
          {
-            // Debug.Log("[InputManager] Collider hit!");
+            // Logs.Log("[InputManager] Collider hit!");
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
 
@@ -287,12 +287,12 @@ namespace Common
          _dragOffset = Vector3.zero;
          _velocity = Vector3.zero;
 
-         Debug.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
+         Logs.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
       }
 
       private void Action_PointerMoved(InputAction.CallbackContext context)
       {
-         //Debug.Log("[InputManager] Pointer moved");
+         //Logs.Log("[InputManager] Pointer moved");
          if (InputBlocked) return;
 
          _pointerPosition = context.ReadValue<Vector2>();
@@ -312,7 +312,7 @@ namespace Common
 
       private void Action_PointerReleased(InputAction.CallbackContext context)
       {
-         // Debug.Log("[InputManager] Pointer released");
+         // Logs.Log("[InputManager] Pointer released");
          if (InputBlocked)
          {
             EndDrag(cancelled: true);
@@ -323,7 +323,7 @@ namespace Common
          if (dragging && dragMode == DragMode.DRAG)
          {
             EndDrag(cancelled: false);
-            Debug.Log("[InputManager] Drag ended");
+            Logs.Log("[InputManager] Drag ended");
          }
 
          if (clicking)
@@ -356,13 +356,13 @@ namespace Common
                }
             }
             _clickingObject = null;
-            Debug.Log("[InputManager] Click ended (happened)");
+            Logs.Log("[InputManager] Click ended (happened)");
          }
       }
 
       private void Action_DoublePressed(InputAction.CallbackContext context)
       {
-         Debug.Log("[InputManager] Pointer double pressed");
+         Logs.Log("[InputManager] Pointer double pressed");
          if (InputBlocked) return;
 
          EndDrag(cancelled: true);
@@ -404,7 +404,7 @@ namespace Common
             }
             _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
-            Debug.Log("[InputManager] Drag started");
+            Logs.Log("[InputManager] Drag started");
          }
          else
          {
@@ -418,7 +418,7 @@ namespace Common
          if (click != null)
          {
             _clickingObject = collider.gameObject;
-            Debug.Log("[InputManager] Click started");
+            Logs.Log("[InputManager] Click started");
             return;
          }
 
@@ -426,7 +426,7 @@ namespace Common
          if (drag != null && dragMode == DragMode.PICKUP)
          {
             TryBeginDrag(collider);
-            Debug.Log("[InputManager] Picked up something!");
+            Logs.Log("[InputManager] Picked up something!");
          }
       }
    }

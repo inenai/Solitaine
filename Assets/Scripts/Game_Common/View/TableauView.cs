@@ -53,13 +53,13 @@ namespace Common
 
         public override void Refresh(CardPile tableauCards, Card cardMoved, Vector3 originalCardPosition, bool immediate, Action onDone)
         {
-            //Debug.Log($"TableauView[{Index}] refreshing...");
+            //Logs.Log($"TableauView[{Index}] refreshing...");
 
             Card[] cards = ReloadCards(tableauCards);
 
             if (tableauCards.Count == 0)
             {
-                //Debug.Log($"TableauView[{Index}] refreshed.");
+                //Logs.Log($"TableauView[{Index}] refreshed.");
                 UpdateTriggerHightlight();
                 onDone?.Invoke();
                 return;
@@ -84,7 +84,7 @@ namespace Common
 
             if (cardViewToAnimate == null)
             {
-                //Debug.Log($"TableauView[{Index}] refreshed.");
+                //Logs.Log($"TableauView[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }

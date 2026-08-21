@@ -23,7 +23,7 @@ namespace Common
             if (cards.Count == 0)
             {
                 onDone?.Invoke();
-                //Debug.Log($"FreeCellView[{Index}] refreshed.");
+                //Logs.Log($"FreeCellView[{Index}] refreshed.");
                 return;
             }
 
@@ -31,7 +31,7 @@ namespace Common
 
             if (cardMoved != cards.Peek())
             {
-                //Debug.Log($"TableauView[{Index}] refreshed.");
+                //Logs.Log($"TableauView[{Index}] refreshed.");
                 onDone?.Invoke();
                 return;
             }

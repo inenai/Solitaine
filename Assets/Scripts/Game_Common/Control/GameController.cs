@@ -20,7 +20,7 @@ public abstract class GameController : MonoBehaviour
         private set
         {
             _status = value;
-            Debug.Log($"STATUS {value}");
+            Logs.Log($"STATUS {value}");
         }
     }
 
@@ -102,7 +102,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
     {
-        Debug.Log("Processing card dragged to pile.");
+        Logs.Log("Processing card dragged to pile.");
         if (IsBusy) return false;
         Processing();
 
@@ -118,7 +118,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
-        Debug.Log("Processing double click.");
+        Logs.Log("Processing double click.");
         if (IsBusy) return false;
         Processing();
 
@@ -150,7 +150,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_PileClicked(PileKind pileKind, int pileIndex)
     {
-        Debug.Log("Processing pile clicked.");
+        Logs.Log("Processing pile clicked.");
         if (IsBusy) return false;
         Processing();
 
@@ -174,7 +174,7 @@ public abstract class GameController : MonoBehaviour
 
     protected void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
     {
-        Debug.Log("RefreshViewTask.");
+        Logs.Log("RefreshViewTask.");
 
         foreach (PileKind kind in pilesToRefresh)
         {
@@ -237,14 +237,14 @@ public abstract class GameController : MonoBehaviour
                     break;
             }
         }
-        Debug.Log("Await...");
+        Logs.Log("Await...");
         StartCoroutine(WaitForViewsToBeRefreshed(onDone));
     }
 
     private IEnumerator WaitForViewsToBeRefreshed(Action onDone)
     {
         while (_viewsRefreshing.Count > 0) yield return null;
-        Debug.Log("Done.");
+        Logs.Log("Done.");
         onDone?.Invoke();
     }
 
@@ -260,13 +260,13 @@ public abstract class GameController : MonoBehaviour
 
     protected void LoadDeckView(Action onDone)
     {
-        Debug.Log("LoadDeckView.");
+        Logs.Log("LoadDeckView.");
         _gameView.Deck.Load(_deck, onDone);
     }
 
     private bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
     {
-        Debug.Log("RefreshView.");
+        Logs.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;
         if (refreshNeeded)
         {
@@ -278,19 +278,19 @@ public abstract class GameController : MonoBehaviour
                     Card solvableCard = _game.GetSolvableCard();
                     if (solvableCard == null)
                     {
-                        Debug.Log("No auto moves availables.");
+                        Logs.Log("No auto moves availables.");
                         onDone?.Invoke();
                         return;
                     }
 
                     Vector3 originalSolvableCardPosition = GetCardViewPosition(solvableCard);
-                    Debug.Log("Auto moves enabled. Solving automatic move.");
+                    Logs.Log("Auto moves enabled. Solving automatic move.");
                     CheckRefreshView(
                         AutoAction_MoveCardAutomatically(solvableCard), onDone, solvableCard, originalSolvableCardPosition);
                 }
                 else
                 {
-                    Debug.Log("Auto moves not enabled.");
+                    Logs.Log("Auto moves not enabled.");
                     onDone?.Invoke();
                 }
             }, cardMoved, originalCardPosition, immediate);
@@ -355,7 +355,7 @@ public abstract class GameController : MonoBehaviour
 
     private void OnUndo()
     {
-        Debug.Log("Processing UNDO.");
+        Logs.Log("Processing UNDO.");
         if (IsBusy) return;
         Processing();
 
@@ -377,7 +377,7 @@ public abstract class GameController : MonoBehaviour
 
     private void OnRedo()
     {
-        Debug.Log("Processing REDO.");
+        Logs.Log("Processing REDO.");
         if (IsBusy) return;
         Processing();
 

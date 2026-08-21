@@ -86,7 +86,7 @@ namespace Sawayama
         protected override bool ValidTableauCardStackToPlace(Card child, Card parent)
         {
             if (child == null || parent == null) return false;
-            //Debug.Log($"Valid Tableau Stack {child} > {parent}?");
+            //Logs.Log($"Valid Tableau Stack {child} > {parent}?");
             bool sameColor = CardUtils.IsSameColor(child.Suit, parent.Suit);
             return !sameColor && child.Value == parent.Value - 1;
         }

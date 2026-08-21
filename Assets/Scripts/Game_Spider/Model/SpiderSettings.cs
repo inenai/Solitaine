@@ -44,7 +44,7 @@ namespace Spider
 
         private static void Log(string message)
         {
-            Debug.Log($"[SpiderSettings] {message}");
+            Logs.Log($"[SpiderSettings] {message}");
         }
 
         public static void Reset(SpiderConfig defaultConfig)

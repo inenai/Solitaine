@@ -125,7 +125,7 @@ namespace Spider
 
         public override Card GetSolvableCard()
         {
-            Debug.Log("Spider: Looking for automatic move");
+            Logs.Log("Spider: Looking for automatic move");
 
             for (int i = 0; i < TableausAmount; i++)
             {
