@@ -384,7 +384,7 @@ namespace Spider
             List<GameCommandAction> commands = new();
             for (int i = 0; i < TableausAmount; i++)
             {
-                for (int j = 0; j < State.Tableaus[i].Count; j++)  //TOP (BACK) -->> Bottom (FRONT)
+                for (int j = 0; j < State.Tableaus[i].Count; j++)  //Bottom (FRONT) -->> TOP (BACK)
                 {
                     Card currentCard = State.Tableaus[i].ElementAt(j);
                     if (currentCard.Free) continue;
