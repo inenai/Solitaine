@@ -95,12 +95,12 @@ namespace Spider
         {
             Log("Shuffling and dealing...");
             CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
-            int cardsInTabs = 54;
+            int preDealtCards = 54;
 
-            for (int i = 0; i < cardsInTabs; i++)
+            for (int i = 0; i < preDealtCards; i++)
             {
                 Card nextCard = deckStack.Pop();
-                if (i >= (cardsInTabs - TableausAmount))
+                if (i >= (preDealtCards - TableausAmount))
                 {
                     nextCard.Show(true);
                     nextCard.FreeCard(true);

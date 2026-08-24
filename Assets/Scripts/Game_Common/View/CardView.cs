@@ -89,7 +89,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
 
     public void OnDragAttemptFailed()
     {
-        PlayLocked();
+        //PlayLocked();
     }
 
     public void OnStartDrag()

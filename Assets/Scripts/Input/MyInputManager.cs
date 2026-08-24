@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,9 +9,7 @@ namespace Common
    public class MyInputManager : MonoBehaviour
    {
       [Header("Settings")]
-      private bool doubleClickEnabled => dragMode != DragMode.PICKUP;
-      [SerializeField] private DragMode dragMode;
-
+      [SerializeField] private float _peekHoldDelay = 0.3f;
       [Header("Input References")]
       [SerializeField] private InputActionReference pointerMovedAction;
       [SerializeField] private InputActionReference pointerDownAction;
@@ -37,8 +36,10 @@ namespace Common
       private Vector3 _pointerPosition;
       private bool dragging => _draggingObject != null;
       private bool clicking => _clickingObject != null;
+      private bool peeking => _peekingObject != null;
       private Collider2D _previousClickedCollider;
       private Collider2D _lastClickCollider;
+      private Coroutine _longHoldPeekCR;
 
       private void Awake()
       {
@@ -75,16 +76,8 @@ namespace Common
          redo.action.performed += Action_Redo;
          peek.action.performed += Action_StartPeek;
          peek.action.canceled += Action_EndPeek;
-
-         if (doubleClickEnabled)
-         {
-            doublePressAction.action.Enable();
-            doublePressAction.action.performed += Action_DoublePressed;
-         }
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-         dragMode = DragMode.DRAG;
-#endif
+         doublePressAction.action.Enable();
+         doublePressAction.action.performed += Action_DoublePressed;
       }
 
       private void OnDisable()
@@ -112,12 +105,8 @@ namespace Common
          redo.action.performed -= Action_Redo;
          peek.action.performed -= Action_StartPeek;
          peek.action.canceled -= Action_EndPeek;
-
-         if (doubleClickEnabled)
-         {
-            doublePressAction.action.Disable();
-            doublePressAction.action.performed -= Action_DoublePressed;
-         }
+         doublePressAction.action.Disable();
+         doublePressAction.action.performed -= Action_DoublePressed;
       }
 
       #region EnhancedTouch
@@ -135,17 +124,9 @@ namespace Common
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
 
-            if (dragging && dragMode == DragMode.PICKUP)
-            {
-               EndDrag(cancelled: false);
-               return;
-            }
-
-            if (dragMode == DragMode.DRAG)
-            {
-               TryBeginDrag(hit.collider);
-            }
+            TryBeginDrag(hit.collider);
             TryBeginClick(hit.collider);
+            _longHoldPeekCR = StartCoroutine(StartDelayedPeek(hit.collider));
          }
       }
 
@@ -174,13 +155,24 @@ namespace Common
          if (InputBlocked)
          {
             EndDrag(cancelled: true);
+            EndPeek();
             _clickingObject = null;
             return;
          }
 
-         if (dragging && dragMode == DragMode.DRAG)
+         if (dragging)
          {
             EndDrag(cancelled: false);
+         }
+
+         if (_longHoldPeekCR != null)
+         {
+            StopCoroutine(_longHoldPeekCR);
+         }
+
+         if (peeking)
+         {
+            EndPeek();
          }
 
          if (clicking)
@@ -195,10 +187,6 @@ namespace Common
                {
                   if (c.CanClick()) c.OnClick();
                   else c.OnClickAttemptFailed();
-               }
-               else if (dragMode == DragMode.PICKUP)
-               {
-                  TryBeginDrag(hit.collider);
                }
             }
             _clickingObject = null;
@@ -255,16 +243,7 @@ namespace Common
             _previousClickedCollider = _lastClickCollider;
             _lastClickCollider = hit.collider;
 
-            if (dragging && dragMode == DragMode.PICKUP)
-            {
-               EndDrag(cancelled: false);
-               return;
-            }
-
-            if (dragMode == DragMode.DRAG)
-            {
-               TryBeginDrag(hit.collider);
-            }
+            TryBeginDrag(hit.collider);
             TryBeginClick(hit.collider);
          }
       }
@@ -296,27 +275,45 @@ namespace Common
 
          if (hit.collider != null)
          {
-            IPeek c = hit.collider.gameObject.GetComponent<IPeek>();
-            if (c != null)
-            {
-               if (c.StartPeeking())
-               {
-                  _peekingObject = c;
-               }
-            }
+            TryBeginPeek(hit.collider);
          }
       }
       IPeek _peekingObject;
       private void Action_EndPeek(InputAction.CallbackContext context)
       {
          Logs.Log($"[InputManager] UNPEEK");
+         if (peeking)
+            EndPeek();
+      }
+
+      private void TryBeginPeek(Collider2D collider)
+      {
+         if (InputBlocked) return;
+         IPeek c = collider.gameObject.GetComponent<IPeek>();
+         if (c != null)
+         {
+            if (c.StartPeeking())
+            {
+               _peekingObject = c;
+            }
+         }
+      }
+
+      private IEnumerator StartDelayedPeek(Collider2D collider)
+      {
+         yield return new WaitForSecondsRealtime(_peekHoldDelay);
+         TryBeginPeek(collider);
+         _longHoldPeekCR = null;
+      }
+
+      private void EndPeek()
+      {
          if (_peekingObject != null)
          {
             _peekingObject.StopPeeking();
             _peekingObject = null;
          }
       }
-
       private void EndDrag(bool cancelled)
       {
          if (!dragging)
@@ -360,7 +357,7 @@ namespace Common
             return;
          }
 
-         if (dragging && dragMode == DragMode.DRAG)
+         if (dragging)
          {
             EndDrag(cancelled: false);
             Logs.Log("[InputManager] Drag ended");
@@ -390,9 +387,6 @@ namespace Common
                         c.OnClickAttemptFailed();
                      }
                   }
-               } else if (dragMode == DragMode.PICKUP)
-               {
-                  TryBeginDrag(hit.collider);
                }
             }
             _clickingObject = null;
@@ -464,13 +458,6 @@ namespace Common
             _clickingObject = collider.gameObject;
             Logs.Log("[InputManager] Click started");
             return;
-         }
-
-         IDrag drag = collider.gameObject.GetComponent<IDrag>();
-         if (drag != null && dragMode == DragMode.PICKUP)
-         {
-            TryBeginDrag(collider);
-            Logs.Log("[InputManager] Picked up something!");
          }
       }
    }

@@ -32,12 +32,6 @@ namespace Common
         FREECELL
     }
 
-    public enum DragMode
-    {
-        DRAG,
-        PICKUP
-    }
-
     public enum RevealedAction
     {
         REVEALED,
