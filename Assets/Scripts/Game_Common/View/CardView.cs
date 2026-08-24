@@ -5,7 +5,7 @@ using Common;
 using UnityEngine;
 using Utils;
 
-public class CardView : MonoBehaviour, IDrag, IDoubleClick
+public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
 {
     private static float CardFlightSpeed = 30f;
 
@@ -28,6 +28,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     private Coroutine _fadeCoroutine;
     private Coroutine _animateCardCR;
     private bool ViewRevealed => Mathf.Approximately(_rotationRoot.transform.localRotation.eulerAngles.y, 180f);
+    private SpriteRenderer _frontRend;
 
     //AUX
     private static List<TargetCardPileView> _auxCompatiblePilesList = new();
@@ -37,6 +38,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
     void Awake()
     {
+        _frontRend = _front.GetComponent<SpriteRenderer>();
         _positionOnStartDrag = transform.position;
         _overlappingColliders = new();
         _targetPile = null;
@@ -131,6 +133,56 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     }
     #endregion
 
+    #region IPeek
+    int _orderInLayerBeforePeek;
+    public bool StartPeeking()
+    {
+        if (_animating) return false;
+        if (_dragging) return false;
+        if (!Card.Revealed) return false;
+        _orderInLayerBeforePeek = _frontRend.sortingOrder;
+        _frontRend.sortingOrder += 100;
+        return true;
+    }
+
+    public void StopPeeking()
+    {
+        _frontRend.sortingOrder = _orderInLayerBeforePeek;
+    }
+    #endregion
+
+    #region IDoubleClick
+
+    public bool CanDoubleClick()
+    {
+        return !_animating && Card.Free;
+    }
+
+    public void OnDoubleClickAttemptFailed()
+    {
+        PlayLocked();
+    }
+
+    public void OnDoubleClick()
+    {
+        Log($"Card {_card} double clicked!");
+        if (_card == null) return;
+        if (!_card.Revealed) return; //Ignores double clicks on hidden cards
+        if (_view.Controller.Status != GameStatus.LISTENING) return;
+
+        bool success = _view.Controller.InputAction_CardDoubleClicked(_card, transform.position);
+        if (!success)
+        {
+            CardView[] cardV = transform.GetComponentsInChildren<CardView>();
+            foreach (CardView c in cardV)
+            {
+                c.OnDoubleClickAttemptFailed();
+            }
+        }
+    }
+    #endregion
+
+    #region CardToPileInteraction
     private List<TargetCardPileView> GetOverlappingPiles()
     {
         _auxTargetPilesList.Clear();
@@ -160,8 +212,6 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
 
         return _auxTargetPilesList;
     }
-
-    #region CardToPileInteraction
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -334,33 +384,5 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick
     }
     #endregion
 
-    #region IDoubleClick
 
-    public bool CanDoubleClick()
-    {
-        return !_animating && Card.Free;
-    }
-
-    public void OnDoubleClickAttemptFailed()
-    {
-        PlayLocked();
-    }
-
-    public void OnDoubleClick()
-    {
-        Log($"Card {_card} double clicked!");
-        if (_card == null) return;
-        if (!_card.Revealed) return; //Ignores double clicks on hidden cards
-        if (_view.Controller.Status != GameStatus.LISTENING) return;
-
-        bool success = _view.Controller.InputAction_CardDoubleClicked(_card, transform.position);
-        if (!success)
-        {
-            CardView[] cardV = transform.GetComponentsInChildren<CardView>();
-            foreach (CardView c in cardV) {
-                c.OnDoubleClickAttemptFailed();
-            }
-        }
-    }
-    #endregion
 }

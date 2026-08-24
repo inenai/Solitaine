@@ -20,6 +20,7 @@ namespace Common
       [SerializeField] private InputActionReference cancelDrag;
       [SerializeField] private InputActionReference undo;
       [SerializeField] private InputActionReference redo;
+      [SerializeField] private InputActionReference peek;
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
@@ -59,9 +60,10 @@ namespace Common
          pointerDownAction.action.Enable();
          resetGameAction.action.Enable();
          drawFromStockAction.action.Enable();
-         cancelDrag.action.Enable();
+
          undo.action.Enable();
          redo.action.Enable();
+         peek.action.Enable();
 
          pointerDownAction.action.performed += Action_PointerPressed;
          pointerMovedAction.action.performed += Action_PointerMoved;
@@ -71,6 +73,8 @@ namespace Common
          cancelDrag.action.performed += Action_CancelDrag;
          undo.action.performed += Action_Undo;
          redo.action.performed += Action_Redo;
+         peek.action.performed += Action_StartPeek;
+         peek.action.canceled += Action_EndPeek;
 
          if (doubleClickEnabled)
          {
@@ -93,9 +97,10 @@ namespace Common
          pointerDownAction.action.Disable();
          resetGameAction.action.Disable();
          drawFromStockAction.action.Disable();
-         cancelDrag.action.Disable();
+
          undo.action.Disable();
          redo.action.Disable();
+         peek.action.Disable();
 
          pointerDownAction.action.performed -= Action_PointerPressed;
          pointerMovedAction.action.performed -= Action_PointerMoved;
@@ -105,6 +110,8 @@ namespace Common
          cancelDrag.action.performed -= Action_CancelDrag;
          undo.action.performed -= Action_Undo;
          redo.action.performed -= Action_Redo;
+         peek.action.performed -= Action_StartPeek;
+         peek.action.canceled -= Action_EndPeek;
 
          if (doubleClickEnabled)
          {
@@ -277,6 +284,39 @@ namespace Common
          EventManager.OnRedo?.Invoke();
       }
 
+      private void Action_StartPeek(InputAction.CallbackContext context)
+      {
+         Logs.Log($"[InputManager] PEEK");
+         if (dragging) return;
+         if (InputBlocked) return;
+         _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
+
+         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
+         if (hit.collider != null)
+         {
+            IPeek c = hit.collider.gameObject.GetComponent<IPeek>();
+            if (c != null)
+            {
+               if (c.StartPeeking())
+               {
+                  _peekingObject = c;
+               }
+            }
+         }
+      }
+      IPeek _peekingObject;
+      private void Action_EndPeek(InputAction.CallbackContext context)
+      {
+         Logs.Log($"[InputManager] UNPEEK");
+         if (_peekingObject != null)
+         {
+            _peekingObject.StopPeeking();
+            _peekingObject = null;
+         }
+      }
+
       private void EndDrag(bool cancelled)
       {
          if (!dragging)
@@ -286,7 +326,7 @@ namespace Common
          _draggingObject = null;
          _dragOffset = Vector3.zero;
          _velocity = Vector3.zero;
-
+         cancelDrag.action.Disable();
          Logs.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
       }
 
@@ -396,6 +436,9 @@ namespace Common
 
          if (dragComponent.CanDrag())
          {
+            if (_peekingObject != null)
+               _peekingObject.StopPeeking();
+
             Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
             {
@@ -404,6 +447,7 @@ namespace Common
             }
             _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
+            cancelDrag.action.Enable();
             Logs.Log("[InputManager] Drag started");
          }
          else

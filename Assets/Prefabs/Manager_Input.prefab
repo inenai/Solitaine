@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 265f0f6363949dd41afa213f95f81f3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragAndDrop
-  doubleClickEnabled: 1
   dragMode: 0
   pointerMovedAction: {fileID: -4622605027913168950, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   pointerDownAction: {fileID: -6385276113615828715, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
@@ -54,4 +53,5 @@ MonoBehaviour:
   cancelDrag: {fileID: -3964200297264616475, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   undo: {fileID: -3538527904713253658, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   redo: {fileID: -8096504389074362917, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  peek: {fileID: -3011399069407506966, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   mouseDragSpeed: 0
