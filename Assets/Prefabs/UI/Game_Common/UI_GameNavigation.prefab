@@ -2495,9 +2495,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\xB7 Left-click / Space: Pick up / drag\n\xB7 Right-click: Cancel drag\n\xB7
-    Double-click / C: Auto-move\n\xB7 D: Draw\n\xB7 R: Restart\n\xB7 Z: Undo\n\xB7
-    X: Redo\n\xB7 V / Right-click: Peek"
+  m_text: "\xB7 Drag: Left-Click / Space\n\xB7 Cancel drag: Right click\n\xB7 Auto
+    move: Double-click / C\n\xB7 Draw: D\n\xB7 Restart: R\n\xB7 Undo: Z\n\xB7 Redo:
+    X\n\xB7 Peek: Hold right-click / V"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
