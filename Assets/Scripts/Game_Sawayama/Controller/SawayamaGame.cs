@@ -106,7 +106,8 @@ namespace Sawayama
             {
                 case PileKind.FREECELL:
                     bool stockEmpty = _state.StockPile.Count == 0;
-                    return stockEmpty && !tableauCardStackParent;
+                    bool freeCellEmpty = _state.FreeCells[0].Count == 0;
+                    return stockEmpty && freeCellEmpty && !tableauCardStackParent;
                 case PileKind.WASTE:
                     return false;
                 case PileKind.FOUNDATION:

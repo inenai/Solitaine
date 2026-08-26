@@ -6,7 +6,7 @@ namespace Utils {
     {
         [SerializeField] Configs _configs;
 
-        void Start()
+        void Awake()
         {
             CommonUtils.LoadConfig(_configs);
         }
