@@ -21,9 +21,6 @@ namespace Common
         public void Init(GameController controller)
         {
             ConfigureVariants();
-#if UNITY_ANDROID && !UNITY_EDITOR
-            _controlsBtn.SetActive(false);
-#endif
             _controller = controller;
             UpdateGameLabel();
         }
