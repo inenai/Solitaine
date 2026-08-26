@@ -25,7 +25,14 @@ namespace Common
 
       public const float DragDepth = 9f;
 
-      private bool InputBlocked => _inputBlockers.Count > 0;
+      private bool InputBlocked
+      {
+         get
+         {
+            Logs.Log($"_inputBlockers.Count: {_inputBlockers.Count}");
+            return _inputBlockers.Count > 0;
+         }
+      }
       private HashSet<string> _inputBlockers;
       private Vector3 _dragOffset;
       private Camera _mainCamera;
@@ -201,7 +208,7 @@ namespace Common
             Debug.LogError($"Input block reason already used: {reason}");
             return;
          }
-
+         Logs.Log($"Input block reason added: {reason}");
          _inputBlockers.Add(reason);
       }
 
@@ -212,7 +219,7 @@ namespace Common
             Debug.LogError($"Input block reason not used: {reason}");
             return;
          }
-
+         Logs.Log($"Input block reason removed: {reason}");
          _inputBlockers.Remove(reason);
       }
 

@@ -7,8 +7,8 @@ public static class EventManager
     public static Action OnGameStarted;
     public static Action OnDrawFromStock;
     public static Action OnGameWon;
-    public static Action OnMenuOpened;
-    public static Action OnMenuClosed;
+    public static Action<string> OnMenuOpened;
+    public static Action<string> OnMenuClosed;
     public static Action OnCardsMoved;
     public static Action OnUndo;
     public static Action OnRedo;

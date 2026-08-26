@@ -15,13 +15,7 @@ namespace Klondike
         [SerializeField] Toggle _restock3Toggle;
         [SerializeField] Toggle _autoMoveEnabledToggle;
 
-        private void OnEnable()
-        {
-            ResetToggles();
-            InitToggleGroups();
-        }
-
-        private void ResetToggles()
+        protected override void ResetToggles()
         {
             _draw1Toggle.isOn = false;
             _draw3Toggle.isOn = false;
@@ -30,7 +24,7 @@ namespace Klondike
             _autoMoveEnabledToggle.isOn = KlondikeSettings.AutoMovesEnabled;
         }
 
-        private void InitToggleGroups()
+        protected override void InitToggleGroups()
         {
            // Logs.Log("[Settings] Initializing values");
             _drawOption.RegisterToggle(_draw1Toggle);

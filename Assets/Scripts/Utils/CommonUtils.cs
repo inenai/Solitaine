@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
 using Common;
 using FreeCell;
 using Klondike;
@@ -90,6 +88,26 @@ namespace Utils
             if (wins < 1000) return new Color(1f, 0.83f, 0f);
             if (wins < 5000) return new Color(0f, 1f, 0.67f);
             return new Color(1f, 0f, 0.66f);
+        }
+
+        internal static string GetRules(SolitaireKind kind)
+        {
+            switch (kind)
+            {
+                case SolitaireKind.KLONDIKE:
+                    return "· Stack cards by alternating colors in descending order.\n· Only Ks can occupy empty spaces.\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+
+                case SolitaireKind.SAWAYAMA:
+                    return "· Stack cards by alternating colors in descending order.\n· Any card can occupy empty spaces.\n· After drawing all cards from the stock, you can use the remaining empty space to place one card.\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+
+                case SolitaireKind.FREECELL:
+                    return "· Stack cards by alternating colors in descending order.\n· Any card can occupy empty spaces.\n· Are there enough free spaces to move a stack card by card? If not, you can't move that stack!\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+
+                case SolitaireKind.SPIDER:
+                    return "· Stack cards by descending order, regardless of suit.\n· To move stacks, they must only have one suit!\n· Any card can occupy empty spaces.\n· To draw more cards from the stock, there cannot be empty spaces.\n· Form eight ordered stacks of a single suit from K to A to win.";
+                default:
+                    throw new Exception($"Solitaire not yet fully supported by UI: {kind}");
+            }
         }
     }
 }

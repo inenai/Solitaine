@@ -121,7 +121,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4225113765136037541}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Common.BaseSettingsScreen, Assembly-CSharp
         m_MethodName: SaveAndRestart
         m_Mode: 1
@@ -280,7 +280,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7204718446938376477}
   - component: {fileID: 3543691478856240182}
-  - component: {fileID: 4225113765136037541}
   - component: {fileID: 5886743281731166319}
   - component: {fileID: 835701287670764291}
   m_Layer: 5
@@ -323,18 +322,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2754480336733511170}
   m_CullTransparentMesh: 1
---- !u!114 &4225113765136037541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2754480336733511170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2393bea9acf59d48b76d1d46269324f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Common.BaseSettingsScreen
 --- !u!114 &5886743281731166319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -560,7 +547,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4225113765136037541}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Common.BaseSettingsScreen, Assembly-CSharp
         m_MethodName: SaveAndStart
         m_Mode: 1
@@ -1117,7 +1104,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4225113765136037541}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Common.BaseSettingsScreen, Assembly-CSharp
         m_MethodName: Close
         m_Mode: 1
@@ -1387,7 +1374,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4225113765136037541}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Common.BaseSettingsScreen, Assembly-CSharp
         m_MethodName: SaveAndClose
         m_Mode: 1

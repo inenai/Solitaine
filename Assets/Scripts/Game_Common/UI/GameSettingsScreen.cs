@@ -2,23 +2,49 @@ using UnityEngine;
 
 namespace Common
 {
-    public abstract class GameSettingsScreen : MonoBehaviour
+    public abstract class GameSettingsScreen : MonoBehaviour, ISolitaireVariant
     {
-        [SerializeField] public SolitaireKind Kind;
+        protected const string MENU_ID_PREFIX = "MENU_Settings_";
+        protected SolitaireKind _kind;
+
         public abstract void Save();
-        void Awake()
+        protected abstract void ResetToggles();
+        protected abstract void InitToggleGroups();
+
+        private void OnEnable()
         {
-            ApplyTints();
+            EventManager.OnMenuOpened?.Invoke(MENU_ID_PREFIX + _kind.ToString());
+            ResetToggles();
+            InitToggleGroups();
         }
 
-        private void ApplyTints()
+        public void Configure(SolitaireKind kind)
         {
-            UIColorTinter[] tinters = GetComponentsInChildren<UIColorTinter>(true);
-            foreach (UIColorTinter tinter in tinters)
-            {
-                tinter.SetColor(Kind);
-            }
+            _kind = kind;
         }
 
+        public void SaveAndClose()
+        {
+            Save();
+            Close();
+        }
+
+        public void SaveAndStart()
+        {
+            SaveAndClose();
+            GameNavigator.LoadGame(_kind);
+        }
+
+        public void SaveAndRestart()
+        {
+            SaveAndClose();
+            EventManager.OnResetGameRequested?.Invoke();
+        }
+
+        public void Close()
+        {
+            EventManager.OnMenuClosed?.Invoke(MENU_ID_PREFIX + _kind.ToString());
+            gameObject.SetActive(false);
+        }
     }
 }
