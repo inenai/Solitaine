@@ -1,30 +1,24 @@
 using Common;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace Spider
 {
     public class SpiderSettingsScreen : GameSettingsScreen
     {
-
         [SerializeField] ToggleGroup _suitsToggleGroup;
         [SerializeField] Toggle _oneSuitToggle;
         [SerializeField] Toggle _twoSuitsToggle;
         [SerializeField] Toggle _fourSuitsToggle;
 
-        private void OnEnable()
-        {
-            ResetToggles();
-            InitToggleGroups();
-        }
-
-        private void ResetToggles()
+        protected override void ResetToggles()
         {
             _oneSuitToggle.isOn = false;
             _twoSuitsToggle.isOn = false;
             _fourSuitsToggle.isOn = false;
         }
 
-        private void InitToggleGroups()
+        protected override void InitToggleGroups()
         {
             Logs.Log("[Settings] Initializing values");
             _suitsToggleGroup.RegisterToggle(_oneSuitToggle);

@@ -8,6 +8,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7490969311074157330}
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndStart
+      objectReference: {fileID: 0}
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Klondike.KlondikeSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7490969311074157330}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Close
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Klondike.KlondikeSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 2754480336733511170, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_Name
       value: Screen_Settings_Klondike
@@ -31,6 +55,18 @@ PrefabInstance:
     - target: {fileID: 3254495000975058236, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4292704542
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7490969311074157330}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndClose
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Klondike.KlondikeSettingsScreen, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5886743281731166319, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_Color.b
@@ -124,6 +160,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7490969311074157330}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndRestart
+      objectReference: {fileID: 0}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Klondike.KlondikeSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -158,7 +206,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d639dd3dbe889b243a5d980ebd480ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Klondike.KlondikeSettingsScreen
-  Kind: 0
   _drawOption: {fileID: 2847558602659822647}
   _draw1Toggle: {fileID: 8431041483912653464}
   _draw3Toggle: {fileID: 3161045795012636675}

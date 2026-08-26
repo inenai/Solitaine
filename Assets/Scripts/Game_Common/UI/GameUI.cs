@@ -9,7 +9,7 @@ namespace Common
     {
         [SerializeField] private TextMeshProUGUI _gameLabel;
         [SerializeField] private SolitaireKind _solitaireKind;
-        [SerializeField] private BaseSettingsScreen _settingsScreen;
+        [SerializeField] private GameSettingsScreen _settingsScreen;
         [SerializeField] private GameObject _controlsBtn;
         [SerializeField] private GameObject _controlsScreen;
         [SerializeField] private Button _undoBtn;
@@ -19,7 +19,7 @@ namespace Common
 
         public void Init(GameController controller)
         {
-            ApplyTints();
+            ConfigureVariants();
 #if UNITY_ANDROID && !UNITY_EDITOR
             _controlsBtn.SetActive(false);
 #endif
@@ -27,12 +27,12 @@ namespace Common
             UpdateGameLabel();
         }
 
-        private void ApplyTints()
+        private void ConfigureVariants()
         {
-            UIColorTinter[] tinters = GetComponentsInChildren<UIColorTinter>(true);
-            foreach (UIColorTinter tinter in tinters)
+            ISolitaireVariant[] variants = GetComponentsInChildren<ISolitaireVariant>(true);
+            foreach (ISolitaireVariant variant in variants)
             {
-                tinter.SetColor(_solitaireKind);
+                variant?.Configure(_solitaireKind);
             }
         }
 
@@ -54,19 +54,7 @@ namespace Common
         private void UpdateGameLabel()
         {
             int wins = CommonUtils.GetWinsFor(_solitaireKind);
-            _gameLabel.text = _solitaireKind.ToString() + " " + $"Wins: {wins}";
-        }
-
-        public void OpenControlsScreen()
-        {
-            EventManager.OnMenuOpened?.Invoke();
-            _controlsScreen.SetActive(true);
-        }
-
-        public void CloseControlsScreen()
-        {
-            _controlsScreen.SetActive(false);
-            EventManager.OnMenuClosed?.Invoke();
+            _gameLabel.text = _solitaireKind.ToString() + "\n" + $"Wins: {wins}";
         }
 
         public void Undo()

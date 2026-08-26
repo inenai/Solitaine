@@ -494,6 +494,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3025406735976608002}
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndStart
+      objectReference: {fileID: 0}
+    - target: {fileID: 1526606399430893385, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Spider.SpiderSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3025406735976608002}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Close
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970132211984983777, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Spider.SpiderSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 2754480336733511170, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_Name
       value: Screen_Settings_Spider
@@ -501,6 +525,18 @@ PrefabInstance:
     - target: {fileID: 3254495000975058236, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_text
       value: Spider settings
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3025406735976608002}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndClose
+      objectReference: {fileID: 0}
+    - target: {fileID: 3641280423386427553, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Spider.SpiderSettingsScreen, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7204718446938376477, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       propertyPath: m_Pivot.x
@@ -582,6 +618,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3025406735976608002}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SaveAndRestart
+      objectReference: {fileID: 0}
+    - target: {fileID: 9005444698562329406, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Spider.SpiderSettingsScreen, Assembly-CSharp
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -615,7 +663,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b25d46fd90b2244aba2c73fe4a17ff4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Spider.SpiderSettingsScreen
-  Kind: 3
   _suitsToggleGroup: {fileID: 5759892554432344092}
   _oneSuitToggle: {fileID: 2119686051664242355}
   _twoSuitsToggle: {fileID: 4879081557845244968}

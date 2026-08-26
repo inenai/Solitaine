@@ -343,14 +343,14 @@ public abstract class GameController : MonoBehaviour
         _ui.OnGameWon();
     }
 
-    private void OnMenuOpened()
+    private void OnMenuOpened(string menuID)
     {
-        _input.BlockInput(MENU_OPENED_REASON);
+        _input.BlockInput(MENU_OPENED_REASON + "_" + menuID);
     }
 
-    private void OnMenuClosed()
+    private void OnMenuClosed(string menuID)
     {
-        _input.UnblockInput(MENU_OPENED_REASON);
+        _input.UnblockInput(MENU_OPENED_REASON + "_" + menuID);
     }
 
     private void OnUndo()

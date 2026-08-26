@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 namespace Common
 {
-    public class UIColorTinter : MonoBehaviour
+    public class UIColorTinter : MonoBehaviour, ISolitaireVariant
     {
-        public void SetColor(SolitaireKind kind)
+        public void Configure(SolitaireKind kind)
         {
             Image image = GetComponent<Image>();
             if (image != null)
