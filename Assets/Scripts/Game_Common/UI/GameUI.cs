@@ -14,6 +14,7 @@ namespace Common
         [SerializeField] private GameObject _controlsScreen;
         [SerializeField] private Button _undoBtn;
         [SerializeField] private Button _redoBtn;
+        [SerializeField] private GameObject _restartBtn;
 
         private GameController _controller;
 
@@ -39,6 +40,7 @@ namespace Common
         public void OnGameWon()
         {
             UpdateGameLabel();
+            _restartBtn.SetActive(true);
         }
 
         public void OpenSettings()

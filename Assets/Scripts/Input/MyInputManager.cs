@@ -29,7 +29,7 @@ namespace Common
       {
          get
          {
-            Logs.Log($"_inputBlockers.Count: {_inputBlockers.Count}");
+            //Logs.Log($"_inputBlockers.Count: {_inputBlockers.Count}");
             return _inputBlockers.Count > 0;
          }
       }

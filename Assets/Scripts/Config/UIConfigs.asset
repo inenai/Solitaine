@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Common.Configs
   Txt_Color_Klondike: {r: 0.17888913, g: 0.49163395, b: 0.8490566, a: 1}
   Txt_Color_Sawayama: {r: 0.8113208, g: 0.2066571, b: 0.2887718, a: 1}
-  Txt_Color_FreeCell: {r: 0.24124834, g: 0.7169812, b: 0.57517624, a: 1}
+  Txt_Color_FreeCell: {r: 0.14141041, g: 0.81761, b: 0.6164267, a: 1}
   Txt_Color_Spider: {r: 1, g: 0.74509805, b: 0, a: 1}
   Img_Color_Klondike: {r: 0, g: 0.24705882, b: 0.5294118, a: 1}
   Img_Color_Sawayama: {r: 0.3584906, g: 0, b: 0.049637005, a: 1}
