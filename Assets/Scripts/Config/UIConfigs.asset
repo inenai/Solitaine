@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af6e3273e57d6824d81f3291c368de9d, type: 3}
+  m_Name: UIConfigs
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Configs
+  Txt_Color_Klondike: {r: 0.17888913, g: 0.49163395, b: 0.8490566, a: 1}
+  Txt_Color_Sawayama: {r: 0.8113208, g: 0.2066571, b: 0.2887718, a: 1}
+  Txt_Color_FreeCell: {r: 0.24124834, g: 0.7169812, b: 0.57517624, a: 1}
+  Txt_Color_Spider: {r: 1, g: 0.74509805, b: 0, a: 1}
+  Img_Color_Klondike: {r: 0, g: 0.24705882, b: 0.5294118, a: 1}
+  Img_Color_Sawayama: {r: 0.3584906, g: 0, b: 0.049637005, a: 1}
+  Img_Color_FreeCell: {r: 0.03529412, g: 0.44313726, b: 0.32156864, a: 1}
+  Img_Color_Spider: {r: 0.74213827, g: 0.5949152, b: 0.17036496, a: 1}
+  Wins_1: {r: 1, g: 1, b: 1, a: 1}
+  Wins_2: {r: 0.76729554, g: 0.41132483, b: 0.20992038, a: 1}
+  Wins_3: {r: 0.80058134, g: 0.820013, b: 0.8238993, a: 1}
+  Wins_4: {r: 0.91823894, g: 0.77708244, b: 0.089513704, a: 1}
+  Wins_5: {r: 0.10715541, g: 0.7924528, b: 0.7355993, a: 1}
+  Wins_6: {r: 1, g: 0, b: 0.40871096, a: 1}
+  Rules_Klondike: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
+    Only Ks can occupy empty spaces.\n\xB7 Stack cards by suit in ascending order
+    in the four foundations from A to K to win."
+  Rules_Sawayama: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
+    Any card can occupy empty spaces.\n\xB7 After drawing all cards from the stock,
+    you can use the remaining empty space to place one card.\n\xB7 Stack cards by
+    suit in ascending order in the four foundations from A to K to win."
+  Rules_FreeCell: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
+    Any card can occupy empty spaces.\n\xB7 Are there enough free spaces to move
+    a stack card by card? If not, you can't move that stack!\n\xB7 Stack cards by
+    suit in ascending order in the four foundations from A to K to win."
+  Rules_Spider: "\xB7 Stack cards by descending order, regardless of suit.\n\xB7
+    To move stacks, they must only have one suit!\n\xB7 Any card can occupy empty
+    spaces.\n\xB7 To draw more cards from the stock, there cannot be empty spaces.\n\xB7
+    Form eight ordered stacks of a single suit from K to A to win."
