@@ -3071,6 +3071,76 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a0019a7b2e797e4b9db0fe23c712de9, type: 3}
+--- !u!1001 &1560230141
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3485946183743254493, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_Name
+      value: Safearea
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 13.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 9.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.69926
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239150397690290055, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+--- !u!212 &1560230142 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 5100841672805138618, guid: d5ce58a932b4eb745a01e207e80d1c0c, type: 3}
+  m_PrefabInstance: {fileID: 1560230141}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1568374718 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6492968730780849206, guid: e19d3bc732a9ced478d41df53d90e8ff, type: 3}
@@ -3814,6 +3884,7 @@ GameObject:
   - component: {fileID: 1715478398}
   - component: {fileID: 1715478397}
   - component: {fileID: 1715478400}
+  - component: {fileID: 1715478401}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3939,6 +4010,19 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1715478401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715478396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 778c64b174efea144ad5321bf1fbddf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrthographicCameraFitter
+  target: {fileID: 1560230142}
 --- !u!1001 &1741835413
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7503,6 +7587,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1715478399}
+  - {fileID: 1560230141}
   - {fileID: 8177633813912558731}
   - {fileID: 487686835}
   - {fileID: 569402906671370523}
