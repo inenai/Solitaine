@@ -79,7 +79,7 @@ namespace Spider
             {
                 deck.Add(new Card(suit, i));
             }
-            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.DIAMONDS : CardSuit.SPADES;
+            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.DIAMONDS : SpiderSettings.SuitsAmount == 2 ? CardSuit.HEARTS : CardSuit.SPADES;
             for (int i = 1; i <= 13; i++)
             {
                 deck.Add(new Card(suit, i));
