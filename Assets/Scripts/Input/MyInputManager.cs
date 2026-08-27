@@ -40,6 +40,7 @@ namespace Common
       private Vector3 _velocity = Vector3.zero;
       private GameObject _draggingObject;
       private GameObject _clickingObject;
+      private IPeek _peekingObject;
       private Vector3 _pointerPosition;
       private bool dragging => _draggingObject != null;
       private bool clicking => _clickingObject != null;
@@ -166,7 +167,7 @@ namespace Common
          {
             // Logs.Log("[InputManager] On finger up: Input is blocked, we end drag and peek");
             EndDrag(cancelled: true);
-            EndPeek();
+            TryEndPeek();
             _clickingObject = null;
             return;
          }
@@ -176,15 +177,7 @@ namespace Common
             EndDrag(cancelled: false);
          }
 
-         if (_longHoldPeekCR != null)
-         {
-            StopCoroutine(_longHoldPeekCR);
-         }
-
-         if (peeking)
-         {
-            EndPeek();
-         }
+         TryEndPeek();
 
          if (clicking)
          {
@@ -288,12 +281,11 @@ namespace Common
             TryBeginPeek(hit.collider);
          }
       }
-      IPeek _peekingObject;
+
       private void Action_EndPeek(InputAction.CallbackContext context)
       {
-         Logs.Log($"[InputManager] UNPEEK");
-         if (peeking)
-            EndPeek();
+         // Logs.Log($"[InputManager] Action_EndPeek");
+         TryEndPeek();
       }
 
       private void TryBeginPeek(Collider2D collider)
@@ -317,9 +309,14 @@ namespace Common
          _longHoldPeekCR = null;
       }
 
-      private void EndPeek()
+      private void TryEndPeek()
       {
-         if (_peekingObject != null)
+         if (_longHoldPeekCR != null)
+         {
+            StopCoroutine(_longHoldPeekCR);
+         }
+
+         if (peeking)
          {
             _peekingObject.StopPeeking();
             _peekingObject = null;
