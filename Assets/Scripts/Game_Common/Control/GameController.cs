@@ -174,7 +174,7 @@ public abstract class GameController : MonoBehaviour
 
     protected void DoRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false)
     {
-        Logs.Log("RefreshViewTask.");
+        //Logs.Log("RefreshViewTask.");
 
         foreach (PileKind kind in pilesToRefresh)
         {
@@ -237,14 +237,14 @@ public abstract class GameController : MonoBehaviour
                     break;
             }
         }
-        Logs.Log("Await...");
+        //Logs.Log("Await...");
         StartCoroutine(WaitForViewsToBeRefreshed(onDone));
     }
 
     private IEnumerator WaitForViewsToBeRefreshed(Action onDone)
     {
         while (_viewsRefreshing.Count > 0) yield return null;
-        Logs.Log("Done.");
+        //Logs.Log("Done.");
         onDone?.Invoke();
     }
 
@@ -260,13 +260,13 @@ public abstract class GameController : MonoBehaviour
 
     protected void LoadDeckView(Action onDone)
     {
-        Logs.Log("LoadDeckView.");
+        //Logs.Log("LoadDeckView.");
         _gameView.Deck.Load(_deck, onDone);
     }
 
     private bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
     {
-        Logs.Log("RefreshView.");
+        //Logs.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;
         if (refreshNeeded)
         {
@@ -278,19 +278,19 @@ public abstract class GameController : MonoBehaviour
                     Card solvableCard = _game.GetSolvableCard();
                     if (solvableCard == null)
                     {
-                        Logs.Log("No auto moves availables.");
+                        //Logs.Log("No auto moves availables.");
                         onDone?.Invoke();
                         return;
                     }
 
                     Vector3 originalSolvableCardPosition = GetCardViewPosition(solvableCard);
-                    Logs.Log("Auto moves enabled. Solving automatic move.");
+                    //Logs.Log("Auto moves enabled. Solving automatic move.");
                     CheckRefreshView(
                         AutoAction_MoveCardAutomatically(solvableCard), onDone, solvableCard, originalSolvableCardPosition);
                 }
                 else
                 {
-                    Logs.Log("Auto moves not enabled.");
+                    //Logs.Log("Auto moves not enabled.");
                     onDone?.Invoke();
                 }
             }, cardMoved, originalCardPosition, immediate);

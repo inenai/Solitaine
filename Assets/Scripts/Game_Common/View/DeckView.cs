@@ -23,7 +23,7 @@ public class DeckView
 
     public void Load(List<Card> cards, Action onDone)
     {
-        Logs.Log($"Load. Loading {cards.Count} cards...");
+        //Logs.Log($"Load. Loading {cards.Count} cards...");
         if (cards.Count != _cardViews.Length)
         {
             throw new Exception("Scene has not enough pre-loaded cards!!!");
@@ -53,38 +53,13 @@ public class DeckView
     public CardView GetCardView(Card card)
     {
         if (_deckView == null)
-            throw new System.Exception($"DeckView is null!");
+            throw new Exception($"DeckView is null!");
         if (card == null)
-            throw new System.Exception($"Asked for a card view that is null!");
+            throw new Exception($"Asked for a card view that is null!");
 
         if (!_deckView.ContainsKey(card))
-            throw new System.Exception($"Asked for a card view that is not available in DeckView: {card}");
+            throw new Exception($"Asked for a card view that is not available in DeckView: {card}");
         return _deckView[card];
     }
 
-    // private void CreateCardUI(Transform transform, Card card, float zOffset, Action onDone)
-    // {
-    //     //Logs.Log($"Create card {card}...");
-    //     AssetManager.InstantiateAsync(CardUtils.CardPrefabAddressSprite, transform, (gameObject) =>
-    //     {
-    //         InitCardGameObject(gameObject, card, zOffset);
-    //         onDone?.Invoke();
-    //         //Logs.Log($"Create card {card} done.");
-    //     }, (errorMessage) =>
-    //     {
-    //         Logs.LogError(errorMessage);
-    //         onDone?.Invoke();
-    //     });
-    // }
-
-    // private IEnumerator WaitForAllCoroutinesDone(Action onDone)
-    // {
-    //     while (_coroutinesRunning > 0) yield return null;
-    //     onDone?.Invoke();
-    // }
-
-    // private void InitCardGameObject(GameObject gameObject, Card card, float zOffset)
-    // {
-    //     InitCard(gameObject.GetComponent<CardView>(), card, zOffset);
-    // }
 }

@@ -57,7 +57,7 @@ namespace Sawayama
 
         private void ShuffleAndDealDeck(List<Card> deck)
         {
-            Log("Shuffling and dealing...");
+            //Log("Shuffling and dealing...");
             CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
             _state.StockPile = deckStack;
             Deal();
