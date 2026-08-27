@@ -11,13 +11,6 @@ namespace Utils
 {
     public static class CommonUtils
     {
-        static Configs Config;
-
-        public static void LoadConfig(Configs config)
-        {
-            Config = config;
-        }
-
         public static IList<T> Shuffle<T>(IList<T> list)
         {
             System.Random rng = new System.Random();
@@ -35,12 +28,12 @@ namespace Utils
 
         public static Color GetUIImageColor(SolitaireKind kind)
         {
-            return Config.GetUIImageColor(kind);
+            return GlobalSettings.Config.GetUIImageColor(kind);
         }
 
         public static Color GetUITextColor(SolitaireKind kind)
         {
-            return Config.GetUITextColor(kind);
+            return GlobalSettings.Config.GetUITextColor(kind);
         }
 
         public static int GetWinsFor(SolitaireKind solitaireKind)
@@ -65,12 +58,24 @@ namespace Utils
 
         public static Color GetWinsColor(int wins)
         {
-            return Config.GetWinsColor(wins);
+            return GlobalSettings.Config.GetWinsColor(wins);
         }
 
         internal static string GetRules(SolitaireKind kind)
         {
-            return Config.GetRules(kind);
+            return GlobalSettings.Config.GetRules(kind);
         }
+
+        internal static string GetTouchCtrlsText()
+        {
+            return GlobalSettings.Config.GetTouchCtrlsDesc();
+        }
+
+        internal static string GetKeyboardMouseCtrlsText()
+        {
+            return GlobalSettings.Config.GetKeyboardMouseCtrlsDesc();
+        }
+
+
     }
 }

@@ -10,8 +10,8 @@ namespace Common
         [SerializeField] private TextMeshProUGUI _gameLabel;
         [SerializeField] private SolitaireKind _solitaireKind;
         [SerializeField] private GameSettingsScreen _settingsScreen;
-        [SerializeField] private GameObject _controlsBtn;
-        [SerializeField] private GameObject _controlsScreen;
+        [SerializeField] private GameObject _rulesCtrlsBtnsPanel;
+        [SerializeField] private TextMeshProUGUI _controlsScreenTxt;
         [SerializeField] private Button _undoBtn;
         [SerializeField] private Button _redoBtn;
         [SerializeField] private GameObject _restartBtn;
@@ -23,6 +23,11 @@ namespace Common
             ConfigureVariants();
             _controller = controller;
             UpdateGameLabel();
+#if UNITY_ANDROID
+            _controlsScreenTxt.text = CommonUtils.GetTouchCtrlsText();
+#else
+            _controlsScreenTxt.text = CommonUtils.GetKeyboardMouseCtrlsDesc();
+#endif
         }
 
         private void ConfigureVariants()

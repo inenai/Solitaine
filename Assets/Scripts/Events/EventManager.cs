@@ -1,4 +1,5 @@
 using System;
+using Common;
 
 public static class EventManager
 {
@@ -13,4 +14,5 @@ public static class EventManager
     public static Action OnUndo;
     public static Action OnRedo;
     public static Action OnStateChanged;
+    public static Action<Language> LanguageSet;
 }

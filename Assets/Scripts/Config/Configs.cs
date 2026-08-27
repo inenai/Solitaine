@@ -27,11 +27,74 @@ namespace Common
         [SerializeField] Color Wins_5 = new Color(0f, 1f, 0.67f);
         [SerializeField] Color Wins_6 = new Color(1f, 0f, 0.66f);
 
-        [Header("Rules")]
-        [SerializeField] string Rules_Klondike = "· Stack cards by alternating colors in descending order.\n· Only Ks can occupy empty spaces.\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
-        [SerializeField] string Rules_Sawayama = "· Stack cards by alternating colors in descending order.\n· Any card can occupy empty spaces.\n· After drawing all cards from the stock, you can use the remaining empty space to place one card.\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
-        [SerializeField] string Rules_FreeCell = "· Stack cards by alternating colors in descending order.\n· Any card can occupy empty spaces.\n· Are there enough free spaces to move a stack card by card? If not, you can't move that stack!\n· Stack cards by suit in ascending order in the four foundations from A to K to win.";
-        [SerializeField] string Rules_Spider = "· Stack cards by descending order, regardless of suit.\n· To move stacks, they must only have one suit!\n· Any card can occupy empty spaces.\n· To draw more cards from the stock, there cannot be empty spaces.\n· Form eight ordered stacks of a single suit from K to A to win.";
+        [Header("Rules EN")]
+        [SerializeField] string Rules_Klondike = @"· Stack cards by alternating colors in descending order.
+· Only Ks can occupy empty spaces.
+· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+        [SerializeField] string Rules_Sawayama =
+@"· Stack cards by alternating colors in descending order.
+· Any card can occupy empty spaces.
+· After drawing all cards from the stock, you can use the remaining empty space to place one card.
+· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+        [SerializeField] string Rules_FreeCell =
+@"· Stack cards by alternating colors in descending order.
+· Any card can occupy empty spaces.
+· Are there enough free spaces to move a stack card by card? If not, you can't move that stack!
+· Stack cards by suit in ascending order in the four foundations from A to K to win.";
+        [SerializeField] string Rules_Spider =
+@"· Stack cards by descending order, regardless of suit.
+· To move stacks, they must only have one suit!
+· Any card can occupy empty spaces.
+· To draw more cards from the stock, there cannot be empty spaces.
+· Form eight ordered stacks of a single suit from K to A to win.";
+
+        [Header("Controls EN")]
+        [SerializeField] string Touch_Controls_Desc = @"· Smart auto-move: Double tap
+· Peek: Hold tap";
+        [SerializeField] string Key_Mouse_Controls_Desc = @"· Drag: Left-Click / Space
+· Cancel drag: Right click
+· Smart auto-move: Double-click / C
+· Draw: D
+· Restart: R
+· Undo: Z
+· Redo: X
+· Peek: Hold right-click / V";
+
+        [Header("Rules ES")]
+        [SerializeField] string Rules_Klondike_ES =
+@"· Apila cartas en orden descendiente, alternando colores.
+· Solo las K pueden ocupar espacios vacíos.
+· Apila las cartas por palo en orden ascendente de la A a la K en las bases para ganar.";
+        [SerializeField] string Rules_Sawayama_ES =
+@"· Apila cartas en orden descendiente, alternando colores.
+· Puedes colocar cualquier carta en los espacios vacíos.
+· Tras dar todas las cartas del mazo, puedes usar su espacio libre para colocar una carta.
+· Apila las cartas por palo en orden ascendente de la A a la K en las bases para ganar.";
+        [SerializeField] string Rules_FreeCell_ES =
+@"· Apila las cartas en orden descendiente, alternando colores.
+· Puedes colocar cualquier carta en los espacios vacíos.
+· ¿Hay lugar suficiente para mover una pila carta por carta? ¡Si no, no puedes mover esa pila!
+· Apila las cartas por palo en orden ascendente de la A a la K en las bases para ganar.";
+        [SerializeField] string Rules_Spider_ES =
+@"· Apila las cartas en orden descendiente, independientemente del palo.
+· ¡Para mover pilas, deben ser de un solo palo!
+· Puedes colocar cualquier carta en los espacios vacíos.
+· Para dar más cartas del mazo, no debe haber espacios vacíos.
+· Forma ocho pilas ordenadas de K a A de un solo palo para ganar.";
+
+        [Header("Controls ES")]
+        [SerializeField] string Touch_Controls_Desc_ES =
+@"· Auto-movimiento inteligente: Toca una carta dos veces
+· Espiar: Mantén el dedo sobre una carta";
+        [SerializeField] string Key_Mouse_Controls_Desc_ES =
+@"· Arrastrar: Click izq. / Barra espaciadora
+· Cancelar arrastre: Click derecho
+· Auto-movimiento inteligente: Doble-click / C
+· Repartir: D
+· Nuevo juego: R
+· Deshacer: Z
+· Rehacer: X
+· Espiar: Mantener click der. / V";
 
         public Color GetUIImageColor(SolitaireKind kind)
         {
@@ -76,21 +139,67 @@ namespace Common
             if (wins < 5000) return Wins_5;
             return Wins_6;
         }
+
         internal string GetRules(SolitaireKind kind)
         {
-            switch (kind)
+            switch (GlobalSettings.CurrentLanguage)
             {
-                case SolitaireKind.KLONDIKE:
-                    return Rules_Klondike;
-                case SolitaireKind.SAWAYAMA:
-                    return Rules_Sawayama;
-                case SolitaireKind.FREECELL:
-                    return Rules_FreeCell;
-                case SolitaireKind.SPIDER:
-                    return Rules_Spider;
+                case Language.ENGLISH:
+                    switch (kind)
+                    {
+                        case SolitaireKind.KLONDIKE:
+                            return Rules_Klondike;
+                        case SolitaireKind.SAWAYAMA:
+                            return Rules_Sawayama;
+                        case SolitaireKind.FREECELL:
+                            return Rules_FreeCell;
+                        case SolitaireKind.SPIDER:
+                            return Rules_Spider;
+                        default:
+                            throw new Exception($"Solitaire not yet fully supported by UI: {kind} language: {Language.ENGLISH}");
+                    }
+
+                case Language.SPANISH:
+                    switch (kind)
+                    {
+                        case SolitaireKind.KLONDIKE:
+                            return Rules_Klondike_ES;
+                        case SolitaireKind.SAWAYAMA:
+                            return Rules_Sawayama_ES;
+                        case SolitaireKind.FREECELL:
+                            return Rules_FreeCell_ES;
+                        case SolitaireKind.SPIDER:
+                            return Rules_Spider_ES;
+                        default:
+                            throw new Exception($"Solitaire not yet fully supported by UI: {kind}language: {Language.SPANISH}");
+                    }
                 default:
-                    throw new Exception($"Solitaire not yet fully supported by UI: {kind}");
+                    throw new Exception($"Language not recognized: {GlobalSettings.CurrentLanguage}");
             }
+        }
+
+        internal string GetKeyboardMouseCtrlsDesc()
+        {
+            switch (GlobalSettings.CurrentLanguage)
+            {
+                case Language.ENGLISH:
+                    return Key_Mouse_Controls_Desc;
+                case Language.SPANISH:
+                    return Key_Mouse_Controls_Desc_ES;
+            }
+            return Key_Mouse_Controls_Desc;
+        }
+
+        internal string GetTouchCtrlsDesc()
+        {
+            switch (GlobalSettings.CurrentLanguage)
+            {
+                case Language.ENGLISH:
+                    return Touch_Controls_Desc;
+                case Language.SPANISH:
+                    return Touch_Controls_Desc_ES;
+            }
+            return Touch_Controls_Desc;
         }
     }
 }

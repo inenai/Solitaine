@@ -43,4 +43,10 @@ namespace Common
         FREED,
         LOCKED
     }
+
+    public enum Language
+    {
+        ENGLISH,
+        SPANISH
+    }
 }

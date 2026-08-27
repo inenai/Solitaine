@@ -8,7 +8,7 @@ namespace Utils {
 
         void Awake()
         {
-            CommonUtils.LoadConfig(_configs);
+            GlobalSettings.LoadConfig(_configs);
         }
     }
 }
