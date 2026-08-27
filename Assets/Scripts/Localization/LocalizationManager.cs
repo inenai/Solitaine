@@ -54,7 +54,7 @@ namespace Common {
                         case LocalizationKey.LOC_RULES:
                             return "Reglas";
                         case LocalizationKey.LOC_GAME_SETTINGS:
-                            return "Configuración";
+                            return "Config.";
                         case LocalizationKey.LOC_CONTROLS:
                             return "Controles";
                         case LocalizationKey.LANGUAGE:
