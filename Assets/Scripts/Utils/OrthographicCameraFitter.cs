@@ -3,44 +3,44 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class OrthographicCameraFitter : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer target;
+    [SerializeField] private SpriteRenderer _target;
 
-    private Camera cam;
-    private Vector2Int lastScreenSize;
+    private Camera _cam;
+    private Vector2Int _lastScreenSize;
 
     private void Awake()
     {
-        cam = GetComponent<Camera>();
+        _cam = GetComponent<Camera>();
         FitCamera();
-        lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+        _lastScreenSize = new Vector2Int(Screen.width, Screen.height);
     }
 
     private void Update()
     {
         Vector2Int currentScreenSize = new Vector2Int(Screen.width, Screen.height);
 
-        if (currentScreenSize != lastScreenSize)
+        if (currentScreenSize != _lastScreenSize)
         {
-            lastScreenSize = currentScreenSize;
+            _lastScreenSize = currentScreenSize;
             FitCamera();
         }
     }
 
     private void FitCamera()
     {
-        if (target == null || !cam.orthographic)
+        if (_target == null || !_cam.orthographic)
             return;
 
-        Bounds bounds = target.bounds;
+        Bounds bounds = _target.bounds;
 
         float sizeForHeight = bounds.size.y / 2f;
-        float sizeForWidth = bounds.size.x / (2f * cam.aspect);
+        float sizeForWidth = bounds.size.x / (2f * _cam.aspect);
 
-        cam.orthographicSize = Mathf.Max(sizeForHeight, sizeForWidth);
+        _cam.orthographicSize = Mathf.Max(sizeForHeight, sizeForWidth);
 
-        Vector3 position = cam.transform.position;
+        Vector3 position = _cam.transform.position;
         position.x = bounds.center.x;
         position.y = bounds.center.y;
-        cam.transform.position = position;
+        _cam.transform.position = position;
     }
 }
