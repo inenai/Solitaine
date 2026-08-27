@@ -14,9 +14,9 @@ namespace Common {
     public static class LocalizationManager
     {
 
-        internal static string GetLocalizedText(LocalizationKey key, Language newLang)
+        internal static string GetLocalizedText(LocalizationKey key, Language lang)
         {
-            switch (newLang)
+            switch (lang)
             {
                 case Language.ENGLISH:
                     switch (key)
@@ -57,7 +57,7 @@ namespace Common {
                     }
                     break;
             }
-            throw new System.Exception($"Localization key {key} could not be resolved for language {newLang}");
+            throw new System.Exception($"Localization key {key} could not be resolved for language {lang}");
         }
     }
 }

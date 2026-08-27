@@ -19,6 +19,7 @@ namespace Common
 
         public static void LoadConfig(Configs config)
         {
+            if (_config != null) return;
             _config = config;
             CurrentLanguage = GetSavedLang();
         }

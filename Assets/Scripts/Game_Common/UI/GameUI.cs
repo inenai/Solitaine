@@ -58,7 +58,7 @@ namespace Common
         private void UpdateGameLabel()
         {
             int wins = CommonUtils.GetWinsFor(_solitaireKind);
-            _gameLabel.text = _solitaireKind.ToString() + "\n" + $"Wins: {wins}";
+            _gameLabel.text = _solitaireKind.ToString() + "\n" + LocalizationManager.GetLocalizedText(LocalizationKey.LOC_WINS, GlobalSettings.CurrentLanguage) + $": {wins}";
         }
 
         public void Undo()
