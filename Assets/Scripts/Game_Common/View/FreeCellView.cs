@@ -26,9 +26,9 @@ namespace Common
 
             Card card = cards.ElementAt(0);
 
+            StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_");
             if (immediate || cardMoved != card)
             {
-                StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_");
                 onDone?.Invoke();
                 return;
             }
