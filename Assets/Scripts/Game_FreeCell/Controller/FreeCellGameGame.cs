@@ -22,7 +22,7 @@ namespace FreeCell
         #region Initialization
         public FreeCellGameGame(List<Card> deck)
         {
-            Log("Starting a Klondike game.");
+            Log("Starting a FreeCell game.");
             CreateGameDeck();
             CreateState();
             RegisterToEvents();
@@ -47,7 +47,7 @@ namespace FreeCell
 
         private void ShuffleAndDealDeck(List<Card> deck)
         {
-            Log("Shuffling and dealing...");
+            //Log("Shuffling and dealing...");
             CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
             int tableauIndex = 0;
 

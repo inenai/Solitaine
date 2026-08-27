@@ -94,7 +94,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
 
     public void OnStartDrag()
     {
-        Log("Start drag!");
+        // Log("Start drag!");
         _dragging = true;
         _positionOnStartDrag = transform.position;
         gameObject.layer = LayerMask.NameToLayer("DraggingCard");
@@ -107,12 +107,12 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
             bool successfulMove = _view.Controller.InputAction_CardDraggedToPile(Card, _targetPile.PileKind, _targetPile.Index, transform.position);
             if (!successfulMove)
             {
-                Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
+                // Log($"End drag! Restoring saved position at {_positionOnStartDrag}");
                 transform.position = _positionOnStartDrag;
             }
             else
             {
-                Log("End drag! Sent card to target pile.");
+                // Log("End drag! Sent card to target pile.");
             }
         }
         else
@@ -220,7 +220,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
         if (!_overlappingColliders.Contains(collision)) {
             _overlappingColliders.Add(collision);
             // if (collision.GetComponent<CardUI>() != null)
-            //     Logs.Log($"Colliding with {collision.GetComponent<CardUI>().Card}");
+            //     Log($"Colliding with {collision.GetComponent<CardUI>().Card}");
         }
 
         UpdateClosestTarget();
@@ -292,7 +292,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
 
     public IEnumerator AnimateCardCR(Vector3 targetPosition, float duration, Action onDone)
     {
-        Logs.Log($"Card {_card} animating...");
+        // Log($"Card {_card} animating...");
         _animating = true;
 
         Vector3 start = new Vector3(transform.position.x, transform.position.y, -MyInputManager.DragDepth);
@@ -313,7 +313,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
         RefreshRevealedState();
 
         _animating = false;
-        Logs.Log($"Card {_card} animated.");
+        // Log($"Card {_card} animated.");
         _animateCardCR = null;
         onDone?.Invoke();
     }

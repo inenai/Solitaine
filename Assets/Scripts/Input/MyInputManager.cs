@@ -119,6 +119,7 @@ namespace Common
       #region EnhancedTouch
       private void OnFingerDown(Finger finger)
       {
+         // Logs.Log("[InputManager] On finger down");
          if (InputBlocked) return;
 
          _pointerPosition = finger.currentTouch.screenPosition;
@@ -133,6 +134,7 @@ namespace Common
 
             TryBeginDrag(hit.collider);
             TryBeginClick(hit.collider);
+            // Logs.Log("[InputManager] On finger down: start delayed peek");
             _longHoldPeekCR = StartCoroutine(StartDelayedPeek(hit.collider));
          }
       }
@@ -159,8 +161,10 @@ namespace Common
 
       private void OnFingerUp(Finger finger)
       {
+         // Logs.Log("[InputManager] On finger up");
          if (InputBlocked)
          {
+            // Logs.Log("[InputManager] On finger up: Input is blocked, we end drag and peek");
             EndDrag(cancelled: true);
             EndPeek();
             _clickingObject = null;
@@ -208,7 +212,7 @@ namespace Common
             Debug.LogError($"Input block reason already used: {reason}");
             return;
          }
-         Logs.Log($"Input block reason added: {reason}");
+         //Logs.Log($"Input block reason added: {reason}");
          _inputBlockers.Add(reason);
       }
 
@@ -219,7 +223,7 @@ namespace Common
             Debug.LogError($"Input block reason not used: {reason}");
             return;
          }
-         Logs.Log($"Input block reason removed: {reason}");
+         //Logs.Log($"Input block reason removed: {reason}");
          _inputBlockers.Remove(reason);
       }
 
@@ -272,7 +276,6 @@ namespace Common
 
       private void Action_StartPeek(InputAction.CallbackContext context)
       {
-         Logs.Log($"[InputManager] PEEK");
          if (dragging) return;
          if (InputBlocked) return;
          _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
@@ -309,6 +312,7 @@ namespace Common
       private IEnumerator StartDelayedPeek(Collider2D collider)
       {
          yield return new WaitForSecondsRealtime(_peekHoldDelay);
+         // Logs.Log("[InputManager] On finger down: start delayed peek - Ready to start peek on collider.");
          TryBeginPeek(collider);
          _longHoldPeekCR = null;
       }
@@ -321,6 +325,7 @@ namespace Common
             _peekingObject = null;
          }
       }
+
       private void EndDrag(bool cancelled)
       {
          if (!dragging)
@@ -331,7 +336,7 @@ namespace Common
          _dragOffset = Vector3.zero;
          _velocity = Vector3.zero;
          cancelDrag.action.Disable();
-         Logs.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
+         // Logs.Log($"[InputManager] Drag ended. Cancelled: {cancelled}");
       }
 
       private void Action_PointerMoved(InputAction.CallbackContext context)
@@ -367,7 +372,7 @@ namespace Common
          if (dragging)
          {
             EndDrag(cancelled: false);
-            Logs.Log("[InputManager] Drag ended");
+            // Logs.Log("[InputManager] Drag ended");
          }
 
          if (clicking)
@@ -397,13 +402,13 @@ namespace Common
                }
             }
             _clickingObject = null;
-            Logs.Log("[InputManager] Click ended (happened)");
+            // Logs.Log("[InputManager] Click ended (happened)");
          }
       }
 
       private void Action_DoublePressed(InputAction.CallbackContext context)
       {
-         Logs.Log("[InputManager] Pointer double pressed");
+         // Logs.Log("[InputManager] Pointer double pressed");
          if (InputBlocked) return;
 
          EndDrag(cancelled: true);
@@ -449,7 +454,7 @@ namespace Common
             _draggingObject = collider.gameObject;
             dragComponent.OnStartDrag();
             cancelDrag.action.Enable();
-            Logs.Log("[InputManager] Drag started");
+            // Logs.Log("[InputManager] Drag started");
          }
          else
          {
@@ -463,7 +468,7 @@ namespace Common
          if (click != null)
          {
             _clickingObject = collider.gameObject;
-            Logs.Log("[InputManager] Click started");
+            // Logs.Log("[InputManager] Click started");
             return;
          }
       }

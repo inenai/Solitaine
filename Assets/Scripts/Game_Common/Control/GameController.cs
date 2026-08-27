@@ -102,7 +102,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_CardDraggedToPile(Card card, PileKind targetPileKind, int targetPileIndex, Vector3 originalCardPosition)
     {
-        Logs.Log("Processing card dragged to pile.");
+        // Logs.Log("Processing card dragged to pile.");
         if (IsBusy) return false;
         Processing();
 
@@ -118,7 +118,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
-        Logs.Log("Processing double click.");
+        // Logs.Log("Processing double click.");
         if (IsBusy) return false;
         Processing();
 
@@ -150,7 +150,7 @@ public abstract class GameController : MonoBehaviour
 
     public bool InputAction_PileClicked(PileKind pileKind, int pileIndex)
     {
-        Logs.Log("Processing pile clicked.");
+        // Logs.Log("Processing pile clicked.");
         if (IsBusy) return false;
         Processing();
 

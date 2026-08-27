@@ -60,7 +60,7 @@ namespace Klondike
 
         private void ShuffleAndDeal(List<Card> deck)
         {
-            Log("Shuffling and dealing...");
+            //Log("Shuffling and dealing...");
             CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
 
             for (int i = 0; i < 7; i++)

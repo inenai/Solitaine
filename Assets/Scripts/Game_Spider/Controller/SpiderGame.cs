@@ -29,7 +29,7 @@ namespace Spider
 
         public SpiderGame(List<Card> deck)
         {
-            Log("Starting a Klondike game.");
+            Log("Starting a Spider game.");
             CreateState();
             ShuffleAndDeal(deck);
             Log();
@@ -93,7 +93,7 @@ namespace Spider
 
         private void ShuffleAndDeal(List<Card> deck)
         {
-            Log("Shuffling and dealing...");
+            //Log("Shuffling and dealing...");
             CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
             int preDealtCards = 54;
 
@@ -125,7 +125,7 @@ namespace Spider
 
         public override Card GetSolvableCard()
         {
-            Logs.Log("Spider: Looking for automatic move");
+            //Logs.Log("Spider: Looking for automatic move");
 
             for (int i = 0; i < TableausAmount; i++)
             {
@@ -167,7 +167,7 @@ namespace Spider
 
         public override List<PileKind> GameAction_TrySmartMoveCard(Card card, PileData sourcePileData)
         {
-            Log($"USER GameAction_TrySmartMoveCard {card}");
+            // Log($"USER GameAction_TrySmartMoveCard {card}");
             List<PileKind> affectedPiles = new List<PileKind>();
 
             ExecuteAction(() =>
@@ -212,7 +212,7 @@ namespace Spider
 
         protected override GameCommand CommonInner_TryDrawCardsFromStock(out int drewAmount)
         {
-            Log("INNER TryDrawCardsFromStock");
+            // Log("INNER TryDrawCardsFromStock");
             drewAmount = DrawCount;
 
             if (State.StockPile.Count == 0)
@@ -319,13 +319,12 @@ namespace Spider
                     }
                 }
             }
-            int targetTableau = -1;
+
             for (int i = 0; i < sameSuitCandidates.Count; i++)
             {
                 command = CommonInner_TryMoveCardsToTableauIndex(card, sourcePileData, sameSuitCandidates[i]);
                 if (command is { Valid: true })
                 {
-                    targetTableau = sameSuitCandidates[i];
                     break;
                 }
             }
@@ -337,7 +336,6 @@ namespace Spider
                     command = CommonInner_TryMoveCardsToTableauIndex(card, sourcePileData, compatibleFullCandidates[i]);
                     if (command is { Valid: true })
                     {
-                        targetTableau = compatibleFullCandidates[i];
                         break;
                     }
                 }

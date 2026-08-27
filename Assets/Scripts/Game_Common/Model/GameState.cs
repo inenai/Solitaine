@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace Common
@@ -52,7 +53,7 @@ namespace Common
 
         public void SaveCommand(GameCommand command)
         {
-            Logs.Log("SAVING COMMAND");
+            //Logs.Log("SAVING COMMAND");
             if (_doneMoves == null) _doneMoves = new();
             _undoneMoves.Clear();
             _doneMoves.Push(command);
@@ -120,53 +121,57 @@ namespace Common
 
         public void LogState()
         {
+            StringBuilder sb = new();
+            sb.AppendLine("=== NEW SOLITAIRE STATE ===");
+
             if (StockPile != null)
-                Logs.Log($"Stock ({StockPile.Count}): {StockPile}");
-            //if (StockPile.Count > 0) Logs.Log($"Top card in stock is: {StockPile.Peek()}");
+                sb.AppendLine($"Stock ({StockPile.Count}): {StockPile}");
+            //if (StockPile.Count > 0) sb.AppendLine($"Top card in stock is: {StockPile.Peek()}");
 
             if (WastePile != null)
-                Logs.Log($"Waste ({WastePile.Count}): {WastePile}");
-            //if (WastePile.Count > 0) Logs.Log($"Top card in waste is: {WastePile.Peek()}");
+                sb.AppendLine($"Waste ({WastePile.Count}): {WastePile}");
+            //if (WastePile.Count > 0) sb.AppendLine($"Top card in waste is: {WastePile.Peek()}");
 
             if (FreeCells != null && FreeCells.Length > 0)
             {
-                Logs.Log("FreeCells:");
+                sb.AppendLine("FreeCells:");
                 for (int i = 0; i < FreeCells.Length; i++)
                 {
-                    Logs.Log($"  FC{i}: {FreeCells[i]}");
-                    if (FreeCells[i].Count > 0) Logs.Log($"Card in FC{i} is: {FreeCells[i].Peek()}");
+                    sb.AppendLine($"  FC{i}: {FreeCells[i]}");
+                    if (FreeCells[i].Count > 0) sb.AppendLine($"Card in FC{i} is: {FreeCells[i].Peek()}");
                 }
             }
 
             if (Foundations != null && Foundations.Length > 0)
             {
-                Logs.Log("Foundations:");
+                sb.AppendLine("Foundations:");
                 for (int i = 0; i < Foundations.Length; i++)
                 {
-                    Logs.Log($"  F{i}: {Foundations[i]}");
-                    if (Foundations[i].Count > 0) Logs.Log($"Top card in F{i} is: {Foundations[i].Peek()}");
+                    sb.AppendLine($"  F{i}: {Foundations[i]}");
+                    if (Foundations[i].Count > 0) sb.AppendLine($"Top card in F{i} is: {Foundations[i].Peek()}");
                 }
             }
 
             if (Tableaus != null && Tableaus.Length > 0)
             {
-                Logs.Log("Tableaus:");
+                sb.AppendLine("Tableaus:");
                 for (int i = 0; i < Tableaus.Length; i++)
                 {
-                    Logs.Log($"  T{i}: {Tableaus[i]}");
-                    if (Tableaus[i].Count > 0) Logs.Log($"Top card in T{i} is: {Tableaus[i].Peek()}");
+                    sb.AppendLine($"  T{i}: {Tableaus[i]}");
+                    if (Tableaus[i].Count > 0) sb.AppendLine($"Top card in T{i} is: {Tableaus[i].Peek()}");
                 }
             }
 
             if (_doneMoves != null)
             {
-                Logs.Log($"UNDOs available: {_doneMoves.Count}");
+                sb.AppendLine($"UNDOs available: {_doneMoves.Count}");
             }
 
             if (_undoneMoves != null)
             {
-                Logs.Log($"REDOs available: {_undoneMoves.Count}");
+                sb.AppendLine($"REDOs available: {_undoneMoves.Count}");
             }
+            Logs.Log(sb.ToString());
         }
 
 

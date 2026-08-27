@@ -98,7 +98,6 @@ public abstract class Game
 
     public void Log()
     {
-        Logs.Log("=== SOLITAIRE STATE ===");
         State.LogState();
     }
     #endregion

@@ -21,7 +21,7 @@ namespace Sawayama
         #region initialization
         public SawayamaGame(List<Card> deck)
         {
-            Log("Starting a Klondike game.");
+            Log("Starting a Sawayama game.");
             CreateState();
             ShuffleAndDealDeck(deck);
             Log();
