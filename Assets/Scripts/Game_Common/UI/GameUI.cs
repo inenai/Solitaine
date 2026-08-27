@@ -26,7 +26,7 @@ namespace Common
 #if UNITY_ANDROID
             _controlsScreenTxt.text = CommonUtils.GetTouchCtrlsText();
 #else
-            _controlsScreenTxt.text = CommonUtils.GetKeyboardMouseCtrlsDesc();
+            _controlsScreenTxt.text = CommonUtils.GetKeyboardMouseCtrlsText();
 #endif
         }
 
