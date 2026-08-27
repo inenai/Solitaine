@@ -33,7 +33,7 @@ namespace Common
                 return;
             }
 
-            AnimateCardMoved(_view.Deck.GetCardView(card), originalCardPosition, _cardPosition, transform, onDone);
+            AnimateCardMoved(_view.Deck.GetCardView(card), originalCardPosition, _cardPosition, onDone);
         }
     }
 }

@@ -386,10 +386,12 @@ public abstract class Game
             GameCommandAction a = new GameCommandActionMove(
                  sourcePile: sourcePileData.Kind, sourceIndex: sourcePileData.Index,
                  targetPile: PileKind.FREECELL, targetIndex: targetPileIndex
-            );
+             );
             a.Execute(State);
             commandActions.Add(a);
+
             commandActions.AddRange(CommonInner_AfterRemovingCardFromPile(sourcePileData));
+
         }
         return new GameCommand(commandActions);
     }

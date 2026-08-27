@@ -29,7 +29,7 @@ namespace Common
             return cards;
         }
 
-        private Transform UpdateCardView(int index, bool immediate, string cardGOName)
+        private void UpdateCardView(int index, bool immediate, string cardGOName)
         {
             Transform desiredParent = index == 0 ? transform : _cardViews[index - 1].transform;
             if (_cardViews[index].transform.parent != desiredParent)
@@ -43,7 +43,6 @@ namespace Common
             else
                 _cardViews[index].PlayRevealIfNeeded();
             _cardViews[index].gameObject.name = cardGOName;
-            return desiredParent;
         }
 
         private void UpdateTriggerHightlight()
@@ -68,13 +67,12 @@ namespace Common
 
             CardView cardViewToAnimate = null;
             Vector3 cardViewToAnimateTargetPos = default;
-            Transform desiredParent = transform;
 
             for (int index = 0; index < cards.Length; index++)
             {
                 bool isCardMoved = cards[index] == cardMoved;
                 string cardGOName = _cardViews[index].gameObject.name = $"Card_T{Index}_{cards[index]}";
-                desiredParent = UpdateCardView(index, immediate, cardGOName);
+                UpdateCardView(index, immediate, cardGOName);
                 if (isCardMoved && !immediate)
                 {
                     cardViewToAnimate = _cardViews[index];
@@ -91,7 +89,7 @@ namespace Common
                 return;
             }
 
-            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, desiredParent, onDone);
+            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, onDone);
         }
 
         private float GetHighlightYPos()

@@ -71,7 +71,7 @@ namespace Common
                 return;
             }
 
-            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, transform, onDone);
+            AnimateCardMoved(cardViewToAnimate, originalCardPosition, cardViewToAnimateTargetPos, onDone);
         }
     }
 }
