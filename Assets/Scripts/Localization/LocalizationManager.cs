@@ -9,6 +9,7 @@ namespace Common {
         LOC_RULES,
         LOC_GAME_SETTINGS,
         LOC_CONTROLS,
+        LANGUAGE,
     }
 
     public static class LocalizationManager
@@ -35,6 +36,8 @@ namespace Common {
                             return "Game Settings";
                         case LocalizationKey.LOC_CONTROLS:
                             return "Controls";
+                        case LocalizationKey.LANGUAGE:
+                            return "English";
                     }
                     break;
                 case Language.SPANISH:
@@ -54,6 +57,8 @@ namespace Common {
                             return "Configuración";
                         case LocalizationKey.LOC_CONTROLS:
                             return "Controles";
+                        case LocalizationKey.LANGUAGE:
+                            return "Español";
                     }
                     break;
             }
