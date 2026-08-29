@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
+[RequireComponent(typeof(Camera))][ExecuteInEditMode]
 public class OrthographicCameraFitter : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _target;
