@@ -29,7 +29,7 @@ public abstract class GameController : MonoBehaviour
     protected Game _game;
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
-    protected bool IsBusy => _status != GameStatus.LISTENING;
+    private bool IsBusy => _status != GameStatus.LISTENING;
 
     #region Initialization
     void Start()
@@ -73,13 +73,13 @@ public abstract class GameController : MonoBehaviour
         }
     }
 
-    protected void Processing()
+    private void Processing()
     {
         Status = GameStatus.PROCESSING;
         _input.BlockInput(GAME_BUSY_REASON);
     }
 
-    protected void Listening()
+    private void Listening()
     {
         Status = GameStatus.LISTENING;
         _input.UnblockInput(GAME_BUSY_REASON);
@@ -116,7 +116,7 @@ public abstract class GameController : MonoBehaviour
             }, card, originalCardPosition, immediate: true, holdAutoMoves: shouldHoldAutoMoves);
     }
 
-    public virtual bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
+    public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
         // Logs.Log("Processing double click.");
         if (IsBusy) return false;
@@ -285,7 +285,7 @@ public abstract class GameController : MonoBehaviour
         _gameView.Deck.Load(_deck, onDone);
     }
 
-    protected bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
+    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
     {
         //Logs.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;
