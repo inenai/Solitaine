@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 2516221368623065189}
   - component: {fileID: 1301273287883498918}
   - component: {fileID: 5315077471180291793}
+  - component: {fileID: 2404201048699553096}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -230,6 +231,19 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Four
+--- !u!114 &2404201048699553096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7279041156796862409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6428f0322e1c241b26639d9ac04241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
+  STR_KEY: 25
 --- !u!1 &7419269959083331565
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,7 +460,16 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 977708445801650728, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3469159281185083257}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2723851967948056652, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5338092468042365897}
+    - targetCorrespondingSourceObject: {fileID: 2778571438297108525, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2145684202984657484}
+    - targetCorrespondingSourceObject: {fileID: 8473074804235985443, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6979681402815837344}
   m_SourcePrefab: {fileID: 100100000, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
 --- !u!224 &379382715402988942 stripped
 RectTransform:
@@ -464,6 +487,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Toggle
+--- !u!1 &3251390958010785770 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2723851967948056652, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+  m_PrefabInstance: {fileID: 635660895408404390}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5338092468042365897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3251390958010785770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6428f0322e1c241b26639d9ac04241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
+  STR_KEY: 22
+--- !u!1 &3340872914404796299 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2778571438297108525, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+  m_PrefabInstance: {fileID: 635660895408404390}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2145684202984657484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3340872914404796299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6428f0322e1c241b26639d9ac04241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
+  STR_KEY: 23
 --- !u!114 &4879081557845244968 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5433497176442063758, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
@@ -480,12 +539,30 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5133380052514752442, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
   m_PrefabInstance: {fileID: 635660895408404390}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 3251390958010785770}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ToggleGroup
+--- !u!1 &9026403956353455493 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8473074804235985443, guid: bb9cfa60e80096240bb367fa85b4ae12, type: 3}
+  m_PrefabInstance: {fileID: 635660895408404390}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6979681402815837344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9026403956353455493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6428f0322e1c241b26639d9ac04241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
+  STR_KEY: 24
 --- !u!1001 &8732676969102294961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -640,7 +717,28 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2754480336733511170, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3025406735976608002}
+    - targetCorrespondingSourceObject: {fileID: 7840252402198738679, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8176050125243922128}
   m_SourcePrefab: {fileID: 100100000, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+--- !u!1 &1584879399715916102 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7840252402198738679, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}
+  m_PrefabInstance: {fileID: 8732676969102294961}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8176050125243922128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1584879399715916102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc6428f0322e1c241b26639d9ac04241, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
+  STR_KEY: 21
 --- !u!224 &5266359701828387000 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3469299280999251721, guid: 5eccb95b49c3b314990da3b50b021069, type: 3}

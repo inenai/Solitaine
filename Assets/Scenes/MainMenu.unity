@@ -814,6 +814,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &504350002 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1584879399715916102, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
+  m_PrefabInstance: {fileID: 1609318258}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &504350007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504350002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  _solitaireKind: 3
 --- !u!1 &527535203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1437,7 +1455,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 324953745859293441, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 986871560}
+    - targetCorrespondingSourceObject: {fileID: 5653630469801630196, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1786211885}
   m_SourcePrefab: {fileID: 100100000, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
 --- !u!224 &986871554 stripped
 RectTransform:
@@ -1449,6 +1473,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 324953745859293441, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
   m_PrefabInstance: {fileID: 986871553}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &986871560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986871555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  _solitaireKind: 0
 --- !u!224 &999364457 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1663939627050859625, guid: 8c0dac5a9190af24487dc9b3d65ac586, type: 3}
@@ -1868,7 +1905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1931197817278494380, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -75.360634
+      value: -16
       objectReference: {fileID: 0}
     - target: {fileID: 1931197817278494380, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1893,7 +1930,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6848095049580749235, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1609318265}
+    - targetCorrespondingSourceObject: {fileID: 1584879399715916102, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 504350007}
   m_SourcePrefab: {fileID: 100100000, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
 --- !u!224 &1609318259 stripped
 RectTransform:
@@ -1905,6 +1948,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6848095049580749235, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
   m_PrefabInstance: {fileID: 1609318258}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1609318265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609318260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  _solitaireKind: 3
 --- !u!1 &1745764097
 GameObject:
   m_ObjectHideFlags: 0
@@ -2056,6 +2112,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Common.Localizable
   STR_KEY: 8
+--- !u!1 &1786211880 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5653630469801630196, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
+  m_PrefabInstance: {fileID: 986871553}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1786211885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786211880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  _solitaireKind: 0
 --- !u!1 &1813870298
 GameObject:
   m_ObjectHideFlags: 0

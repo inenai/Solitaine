@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Common
 {
@@ -31,6 +32,12 @@ namespace Common
             if (text != null)
             {
                 text.text = value;
+            }
+
+            Text textLegacy = GetComponent<Text>();
+            if (textLegacy != null)
+            {
+                textLegacy.text = value;
             }
         }
     }
