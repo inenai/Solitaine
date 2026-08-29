@@ -37,7 +37,7 @@ MonoBehaviour:
     new cards whenever you run out of moves on the board. \\n\xB7 Build Foundations:
     Drag Aces to the top-right foundation slots as soon as they appear, then build
     up on them in order (A -> 2 -> 3 \xB7 \xB7 \xB7 -> K) of the same suit."
-  Rules_Sawayama: "Objective: Move all 52 cards into the 4 Foundation slots (top-right),
+  Rules_Sawayama: "Objective: Move all 52 cards into the 4 Foundation slots (left),
     organized by suit from Ace to King. \\n \\nHow to Play: \\n\xB7 Build Down on
     the Board: Place cards in descending order and alternating colors (e.g., a red
     7 on a black 8). \\n\xB7 Flexible Empty Spaces: Any card or sequence (not just
