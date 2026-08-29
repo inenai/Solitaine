@@ -22,7 +22,11 @@ namespace Common
 
             if (immediate)
             {
-                StackCardsInPosition(cards, transform.position, transform, $"Card_F{Index}_");
+                List<CardView> cardViews = StackCardsInPosition(cards, transform.position, transform, $"Card_F{Index}_");
+                foreach (CardView cv in cardViews)
+                {
+                    cv.ShouldPlayLocked(true);
+                }
                 //Logs.Log($"Foundation[{Index}] refreshed.");
                 onDone?.Invoke();
             }

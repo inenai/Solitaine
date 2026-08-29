@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Utils;
 
@@ -26,7 +27,12 @@ namespace Common
 
             Card card = cards.ElementAt(0);
 
-            StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_");
+            List<CardView> cardViews = StackCardsInPosition(cards, _cardPosition, transform, "Card_FC_");
+            foreach (CardView cv in cardViews)
+            {
+                cv.ShouldPlayLocked(true);
+            }
+
             if (immediate || cardMoved != card)
             {
                 onDone?.Invoke();

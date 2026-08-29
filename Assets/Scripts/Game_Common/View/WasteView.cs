@@ -34,6 +34,10 @@ namespace Common
             }
 
             _cardViews = StackCardsInPosition(cards, GetPosition(0, 0), transform, "Card_W_", cardMoved);
+            foreach (CardView cv in _cardViews)
+            {
+                cv.ShouldPlayLocked(true);
+            }
 
             CardView cardViewToAnimate = null;
             Vector3 cardViewToAnimateTargetPos = default;

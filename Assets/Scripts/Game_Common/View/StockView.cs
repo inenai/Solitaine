@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Common
@@ -28,7 +29,11 @@ namespace Common
 
             if (immediate || cardMoved == null)
             {
-                StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_", cardMoved, displaceEvery);
+                List<CardView> cardsViews = StackCardsInPosition(cards, _cardsRoot.position, _cardsRoot.transform, "Card_S_", cardMoved, displaceEvery);
+                foreach (CardView cv in cardsViews)
+                {
+                    cv.ShouldPlayLocked(false);
+                }
                 //Logs.Log("StockView refreshed.");
                 onDone?.Invoke();
                 return;

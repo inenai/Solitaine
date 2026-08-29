@@ -5,7 +5,7 @@ using Common;
 using UnityEngine;
 using Utils;
 
-public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
+public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek, IClick
 {
     private static float CardFlightSpeed = 30f;
 
@@ -29,6 +29,8 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
     private Coroutine _animateCardCR;
     private bool ViewRevealed => Mathf.Approximately(_rotationRoot.transform.localRotation.eulerAngles.y, 180f);
     private SpriteRenderer _frontRend;
+    private Coroutine _revealCoroutine;
+    private bool _preventPlayLocked;
 
     //AUX
     private static List<TargetCardPileView> _auxCompatiblePilesList = new();
@@ -49,7 +51,13 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
     {
         _view = gameView;
         _card = card;
+        _preventPlayLocked = false;
         UpdateView();
+    }
+
+    public void ShouldPlayLocked(bool playLocked)
+    {
+        _preventPlayLocked = !playLocked;
     }
 
     void LateUpdate()
@@ -160,7 +168,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
 
     public void OnDoubleClickAttemptFailed()
     {
-        PlayLocked();
+        if (!_preventPlayLocked) PlayLocked();
     }
 
     public void OnDoubleClick()
@@ -180,6 +188,25 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
             }
         }
     }
+    #endregion
+
+    #region IClick
+
+    public void OnClick()
+    {
+        _view.Controller.InputAction_CardClicked(_card);
+    }
+
+    public bool CanClick()
+    {
+        return true;
+    }
+
+    public void OnClickAttemptFailed()
+    {
+        //Do nothing
+    }
+
     #endregion
 
     #region CardToPileInteraction
@@ -343,7 +370,6 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek
         _fadeCoroutine = null;
     }
 
-    Coroutine _revealCoroutine;
     public void PlayRevealIfNeeded()
     {
         if (ViewRevealed && !Card.Revealed)

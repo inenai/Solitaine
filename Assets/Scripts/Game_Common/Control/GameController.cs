@@ -29,7 +29,7 @@ public abstract class GameController : MonoBehaviour
     protected Game _game;
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
-    private bool IsBusy => _status != GameStatus.LISTENING;
+    protected bool IsBusy => _status != GameStatus.LISTENING;
 
     #region Initialization
     void Start()
@@ -73,13 +73,13 @@ public abstract class GameController : MonoBehaviour
         }
     }
 
-    private void Processing()
+    protected void Processing()
     {
         Status = GameStatus.PROCESSING;
         _input.BlockInput(GAME_BUSY_REASON);
     }
 
-    private void Listening()
+    protected void Listening()
     {
         Status = GameStatus.LISTENING;
         _input.UnblockInput(GAME_BUSY_REASON);
@@ -116,7 +116,7 @@ public abstract class GameController : MonoBehaviour
             }, card, originalCardPosition, immediate: true, holdAutoMoves: shouldHoldAutoMoves);
     }
 
-    public bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
+    public virtual bool InputAction_CardDoubleClicked(Card card, Vector3 originalCardPosition)
     {
         // Logs.Log("Processing double click.");
         if (IsBusy) return false;
@@ -159,6 +159,27 @@ public abstract class GameController : MonoBehaviour
             {
                 Listening();
             });
+    }
+
+
+    internal void InputAction_CardClicked(Card card)
+    {
+        if (IsBusy) return;
+        Processing();
+
+        PileData data = _game.State.GetCardPileOwnerData(card);
+        if (data.Kind == PileKind.STOCK)
+        {
+            CheckRefreshView(
+           _game.GameAction_ClickedPile(data.Kind, data.Index), () =>
+           {
+               Listening();
+           });
+        }
+        else
+        {
+            Listening();
+        }
     }
 
     protected List<PileKind> AutoAction_MoveCardAutomatically(Card card)
@@ -264,7 +285,7 @@ public abstract class GameController : MonoBehaviour
         _gameView.Deck.Load(_deck, onDone);
     }
 
-    private bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
+    protected bool CheckRefreshView(List<PileKind> pilesToRefresh, Action onDone, Card cardMoved = null, Vector3 originalCardPosition = default, bool immediate = false, bool holdAutoMoves = false)
     {
         //Logs.Log("RefreshView.");
         bool refreshNeeded = pilesToRefresh.Count > 0;

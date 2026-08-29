@@ -57,6 +57,11 @@ namespace Common
 
             Card[] cards = ReloadCards(tableauCards);
 
+            foreach (CardView cv in _cardViews)
+            {
+                cv.ShouldPlayLocked(true);
+            }
+
             if (tableauCards.Count == 0)
             {
                 //Logs.Log($"TableauView[{Index}] refreshed.");
