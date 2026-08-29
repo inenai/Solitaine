@@ -26,6 +26,7 @@ namespace Common
         [SerializeField] Color Wins_4 = new Color(1f, 0.83f, 0f);
         [SerializeField] Color Wins_5 = new Color(0f, 1f, 0.67f);
         [SerializeField] Color Wins_6 = new Color(1f, 0f, 0.66f);
+        [SerializeField] Gradient Wins_Gradient = new Gradient();
 
         [Header("Rules EN")]
         [SerializeField] string Rules_Klondike = @"· Stack cards by alternating colors in descending order.
@@ -132,12 +133,14 @@ namespace Common
 
         public Color GetWinsColor(int wins)
         {
-            if (wins < 10) return Wins_1;
-            if (wins < 50) return Wins_2;
-            if (wins < 200) return Wins_3;
-            if (wins < 1000) return Wins_4;
-            if (wins < 5000) return Wins_5;
-            return Wins_6;
+            if (wins < 500) return Wins_Gradient.Evaluate((float)wins / 500);
+            else return Wins_Gradient.Evaluate(1);
+            // if (wins < 10) return Wins_1;
+            // if (wins < 50) return Wins_2;
+            // if (wins < 200) return Wins_3;
+            // if (wins < 1000) return Wins_4;
+            // if (wins < 5000) return Wins_5;
+            // return Wins_6;
         }
 
         internal string GetRules(SolitaireKind kind)
