@@ -26,18 +26,110 @@ MonoBehaviour:
   Wins_4: {r: 0.91823894, g: 0.77708244, b: 0.089513704, a: 1}
   Wins_5: {r: 0.10715541, g: 0.7924528, b: 0.7355993, a: 1}
   Wins_6: {r: 1, g: 0, b: 0.40871096, a: 1}
-  Rules_Klondike: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
-    Only Ks can occupy empty spaces.\n\xB7 Stack cards by suit in ascending order
-    in the four foundations from A to K to win."
-  Rules_Sawayama: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
-    Any card can occupy empty spaces.\n\xB7 After drawing all cards from the stock,
-    you can use the remaining empty space to place one card.\n\xB7 Stack cards by
-    suit in ascending order in the four foundations from A to K to win."
-  Rules_FreeCell: "\xB7 Stack cards by alternating colors in descending order.\n\xB7
-    Any card can occupy empty spaces.\n\xB7 Are there enough free spaces to move
-    a stack card by card? If not, you can't move that stack!\n\xB7 Stack cards by
-    suit in ascending order in the four foundations from A to K to win."
-  Rules_Spider: "\xB7 Stack cards by descending order, regardless of suit.\n\xB7
-    To move stacks, they must only have one suit!\n\xB7 Any card can occupy empty
-    spaces.\n\xB7 To draw more cards from the stock, there cannot be empty spaces.\n\xB7
-    Form eight ordered stacks of a single suit from K to A to win."
+  Rules_Klondike: "Objective: Move all 52 cards into the 4 top-right Foundation piles,
+    organized by suit from Ace to King. \\n \\nHow to Play: \\n\xB7 Build Down on
+    the Board: Place cards on top of each other in descending order and alternating
+    colors (e.g., a red 7 on a black 8). \\n\xB7 Move Sequences: You can drag groups
+    of ordered cards together between columns. \\n\xB7 Fill Empty Spaces: Only a
+    King (or a sequence starting with a King) can be placed in an empty column. \\n\xB7
+    Reveal Hidden Cards: Uncover face-down cards in the main board by moving the
+    cards on top of them. \\n\xB7 Draw Stock Cards: Tap the top-left deck to reveal
+    new cards whenever you run out of moves on the board. \\n\xB7 Build Foundations:
+    Drag Aces to the top-right foundation slots as soon as they appear, then build
+    up on them in order (A -> 2 -> 3 \xB7 \xB7 \xB7 -> K) of the same suit."
+  Rules_Sawayama: "Objective: Move all 52 cards into the 4 Foundation slots (top-right),
+    organized by suit from Ace to King. \\n \\nHow to Play: \\n\xB7 Build Down on
+    the Board: Place cards in descending order and alternating colors (e.g., a red
+    7 on a black 8). \\n\xB7 Flexible Empty Spaces: Any card or sequence (not just
+    Kings) can be placed into an empty column. \\n\xB7 Single Deck Pass: The stock
+    pile can only be cycled through once. It does not reset when empty. \\n\xB7 Bonus
+    Extra Cell: Once the stock pile is empty, its space converts into a Free Cell
+    to hold 1 temporary card. \\n\xB7 Build Foundations: Move Aces to the top-right
+    foundation slots as soon as possible, building up in order (A -> 2 -> 3 \xB7
+    \xB7 \xB7 -> K) of the same suit. Cards sent to the Foundation cannot be pulled
+    back to the board."
+  Rules_FreeCell: "Objective: Move all 52 cards into the 4 Foundations (top-right),
+    organized by suit from Ace to King. \\n \\nHow to Play: \\n\xB7 Fully Visible
+    Board: All 52 cards are dealt face-up across 8 columns from the start. \\n\xB7
+    Free Cells: You have 4 cells in the top-left corner. Each cell can hold 1 temporary
+    card. \\n\xB7 Build Down on the Board: Place cards in descending order and alternating
+    colors (e.g., a red 7 on a black 8). \\n\xB7 Move Limit Based on Open Space:
+    The maximum size of a card sequence you can move at once depends on your available
+    free cells and empty columns. \\n\xB7 Flexible Empty Columns: Any card or sequence
+    can be placed into an empty tableau column. \\n\xB7 Build Foundations: Move Aces
+    to the Foundation slots as soon as they appear, building up in order (A -> 2
+    -> 3 \xB7 \xB7 \xB7 -> K) of the same suit."
+  Rules_Spider: "Objective: Assemble all cards on the board into complete same-suit
+    sequences from King down to Ace to clear them into the Foundations. \\n \\nHow
+    to Play: \\n\xB7 Initial Board: 54 cards are dealt across 10 columns (only the
+    top card of each column is face-up). \\n\xB7 Build Down on the Board: Place cards
+    in descending order (e.g., a 7 on an 8). You can place cards on different suits,
+    but keeping same-suit sequences intact is ideal. \\n\xB7 Move Sequences: You
+    can only drag and move groups of cards together if they are of the same suit
+    and in strict descending order. \\n\xB7 Reveal Hidden Cards: Clear face-up cards
+    to uncover and flip the hidden card underneath them. \\n\xB7 Fill Empty Columns:
+    Any card or valid same-suit sequence can be placed into an empty column. \\n\xB7
+    Draw Stock Cards: When out of moves, tap the stock pile to deal 1 card face-up
+    onto all 10 columns (all columns must have at least 1 card to deal). \\n\xB7
+    Build Foundations: Complete a full sequence of the same suit from King down to
+    Ace (K, Q, J... 2, A) to automatically clear it from the board into the Foundations."
+  Touch_Controls_Desc: "\xB7 Smart auto-move: Double tap\r\n\xB7 Peek: Hold tap"
+  Key_Mouse_Controls_Desc: "\xB7 Drag: Left-Click / Space\r\n\xB7 Cancel drag: Right
+    click\r\n\xB7 Smart auto-move: Double-click / C\r\n\xB7 Draw: D\r\n\xB7 Restart:
+    R\r\n\xB7 Undo: Z\r\n\xB7 Redo: X\r\n\xB7 Peek: Hold right-click / V"
+  Rules_Klondike_ES: "Objetivo: Mueve las 52 cartas a las 4 pilas de Base (arriba
+    a la derecha), organizadas por palo de As a Rey. \\n \\nC\xF3mo jugar: \\n\xB7
+    Ordena en el tablero: Coloca las cartas en orden descendente y alternando colores
+    (p. ej., un 7 rojo sobre un 8 negro). \\n\xB7 Mueve secuencias: Puedes arrastrar
+    grupos de cartas ordenadas de una columna a otra. \\n\xB7 Llena espacios vac\xEDos:
+    Solo puedes colocar un Rey (o una secuencia que empiece por un Rey) en las columnas
+    vac\xEDas. \\n\xB7 Revela cartas ocultas: Despeja las cartas boca abajo del tablero
+    moviendo las que tienen encima. \\n\xB7 Roba del mazo: Toca el mazo de reserva
+    (arriba a la izquierda) para obtener nuevas cartas. \\n\xB7 Completa las Bases:
+    Lleva los Ases a las casillas superiores derechas en cuanto aparezcan y construye
+    sobre ellas en orden (A -> 2 -> 3 \xB7 \xB7 \xB7 -> K) de su mismo palo."
+  Rules_Sawayama_ES: "Objetivo: Mueve las 52 cartas a las 4 casillas de Base (izquierda),
+    organizadas por palo de As a Rey. \\n \\nC\xF3mo jugar: \\n\xB7 Ordena en el
+    tablero: Coloca las cartas en orden descendente y alternando colores (p. ej.,
+    un 7 rojo sobre un 8 negro). \\n\xB7 Espacios vac\xEDos flexibles: Cualquier
+    carta o secuencia (no solo Reyes) se puede colocar en una columna vac\xEDa del
+    tablero. \\n\xB7 Un solo pase de mazo: El mazo de reserva solo se puede recorrer
+    una vez. No se reinicia al terminarse. \\n\xB7 Casilla libre adicional: Cuando
+    agotas el mazo de reserva, el espacio vac\xEDo que deja se convierte en una Casilla
+    libre (Free Cell) para guardar 1 carta temporalmente. \\n\xB7 Completa las Bases:
+    Lleva los Ases a las casillas superiores derechas y construye sobre ellos en
+    orden (A -> 2 -> 3 \xB7 \xB7 \xB7 -> K) de su mismo palo. Las cartas enviadas
+    a la Base no pueden regresar al tablero."
+  Rules_FreeCell_ES: "Objetivo: Mueve las 52 cartas a las 4 Bases (arriba a la derecha),
+    organizadas por palo de As a Rey. \\n \\nC\xF3mo jugar: \\n\xB7 Tablero visible:
+    Las 52 cartas se reparten boca arriba en 8 columnas desde el inicio. \\n\xB7
+    Casillas libres (Free Cells): Dispones de 4 casillas en la esquina superior izquierda.
+    Cada una permite guardar 1 carta temporalmente. \\n\xB7 Ordena en el tablero:
+    Coloca las cartas en orden descendente y alternando colores (p. ej., un 7 rojo
+    sobre un 8 negro). \\n\xB7 Mueve seg\xFAn tus espacios: El n\xFAmero de cartas
+    que puedes mover a la vez depende de cu\xE1ntas casillas libres y columnas vac\xEDas
+    tengas disponibles. \\n\xB7 Llena columnas vac\xEDas: Puedes colocar cualquier
+    carta o secuencia en una columna del tablero que quede vac\xEDa. \\n\xB7 Completa
+    las Bases: Lleva los Ases a las casillas de la Base en cuanto aparezcan y construye
+    sobre ellos en orden (A -> 2 -> 3 \xB7 \xB7 \xB7 -> K) de su mismo palo."
+  Rules_Spider_ES: "Objetivo: Organiza todas las cartas en columnas completas del
+    mismo palo en orden descendente, de Rey a As, para despejarlas del tablero hacia
+    las Bases. \\n \\nC\xF3mo jugar: \\n\xB7 Tablero inicial: Se reparten 54 cartas
+    en 10 columnas (solo la carta superior de cada columna est\xE1 boca arriba).
+    \\n\xB7 Ordena en el tablero: Coloca las cartas en orden descendente (p. ej.,
+    un 7 sobre un 8). Puedes mezclar palos, pero es preferible agrupar el mismo palo.
+    \\n\xB7 Mueve secuencias: Solo puedes mover grupos de cartas si son del mismo
+    palo y est\xE1n en orden descendente perfecto. \\n\xB7 Revela cartas ocultas:
+    Despeja las cartas boca arriba para voltear la carta oculta que tienen debajo.
+    \\n\xB7 Llena columnas vac\xEDas: Puedes colocar cualquier carta o secuencia
+    v\xE1lida en una columna vac\xEDa. \\n\xB7 Roba del mazo: Cuando te quedes sin
+    movimientos, toca el mazo de reserva para repartir 1 carta boca arriba en cada
+    una de las 10 columnas (requiere que ninguna columna est\xE9 vac\xEDa). \\n\xB7
+    Completa las Bases: Al formar una secuencia completa del mismo palo (K, Q, J...
+    2, A), se retira autom\xE1ticamente del tablero hacia las Bases."
+  Touch_Controls_Desc_ES: "\xB7 Auto-movimiento inteligente: Toca una carta dos veces\r\n\xB7
+    Espiar: Mant\xE9n el dedo sobre una carta"
+  Key_Mouse_Controls_Desc_ES: "\xB7 Arrastrar: Click izq. / Barra espaciadora\r\n\xB7
+    Cancelar arrastre: Click derecho\r\n\xB7 Auto-movimiento inteligente: Doble-click
+    / C\r\n\xB7 Repartir: D\r\n\xB7 Nuevo juego: R\r\n\xB7 Deshacer: Z\r\n\xB7 Rehacer:
+    X\r\n\xB7 Espiar: Mantener click der. / V"
