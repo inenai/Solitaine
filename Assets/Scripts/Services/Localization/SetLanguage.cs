@@ -1,16 +1,18 @@
+using Common;
+using Services;
 using UnityEngine;
 
-namespace Common {
+namespace Enums {
     public class SetLanguage : MonoBehaviour
     {
         public void SetLanguageToEnglish()
         {
-            GlobalSettings.SetCurrentLang(Language.ENGLISH);
+            God.Settings.SetCurrentLang(Language.ENGLISH);
         }
 
         public void SetLanguageToSpanish()
         {
-            GlobalSettings.SetCurrentLang(Language.SPANISH);
+            God.Settings.SetCurrentLang(Language.SPANISH);
         }
     }
 }

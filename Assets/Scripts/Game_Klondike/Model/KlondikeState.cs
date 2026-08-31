@@ -4,13 +4,12 @@ namespace Klondike
 {
     public class KlondikeState : GameState
     {
-        public int DrawCount => _drawAmount;
         public override int AvailableRestocks => _availableRestocks;
-        public override bool FoundationCardsFree => _foundationCardsFree;
+        public override bool FoundationCardsFree => true;
+        public int DrawAmount => _drawAmount;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
-        bool _foundationCardsFree = KlondikeSettings.DEFAULT_FOUNDATION_CARDS_FREE;
 
         public KlondikeState(Game game) : base(game)
         {
@@ -20,9 +19,8 @@ namespace Klondike
         {
             _drawAmount = KlondikeSettings.DrawAmount;
             _availableRestocks = KlondikeSettings.AvailableRestocks;
-            _foundationCardsFree = KlondikeSettings.FoundationCardsFree;
-        }
 
+        }
 
         public override void OnRestock(bool undo = false)
         {

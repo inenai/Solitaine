@@ -1,8 +1,9 @@
+using Common;
 using TMPro;
 using UnityEngine;
 using Utils;
 
-namespace Common {
+namespace Enums {
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class RulesTextLoader : MonoBehaviour, ISolitaireVariant
     {

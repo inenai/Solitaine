@@ -8,20 +8,6 @@ namespace Spider
         public const int DEFAULT_SUITS = 1;
         public static bool SavedSettingsAvailable => PlayerPrefs.GetInt(PlayerPrefsKeys.Sp_SavedSettingsFlag, 0) != 0;
 
-        public static int WinCount
-        {
-            get
-            {
-                return PlayerPrefs.GetInt(PlayerPrefsKeys.Sp_WinCountKey, 0);
-            }
-            set
-            {
-                Log($"Win count set to {value}");
-                PlayerPrefs.SetInt(PlayerPrefsKeys.Sp_WinCountKey, value);
-                PlayerPrefs.Save();
-            }
-        }
-
         public static int SuitsAmount
         {
             get

@@ -1,3 +1,4 @@
+using Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +16,7 @@ namespace Common
         void Start()
         {
             GetComponent<Button>().onClick.AddListener(GoToGame);
-            UpdateWinShowcase(CommonUtils.GetWinsFor(_kind));
+            UpdateWinShowcase(God.Database.GetTotalWins(_kind));
         }
 
         private void GoToGame()

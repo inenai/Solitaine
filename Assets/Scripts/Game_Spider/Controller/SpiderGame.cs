@@ -37,7 +37,7 @@ namespace Spider
 
         private void CreateState()
         {
-            _state = new SpiderState(this);
+            _state = new SpiderState(this, SpiderSettings.SuitsAmount);
         }
 
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)

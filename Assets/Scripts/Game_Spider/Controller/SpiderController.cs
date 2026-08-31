@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using Services;
 
 namespace Spider
 {
@@ -33,14 +34,14 @@ namespace Spider
             _game = new SpiderGame(_deck);
         }
 
-        protected override bool IsAutoMovesEnabled()
-        {
-            return true;
-        }
-
         protected override void UpdateWinsCount()
         {
-            SpiderSettings.WinCount++;
+            God.Database.AddGameEntry_Spider(
+                TimeSpentSeconds,
+                _game.State.MovesCount,
+                _game.State.UsedUndos,
+                _game.State.UsedRedos,
+                ((SpiderState)_game.State).SuitsUsed);
         }
 
         protected override void InitConfig()
