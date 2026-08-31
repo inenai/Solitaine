@@ -1458,7 +1458,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 324953745859293441, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 986871560}
+      addedObject: {fileID: 986871556}
     - targetCorrespondingSourceObject: {fileID: 5653630469801630196, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1786211885}
@@ -1473,7 +1473,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 324953745859293441, guid: ff481085ed7d6c142924a31e5e280fe0, type: 3}
   m_PrefabInstance: {fileID: 986871553}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &986871560
+--- !u!114 &986871556
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1484,7 +1484,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantConfigure
   _solitaireKind: 0
 --- !u!224 &999364457 stripped
 RectTransform:
@@ -1933,7 +1933,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6848095049580749235, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1609318265}
+      addedObject: {fileID: 1609318261}
     - targetCorrespondingSourceObject: {fileID: 1584879399715916102, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
       insertIndex: -1
       addedObject: {fileID: 504350007}
@@ -1948,7 +1948,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6848095049580749235, guid: 3eacfa4aeb8ce3c4285c1a954648cb76, type: 3}
   m_PrefabInstance: {fileID: 1609318258}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1609318265
+--- !u!114 &1609318261
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1959,7 +1959,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b4909e0a9af317f48b562fadf402b9a5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantColorConfigure
+  m_EditorClassIdentifier: Assembly-CSharp::Common.VariantConfigure
   _solitaireKind: 3
 --- !u!1 &1745764097
 GameObject:

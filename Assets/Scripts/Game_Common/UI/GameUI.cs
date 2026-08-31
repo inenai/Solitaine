@@ -5,10 +5,9 @@ using Utils;
 
 namespace Common
 {
-    public class GameUI : MonoBehaviour, ISettingsManager
+    public class GameUI : MonoBehaviour, ISettingsManager, ISolitaireVariant
     {
         [SerializeField] private TextMeshProUGUI _gameLabel;
-        [SerializeField] private SolitaireKind _solitaireKind;
         [SerializeField] private GameSettingsScreen _settingsScreen;
         [SerializeField] private GameObject _rulesCtrlsBtnsPanel;
         [SerializeField] private TextMeshProUGUI _controlsScreenTxt;
@@ -16,11 +15,11 @@ namespace Common
         [SerializeField] private Button _redoBtn;
         [SerializeField] private GameObject _restartBtn;
 
+        private SolitaireKind _solitaireKind;
         private GameController _controller;
 
         public void Init(GameController controller)
         {
-            ConfigureVariants();
             _controller = controller;
             UpdateGameLabel();
 #if UNITY_ANDROID
@@ -30,13 +29,9 @@ namespace Common
 #endif
         }
 
-        private void ConfigureVariants()
+        public void Configure(SolitaireKind kind)
         {
-            ISolitaireVariant[] variants = GetComponentsInChildren<ISolitaireVariant>(true);
-            foreach (ISolitaireVariant variant in variants)
-            {
-                variant?.Configure(_solitaireKind);
-            }
+            _solitaireKind = kind;
         }
 
         public void OnGameWon()

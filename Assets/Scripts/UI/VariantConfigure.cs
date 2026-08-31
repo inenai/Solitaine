@@ -13,7 +13,13 @@ namespace Common
         private void ConfigureVariants()
         {
             ISolitaireVariant[] variants = GetComponents<ISolitaireVariant>();
-            foreach(ISolitaireVariant v in variants)
+            foreach (ISolitaireVariant v in variants)
+            {
+                v?.Configure(_solitaireKind);
+            }
+
+            ISolitaireVariant[] variantsChildren = GetComponentsInChildren<ISolitaireVariant>(true);
+            foreach (ISolitaireVariant v in variantsChildren)
             {
                 v?.Configure(_solitaireKind);
             }
