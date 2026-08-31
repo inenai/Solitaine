@@ -18,14 +18,17 @@ namespace Services
 
             MigrateOldWinData();
 
-            int klondikeWins = GetTotalWins(SolitaireKind.KLONDIKE);
-            int sawayamaWins = GetTotalWins(SolitaireKind.SAWAYAMA);
-            int freeCellWins = GetTotalWins(SolitaireKind.FREECELL);
-            int spiderWins = GetTotalWins(SolitaireKind.SPIDER);
-            Logs.Log($"[SQL] Klondike Wins: {klondikeWins}");
-            Logs.Log($"[SQL] Sawayama Wins: {sawayamaWins}");
-            Logs.Log($"[SQL] FreeCell Wins: {freeCellWins}");
-            Logs.Log($"[SQL] Spider Wins: {spiderWins}");
+            // int klondikeWins = GetTotalWins(SolitaireKind.KLONDIKE);
+            // int sawayamaWins = GetTotalWins(SolitaireKind.SAWAYAMA);
+            // int freeCellWins = GetTotalWins(SolitaireKind.FREECELL);
+            // int spiderWins = GetTotalWins(SolitaireKind.SPIDER);
+            // Logs.Log($"[SQL] Klondike Wins: {klondikeWins}");
+            // Logs.Log($"[SQL] Sawayama Wins: {sawayamaWins}");
+            // Logs.Log($"[SQL] FreeCell Wins: {freeCellWins}");
+            // Logs.Log($"[SQL] Spider Wins: {spiderWins}");
+
+            // int gamesWithStats = _db.ExecuteScalar<int>("SELECT COUNT(*) FROM WonGames WHERE time_seconds IS NOT NULL AND time_seconds != ?", int.MaxValue);
+            // Logs.Log($"[SQL] Games with statistics: {gamesWithStats}");
         }
 
         private void MigrateOldWinData()
@@ -122,6 +125,7 @@ namespace Services
 
         #region READ
         // Default values can be int.MaxValue or NULL
+        //_db.ExecuteScalar<int>("SELECT COUNT(*) WHERE time_seconds IS NOT NULL AND column != ?", int.MaxValue
 
         public int GetTotalWins(SolitaireKind kind)
         {
