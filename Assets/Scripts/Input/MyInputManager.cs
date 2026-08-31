@@ -291,12 +291,16 @@ namespace Common
       private void TryBeginPeek(Collider2D collider)
       {
          if (InputBlocked) return;
-         IPeek c = collider.gameObject.GetComponent<IPeek>();
-         if (c != null)
+         IPeek peekable = collider.gameObject.GetComponent<IPeek>();
+         if (peekable != null)
          {
-            if (c.StartPeeking())
+            if (peekable.StartPeeking())
             {
-               _peekingObject = c;
+               if (_peekingObject != null && _peekingObject != peekable)
+               {
+                  _peekingObject.StopPeeking();
+               }
+               _peekingObject = peekable;
             }
          }
       }
@@ -441,6 +445,9 @@ namespace Common
          {
             if (_peekingObject != null)
                _peekingObject.StopPeeking();
+
+            if (_draggingObject != null)
+               EndDrag(cancelled: true);
 
             Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
