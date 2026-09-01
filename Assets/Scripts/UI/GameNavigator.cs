@@ -37,6 +37,9 @@ namespace Common
                 case SolitaireKind.SPIDER:
                     LoadSpider();
                     return;
+                case SolitaireKind.SCORPION:
+                    LoadScorpion();
+                    return;
                 default:
                     throw new Exception($"Solitaire kind still not supported in navigatior {kind}");
             }
@@ -60,6 +63,11 @@ namespace Common
         public static void LoadSpider()
         {
             SceneManager.LoadScene("Game_Spider");
+        }
+
+        public static void LoadScorpion()
+        {
+            SceneManager.LoadScene("Game_Scorpion");
         }
     }
 }
