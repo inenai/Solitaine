@@ -17,6 +17,7 @@ namespace Services
             _db.CreateTable<WonGames>();
             _db.CreateTable<Settings_Klondike>();
             _db.CreateTable<Settings_Spider>();
+            _db.CreateTable<Settings_Scorpion>();
 
             MigrateOldWinData();
 
