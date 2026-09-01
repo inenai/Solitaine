@@ -37,7 +37,7 @@ namespace Spider
 
         private void CreateState()
         {
-            _state = new SpiderState(this, SpiderSettings.SuitsAmount);
+            _state = new SpiderState(this);
         }
 
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
@@ -232,7 +232,7 @@ namespace Spider
                 return null;
 
             List<GameCommandAction> commands = new();
-            GameCommandAction gca = null;
+            GameCommandAction gca;
 
             for (int i = 0; i < TableausAmount; i++)
             {

@@ -1,4 +1,5 @@
 using Common;
+using Scorpion;
 using SQLite;
 
 namespace Storage
@@ -39,5 +40,14 @@ namespace Storage
         public int GameId { get; set; }
         [Column("suits_amount")]
         public int Suits { get; set; }
+    }
+
+    [Table("GameSettings_Scorpion")]
+    public class Settings_Scorpion
+    {
+        [Column("game_id")]
+        public int GameId { get; set; }
+        [Column("variant")]
+        public ScorpionVariant Variant { get; set; }
     }
 }

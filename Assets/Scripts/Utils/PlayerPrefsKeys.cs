@@ -17,7 +17,9 @@ namespace Common
         public const string Sp_SavedSettingsFlag = "SP_SAVED_SETTINGS";
         public const string Sp_SuitsAmount = "SP_SUITS_AMOUNT";
 
-
+        //SCORPION
+        public const string Sc_SavedSettingsFlag = "SC_SAVED_SETTINGS";
+        public const string Sc_Variant = "SC_GAME_VARIANT";
     }
 
 }

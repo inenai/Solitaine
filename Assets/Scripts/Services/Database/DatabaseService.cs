@@ -1,4 +1,6 @@
+using System;
 using Common;
+using Scorpion;
 using SQLite;
 using Storage;
 using UnityEngine;
@@ -120,6 +122,19 @@ namespace Services
             };
 
             _db.Insert(settings_Spider);
+        }
+
+        public void AddGameEntry_Scorpion(int timeSpentSeconds, int movesCount, int usedUndos, int usedRedos, ScorpionVariant variant)
+        {
+            var game = AddGameEntry(SolitaireKind.SCORPION, timeSpentSeconds, movesCount, usedUndos, usedRedos);
+
+            var settings_Scorpion = new Settings_Scorpion
+            {
+                GameId = game.GameId,
+                Variant = variant
+            };
+
+            _db.Insert(settings_Scorpion);
         }
         #endregion
 

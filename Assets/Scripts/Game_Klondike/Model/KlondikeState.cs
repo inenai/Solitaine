@@ -19,7 +19,6 @@ namespace Klondike
         {
             _drawAmount = KlondikeSettings.DrawAmount;
             _availableRestocks = KlondikeSettings.AvailableRestocks;
-
         }
 
         public override void OnRestock(bool undo = false)

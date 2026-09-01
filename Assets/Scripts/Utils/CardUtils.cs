@@ -11,6 +11,8 @@ namespace Utils
         public static string CardPrefabAddressSprite = "CARD_PREFAB";
         public const float CardStackZOffset = -0.05f;
 
+        public const float MinCardStackYOffset = -0.2f;
+
         public static string GetSuitStr(CardSuit suit)
         {
             string suitStr = suit switch
