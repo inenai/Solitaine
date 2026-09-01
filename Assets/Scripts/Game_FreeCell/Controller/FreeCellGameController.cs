@@ -1,6 +1,5 @@
-
-using System.Collections.Generic;
 using Common;
+using Services;
 
 namespace FreeCell
 {
@@ -9,11 +8,6 @@ namespace FreeCell
         public override bool IsRestockAvailable()
         {
             return false;
-        }
-
-        protected override bool IsAutoMovesEnabled()
-        {
-            return true;
         }
 
         protected override void LoadDeck()
@@ -28,7 +22,12 @@ namespace FreeCell
 
         protected override void UpdateWinsCount()
         {
-            FreeCellGameSettings.WinCount++;
+            God.Database.AddGameEntry(
+                SolitaireKind.FREECELL,
+                TimeSpentSeconds,
+                _game.State.MovesCount,
+                _game.State.UsedUndos,
+                _game.State.UsedRedos);
         }
     }
 }

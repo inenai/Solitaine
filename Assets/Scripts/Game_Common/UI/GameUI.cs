@@ -1,3 +1,4 @@
+using Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,8 +53,8 @@ namespace Common
 
         private void UpdateGameLabel()
         {
-            int wins = CommonUtils.GetWinsFor(_solitaireKind);
-            _gameLabel.text = _solitaireKind.ToString() + "\n" + LocalizationManager.GetLocalizedText(LocalizationKey.LOC_WINS, GlobalSettings.CurrentLanguage) + $": {wins}";
+            int wins = God.Database.GetTotalWins(_solitaireKind);
+            _gameLabel.text = _solitaireKind.ToString() + "\n" + LocalizationService.GetLocalizedText(LocalizationKey.LOC_WINS, God.Settings.CurrentLanguage) + $": {wins}";
         }
 
         public void Undo()

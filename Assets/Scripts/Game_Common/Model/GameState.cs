@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 namespace Common
 {
@@ -37,7 +36,6 @@ namespace Common
         public GameState(Game game)
         {
             ApplyConfig();
-
             InitFoundations(game.FoundationsAmount);
             InitTableau(game.TableausAmount);
             InitFreeCells(game.FreeCellsAmount);
@@ -67,6 +65,7 @@ namespace Common
             for (int i = c.Actions.Count -1; i >= 0; i--)
                 c.Actions[i].Execute(this, undo: true);
             _undoneMoves.Push(c);
+            UsedUndos++;
             EventManager.OnStateChanged?.Invoke();
             return true;
         }
@@ -78,6 +77,7 @@ namespace Common
             foreach (GameCommandAction a in c.Actions)
                 a.Execute(this);
             _doneMoves.Push(c);
+            UsedRedos++;
             EventManager.OnStateChanged?.Invoke();
             return true;
         }
@@ -261,5 +261,11 @@ namespace Common
                     throw new Exception($"[Game] Invalid pile kind {kind}");
             }
         }
+
+        #region Statistics
+        public int MovesCount => _doneMoves.Count;
+        public int UsedUndos { get; private set; }
+        public int UsedRedos { get; private set; }
+        #endregion
     }
 }

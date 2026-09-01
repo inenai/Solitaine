@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using Common;
+using Services;
 using UnityEngine;
 
 namespace Klondike
@@ -16,11 +15,6 @@ namespace Klondike
         protected override void ResetSettingsToDefault()
         {
             KlondikeSettings.Reset(_defaultConfig);
-        }
-
-        protected override bool IsAutoMovesEnabled()
-        {
-            return KlondikeSettings.AutoMovesEnabled;
         }
 
         protected override void InitConfig()
@@ -43,7 +37,13 @@ namespace Klondike
 
         protected override void UpdateWinsCount()
         {
-            KlondikeSettings.WinCount++;
+            God.Database.AddGameEntry_Klondike(
+                 TimeSpentSeconds,
+                 _game.State.MovesCount,
+                 _game.State.UsedUndos,
+                 _game.State.UsedRedos,
+                 ((KlondikeState)_game.State).DrawAmount,
+                 ((KlondikeState)_game.State).AvailableRestocks);
         }
     }
 }

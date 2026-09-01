@@ -17,7 +17,7 @@ namespace Klondike
         public override int FreeCellsAmount => 0;
         public override bool HasStock => true;
         public override bool HasWaste => true;
-        protected override int DrawCount => KState.DrawCount;
+        protected override int DrawCount => KState.DrawAmount;
 
         KlondikeState _state;
 

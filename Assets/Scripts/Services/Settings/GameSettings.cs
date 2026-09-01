@@ -1,11 +1,12 @@
 using System;
+using Services;
 using UnityEngine;
 
 namespace Common
 {
     [CreateAssetMenu(fileName = "UIConfigs", menuName = "Solitaine/Create UI config asset")]
 
-    public class Configs : ScriptableObject
+    public class Settings : ScriptableObject
     {
         [Header("Text Colors")]
         [SerializeField] Color Txt_Color_Klondike = new Color(50f / 255f, 113f / 255f, 185f / 255f);
@@ -145,7 +146,7 @@ namespace Common
 
         internal string GetRules(SolitaireKind kind)
         {
-            switch (GlobalSettings.CurrentLanguage)
+            switch (God.Settings.CurrentLanguage)
             {
                 case Language.ENGLISH:
                     switch (kind)
@@ -177,13 +178,13 @@ namespace Common
                             throw new Exception($"Solitaire not yet fully supported by UI: {kind}language: {Language.SPANISH}");
                     }
                 default:
-                    throw new Exception($"Language not recognized: {GlobalSettings.CurrentLanguage}");
+                    throw new Exception($"Language not recognized: {God.Settings.CurrentLanguage}");
             }
         }
 
         internal string GetKeyboardMouseCtrlsDesc()
         {
-            switch (GlobalSettings.CurrentLanguage)
+            switch (God.Settings.CurrentLanguage)
             {
                 case Language.ENGLISH:
                     return Key_Mouse_Controls_Desc;
@@ -195,7 +196,7 @@ namespace Common
 
         internal string GetTouchCtrlsDesc()
         {
-            switch (GlobalSettings.CurrentLanguage)
+            switch (God.Settings.CurrentLanguage)
             {
                 case Language.ENGLISH:
                     return Touch_Controls_Desc;

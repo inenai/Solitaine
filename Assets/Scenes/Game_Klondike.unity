@@ -3651,9 +3651,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3761756735651077684, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.0006637573
+      objectReference: {fileID: 0}
     - target: {fileID: 4775908184548764801, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
       propertyPath: m_Name
       value: UI_HamburgerGameNavigation
+      objectReference: {fileID: 0}
+    - target: {fileID: 5203319266718232999, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5203319266718232999, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5203319266718232999, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5686257518324039698, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4882,7 +4898,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1835531572532015012, guid: ac0f6a4edb9825846970eb54cfa39e08, type: 3}
       propertyPath: m_Name
-      value: ConfigLoader
+      value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 5873656560355221286, guid: ac0f6a4edb9825846970eb54cfa39e08, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7742,6 +7758,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1715478399}
+  - {fileID: 2037555034}
   - {fileID: 8992838912280678439}
   - {fileID: 8177633813912558731}
   - {fileID: 487686835}
@@ -7749,4 +7766,3 @@ SceneRoots:
   - {fileID: 1655902284}
   - {fileID: 1502778609}
   - {fileID: 578882859}
-  - {fileID: 2037555034}

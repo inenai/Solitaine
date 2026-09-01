@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Common;
-using FreeCell;
-using Klondike;
-using Sawayama;
-using Spider;
+using Services;
+using Storage;
 using UnityEngine;
 
 namespace Utils
@@ -28,54 +25,32 @@ namespace Utils
 
         public static Color GetUIImageColor(SolitaireKind kind)
         {
-            return GlobalSettings.Config.GetUIImageColor(kind);
+            return God.Settings.Config.GetUIImageColor(kind);
         }
 
         public static Color GetUITextColor(SolitaireKind kind)
         {
-            return GlobalSettings.Config.GetUITextColor(kind);
-        }
-
-        public static int GetWinsFor(SolitaireKind solitaireKind)
-        {
-            switch (solitaireKind)
-            {
-                case SolitaireKind.KLONDIKE:
-                    return KlondikeSettings.WinCount;
-
-                case SolitaireKind.SAWAYAMA:
-                    return SawayamaSettings.WinCount;
-
-                case SolitaireKind.FREECELL:
-                    return FreeCellGameSettings.WinCount;
-
-                case SolitaireKind.SPIDER:
-                    return SpiderSettings.WinCount;
-                default:
-                    throw new Exception($"Solitaire not yet fully supported by UI: {solitaireKind}");
-            }
+            return God.Settings.Config.GetUITextColor(kind);
         }
 
         public static Color GetWinsColor(int wins)
         {
-            return GlobalSettings.Config.GetWinsColor(wins);
+            return God.Settings.Config.GetWinsColor(wins);
         }
 
         internal static string GetRules(SolitaireKind kind)
         {
-            return GlobalSettings.Config.GetRules(kind);
+            return God.Settings.Config.GetRules(kind);
         }
 
         internal static string GetTouchCtrlsText()
         {
-            return GlobalSettings.Config.GetTouchCtrlsDesc();
+            return God.Settings.Config.GetTouchCtrlsDesc();
         }
 
         internal static string GetKeyboardMouseCtrlsText()
         {
-            return GlobalSettings.Config.GetKeyboardMouseCtrlsDesc();
+            return God.Settings.Config.GetKeyboardMouseCtrlsDesc();
         }
-
-
     }
 }

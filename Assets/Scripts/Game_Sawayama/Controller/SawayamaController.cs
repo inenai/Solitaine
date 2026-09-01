@@ -1,4 +1,7 @@
 
+using Common;
+using Services;
+
 namespace Sawayama
 {
     public class SawayamaController : GameController
@@ -8,11 +11,6 @@ namespace Sawayama
         public override bool IsRestockAvailable()
         {
             return false;
-        }
-
-        protected override bool IsAutoMovesEnabled()
-        {
-            return true;
         }
 
         protected override void LoadDeck()
@@ -27,7 +25,12 @@ namespace Sawayama
 
         protected override void UpdateWinsCount()
         {
-            SawayamaSettings.WinCount++;
+            God.Database.AddGameEntry(
+               SolitaireKind.SAWAYAMA,
+               TimeSpentSeconds,
+               _game.State.MovesCount,
+               _game.State.UsedUndos,
+               _game.State.UsedRedos);
         }
     }
 }

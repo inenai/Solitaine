@@ -1,8 +1,10 @@
+using Common;
+using Services;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Common
+namespace Enums
 {
     public class Localizable : MonoBehaviour
     {
@@ -10,7 +12,7 @@ namespace Common
 
         void Start()
         {
-            OnLangSet(GlobalSettings.CurrentLanguage);
+            OnLangSet(God.Settings.CurrentLanguage);
             EventManager.LanguageSet += OnLangSet;
         }
 
@@ -21,7 +23,7 @@ namespace Common
 
         private void OnLangSet(Language newLang)
         {
-            string value = LocalizationManager.GetLocalizedText(STR_KEY, newLang);
+            string value = LocalizationService.GetLocalizedText(STR_KEY, newLang);
             TextMeshProUGUI textUI = GetComponent<TextMeshProUGUI>();
             if (textUI != null)
             {

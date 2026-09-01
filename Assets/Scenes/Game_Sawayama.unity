@@ -437,7 +437,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1835531572532015012, guid: ac0f6a4edb9825846970eb54cfa39e08, type: 3}
       propertyPath: m_Name
-      value: ConfigLoader
+      value: GameManage
       objectReference: {fileID: 0}
     - target: {fileID: 5873656560355221286, guid: ac0f6a4edb9825846970eb54cfa39e08, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3614,7 +3614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3761756735651077684, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00018310547
+      value: -0.0011901855
       objectReference: {fileID: 0}
     - target: {fileID: 4775908184548764801, guid: 4d02aa0ec7f56674f85f33a1af8e7b4d, type: 3}
       propertyPath: m_Name
@@ -3885,7 +3885,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6.3174996
+  orthographic size: 4.55
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7640,6 +7640,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1715478399}
+  - {fileID: 211352107}
   - {fileID: 6239150396547147642}
   - {fileID: 8177633813912558731}
   - {fileID: 487686835}
@@ -7647,4 +7648,3 @@ SceneRoots:
   - {fileID: 1692365570}
   - {fileID: 1517859608}
   - {fileID: 578882859}
-  - {fileID: 211352107}

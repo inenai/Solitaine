@@ -13,7 +13,6 @@ namespace Klondike
         [SerializeField] ToggleGroup _restockOption;
         [SerializeField] Toggle _restockInfToggle;
         [SerializeField] Toggle _restock3Toggle;
-        [SerializeField] Toggle _autoMoveEnabledToggle;
 
         protected override void ResetToggles()
         {
@@ -21,7 +20,6 @@ namespace Klondike
             _draw3Toggle.isOn = false;
             _restock3Toggle.isOn = false;
             _restockInfToggle.isOn = false;
-            _autoMoveEnabledToggle.isOn = KlondikeSettings.AutoMovesEnabled;
         }
 
         protected override void InitToggleGroups()
@@ -67,8 +65,6 @@ namespace Klondike
 
             if (_restock3Toggle.isOn) KlondikeSettings.AvailableRestocks = 3;
             if (_restockInfToggle.isOn) KlondikeSettings.AvailableRestocks = -1;
-
-            KlondikeSettings.AutoMovesEnabled = _autoMoveEnabledToggle.isOn;
         }
     }
 }

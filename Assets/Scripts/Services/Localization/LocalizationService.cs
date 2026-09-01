@@ -1,4 +1,6 @@
-namespace Common {
+using Common;
+
+namespace Services {
 
     public enum LocalizationKey
     {
@@ -30,8 +32,13 @@ namespace Common {
         GS_SP_FOUR,
     }
 
-    public static class LocalizationManager
+    public class LocalizationService : Service
     {
+
+        public override void Init()
+        {
+
+        }
 
         internal static string GetLocalizedText(LocalizationKey key, Language lang)
         {
@@ -154,5 +161,7 @@ namespace Common {
             }
             throw new System.Exception($"Localization key {key} could not be resolved for language {lang}");
         }
+
+
     }
 }

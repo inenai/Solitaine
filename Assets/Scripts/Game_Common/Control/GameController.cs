@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using Services;
 using UnityEngine;
 using Utils;
 
@@ -30,6 +31,7 @@ public abstract class GameController : MonoBehaviour
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
     private bool IsBusy => _status != GameStatus.LISTENING;
+    private float _timeSpentSeconds;
 
     #region Initialization
     void Start()
@@ -62,6 +64,12 @@ public abstract class GameController : MonoBehaviour
         LoadGame();
         _game.Init();
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
+        _timeSpentSeconds = 0f;
+    }
+
+    void Update()
+    {
+        _timeSpentSeconds += Time.unscaledDeltaTime;
     }
 
     private void ResetDeck()
@@ -94,7 +102,6 @@ public abstract class GameController : MonoBehaviour
     #region GameController
     public abstract bool IsRestockAvailable();
     protected abstract void LoadDeck();
-    protected abstract bool IsAutoMovesEnabled();
     protected abstract void UpdateWinsCount();
     protected abstract void LoadGame();
     protected virtual void InitConfig() { }
@@ -294,7 +301,7 @@ public abstract class GameController : MonoBehaviour
             _ui.UpdateUndoRedoButtons(enableUndoBtn:_game.State.UndoAvailable,enableRedoBtn:_game.State.RedoAvailable);
             DoRefreshView(pilesToRefresh, () =>
             {
-                if (!holdAutoMoves && IsAutoMovesEnabled())
+                if (!holdAutoMoves && God.Settings.AutoMoves)
                 {
                     Card solvableCard = _game.GetSolvableCard();
                     if (solvableCard == null)
@@ -417,5 +424,9 @@ public abstract class GameController : MonoBehaviour
             Listening();
         }
     }
+    #endregion
+
+    #region Statistics
+    public int TimeSpentSeconds => Mathf.CeilToInt(_timeSpentSeconds);
     #endregion
 }
