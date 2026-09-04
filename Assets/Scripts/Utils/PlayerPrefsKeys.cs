@@ -20,6 +20,7 @@ namespace Common
         //SCORPION
         public const string Sc_SavedSettingsFlag = "SC_SAVED_SETTINGS";
         public const string Sc_Variant = "SC_GAME_VARIANT";
+        public const string Sc_SuitsAmount = "SC_SUITS_AMOUNT";
     }
 
 }

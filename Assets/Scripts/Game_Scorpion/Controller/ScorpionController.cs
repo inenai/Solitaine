@@ -1,3 +1,4 @@
+using System;
 using Services;
 using UnityEngine;
 
@@ -6,6 +7,19 @@ namespace Scorpion
     public class ScorpionController : GameController
     {
         [SerializeField] private ScorpionConfig _defaultConfig;
+
+        protected override void StartNewGame(Action onDone)
+        {
+            LoadDeck();
+            LoadDeckView(() =>
+            {
+                base.StartNewGame(() =>
+                {
+                    onDone.Invoke();
+                });
+            });
+        }
+
 
         public override bool IsRestockAvailable()
         {
@@ -42,7 +56,8 @@ namespace Scorpion
                  _game.State.MovesCount,
                  _game.State.UsedUndos,
                  _game.State.UsedRedos,
-                 ((ScorpionState)_game.State).Variant);
+                 ((ScorpionState)_game.State).Variant,
+                 ((ScorpionState)_game.State).SuitsUsed);
         }
     }
 }

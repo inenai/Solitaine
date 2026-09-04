@@ -49,5 +49,7 @@ namespace Storage
         public int GameId { get; set; }
         [Column("variant")]
         public ScorpionVariant Variant { get; set; }
+        [Column("suits_amount")]
+        public int Suits { get; set; }
     }
 }

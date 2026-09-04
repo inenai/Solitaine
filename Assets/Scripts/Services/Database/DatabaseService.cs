@@ -125,14 +125,15 @@ namespace Services
             _db.Insert(settings_Spider);
         }
 
-        public void AddGameEntry_Scorpion(int timeSpentSeconds, int movesCount, int usedUndos, int usedRedos, ScorpionVariant variant)
+        public void AddGameEntry_Scorpion(int timeSpentSeconds, int movesCount, int usedUndos, int usedRedos, ScorpionVariant variant, int suits)
         {
             var game = AddGameEntry(SolitaireKind.SCORPION, timeSpentSeconds, movesCount, usedUndos, usedRedos);
 
             var settings_Scorpion = new Settings_Scorpion
             {
                 GameId = game.GameId,
-                Variant = variant
+                Variant = variant,
+                Suits = suits
             };
 
             _db.Insert(settings_Scorpion);

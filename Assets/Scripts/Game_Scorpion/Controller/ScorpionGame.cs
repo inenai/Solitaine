@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common;
+using Utils;
 using static Utils.CommonUtils;
 
 namespace Scorpion
@@ -37,23 +38,7 @@ namespace Scorpion
         public static List<Card> CreateGameDeck()
         {
             List<Card> deck = new();
-
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.HEARTS, i));
-            }
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.DIAMONDS, i));
-            }
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.SPADES, i));
-            }
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.CLUBS, i));
-            }
+            CardUtils.AddOneSetOfCardsToDeck(deck, ScorpionSettings.SuitsAmount);
             return deck;
         }
 
