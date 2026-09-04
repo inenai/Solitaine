@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 
-namespace Common
+namespace Services
 {
-   public class MyInputManager : MonoBehaviour
+   public class InputService : Service
    {
       [Header("Settings")]
       [SerializeField] private float _peekHoldDelay = 0.3f;
@@ -23,7 +24,7 @@ namespace Common
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
-      public const float DragDepth = 9f;
+      public float DragDepth = 9f;
 
       private bool InputBlocked
       {
@@ -49,7 +50,7 @@ namespace Common
       private Collider2D _lastClickCollider;
       private Coroutine _longHoldPeekCR;
 
-      private void Awake()
+      public override void Init()
       {
          _inputBlockers = new();
          _mainCamera = Camera.main;

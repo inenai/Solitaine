@@ -8,7 +8,6 @@ using Utils;
 
 public abstract class GameController : MonoBehaviour
 {
-    [SerializeField] protected MyInputManager _input;
     [SerializeField] protected GameUI _ui;
     [SerializeField] protected GameView _gameView;
 
@@ -37,7 +36,7 @@ public abstract class GameController : MonoBehaviour
     void Start()
     {
         Status = GameStatus.INITIALIZING;
-        _input.BlockInput(GAME_BUSY_REASON);
+        God.Input.BlockInput(GAME_BUSY_REASON);
         Initialize(() =>
         {
             StartNewGame(() =>
@@ -84,13 +83,13 @@ public abstract class GameController : MonoBehaviour
     private void Processing()
     {
         Status = GameStatus.PROCESSING;
-        _input.BlockInput(GAME_BUSY_REASON);
+        God.Input.BlockInput(GAME_BUSY_REASON);
     }
 
     private void Listening()
     {
         Status = GameStatus.LISTENING;
-        _input.UnblockInput(GAME_BUSY_REASON);
+        God.Input.UnblockInput(GAME_BUSY_REASON);
     }
 
     void OnDestroy()
@@ -373,12 +372,12 @@ public abstract class GameController : MonoBehaviour
 
     private void OnMenuOpened(string menuID)
     {
-        _input.BlockInput(MENU_OPENED_REASON + "_" + menuID);
+        God.Input.BlockInput(MENU_OPENED_REASON + "_" + menuID);
     }
 
     private void OnMenuClosed(string menuID)
     {
-        _input.UnblockInput(MENU_OPENED_REASON + "_" + menuID);
+        God.Input.UnblockInput(MENU_OPENED_REASON + "_" + menuID);
     }
 
     private void OnUndo()
