@@ -4,17 +4,19 @@ namespace Spider
 {
     public class SpiderState : GameState
     {
-        public SpiderState(Game game, int suits) : base(game)
+        private int _suitsUsed;
+        public int SuitsUsed => _suitsUsed;
+        public SpiderState(Game game) : base(game)
         {
-            SuitsUsed = suits;
         }
 
         public override int AvailableRestocks => 0;
 
         public override bool FoundationCardsFree => false;
 
-        #region Statistics
-        public int SuitsUsed { get; private set; }
-        #endregion
+        protected override void ApplyConfig()
+        {
+            _suitsUsed = SpiderSettings.SuitsAmount;
+        }
     }
 }

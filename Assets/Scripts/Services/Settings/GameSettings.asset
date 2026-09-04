@@ -16,10 +16,12 @@ MonoBehaviour:
   Txt_Color_Sawayama: {r: 0.8113208, g: 0.2066571, b: 0.2887718, a: 1}
   Txt_Color_FreeCell: {r: 0.14141041, g: 0.81761, b: 0.6164267, a: 1}
   Txt_Color_Spider: {r: 1, g: 0.74509805, b: 0, a: 1}
+  Txt_Color_Scorpion: {r: 0.70784503, g: 0.39248842, b: 0.7924528, a: 1}
   Img_Color_Klondike: {r: 0, g: 0.24705882, b: 0.5294118, a: 1}
   Img_Color_Sawayama: {r: 0.3584906, g: 0, b: 0.049637005, a: 1}
   Img_Color_FreeCell: {r: 0.03529412, g: 0.44313726, b: 0.32156864, a: 1}
   Img_Color_Spider: {r: 0.74213827, g: 0.5949152, b: 0.17036496, a: 1}
+  Img_Color_Scorpion: {r: 0.40784314, g: 0.06666667, b: 0.5019608, a: 1}
   Wins_1: {r: 1, g: 1, b: 1, a: 1}
   Wins_2: {r: 0.76729554, g: 0.41132483, b: 0.20992038, a: 1}
   Wins_3: {r: 0.80058134, g: 0.820013, b: 0.8238993, a: 1}
@@ -103,6 +105,17 @@ MonoBehaviour:
     onto all 10 columns (all columns must have at least 1 card to deal). \\n\xB7
     Build Foundations: Complete a full sequence of the same suit from King down to
     Ace (K, Q, J... 2, A) to automatically clear it from the board into the Foundations."
+  Rules_Scorpion: "Objective: Move all 52 cards into 4 complete sequences, each organized
+    by suit from King down to Ace. \\n \\nHow to Play: \\n\xB7 Build Down on the
+    Board: Place cards in descending order by suit (e.g., 7 of spades on 8 of spades).
+    \\n\xB7 Move Card Sequences: You can move any group of face-up cards together,
+    even if they are not arranged in order. \\n\xB7 Build Same-Suit Sequences: Arrange
+    cards of the same suit in descending order (K -> Q -> J \xB7 \xB7 \xB7 -> A).
+    Once a complete sequence is formed, it is removed from the board. \\n\xB7 Reveal
+    Hidden Cards: Uncover face-down cards by moving the face-up cards on top of them.
+    \\n\xB7 Fill Empty Spaces: Only a King, or a sequence starting with a King, can
+    be placed into an empty column. \\n\xB7 Deal Stock Cards: When you run out of
+    moves, deal the remaining stock cards onto the first three tableau columns."
   Touch_Controls_Desc: "\xB7 Smart auto-move: Double tap\r\n\xB7 Peek: Hold tap"
   Key_Mouse_Controls_Desc: "\xB7 Drag: Left-Click / Space\r\n\xB7 Cancel drag: Right
     click\r\n\xB7 Smart auto-move: Double-click / C\r\n\xB7 Draw: D\r\n\xB7 Restart:
@@ -157,6 +170,19 @@ MonoBehaviour:
     una de las 10 columnas (requiere que ninguna columna est\xE9 vac\xEDa). \\n\xB7
     Completa las Bases: Al formar una secuencia completa del mismo palo (K, Q, J...
     2, A), se retira autom\xE1ticamente del tablero hacia las Bases."
+  Rules_Scorpion_ES: "Objetivo: Mueve las 52 cartas para formar 4 secuencias completas,
+    cada una organizada por palo desde el Rey hasta el As. \\n \\nC\xF3mo jugar:
+    \\n\xB7 Construye en orden descendente: Coloca las cartas en orden descendente
+    y del mismo palo (por ejemplo, el 7 de picas sobre el 8 de picas). \\n\xB7 Mueve
+    secuencias de cartas: Puedes mover juntas varias cartas boca arriba, incluso
+    si no est\xE1n organizadas en orden. \\n\xB7 Forma secuencias del mismo palo:
+    Organiza las cartas del mismo palo en orden descendente (K -> Q -> J \xB7 \xB7
+    \xB7 -> A). Cuando formes una secuencia completa, se retirar\xE1 del tablero.
+    \\n\xB7 Descubre las cartas ocultas: Descubre las cartas boca abajo moviendo
+    las cartas que tienen encima. \\n\xB7 Llena los espacios vac\xEDos: Solo puedes
+    colocar un Rey, o una secuencia que comience con un Rey, en una columna vac\xEDa.
+    \\n\xB7 Reparte las cartas del mazo: Cuando no te queden m\xE1s movimientos,
+    reparte las cartas restantes del mazo en las tres primeras columnas del tablero."
   Touch_Controls_Desc_ES: "\xB7 Auto-movimiento inteligente: Toca una carta dos veces\r\n\xB7
     Espiar: Mant\xE9n el dedo sobre una carta"
   Key_Mouse_Controls_Desc_ES: "\xB7 Arrastrar: Click izq. / Barra espaciadora\r\n\xB7

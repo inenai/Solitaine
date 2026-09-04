@@ -30,6 +30,8 @@ namespace Services {
         GS_SP_ONE,
         GS_SP_TWO,
         GS_SP_FOUR,
+        GS_SC_TITLE,
+        GS_SC_VARIANT,
     }
 
     public class LocalizationService : Service
@@ -99,6 +101,10 @@ namespace Services {
                             return "Two";
                         case LocalizationKey.GS_SP_FOUR:
                             return "Four";
+                        case LocalizationKey.GS_SC_TITLE:
+                            return "Scorpion Settings";
+                        case LocalizationKey.GS_SC_VARIANT:
+                            return "Variant:";
                     }
                     break;
                 case Language.SPANISH:
@@ -156,6 +162,10 @@ namespace Services {
                             return "Dos";
                         case LocalizationKey.GS_SP_FOUR:
                             return "Cuatro";
+                        case LocalizationKey.GS_SC_TITLE:
+                            return "Configurar Scorpion";
+                        case LocalizationKey.GS_SC_VARIANT:
+                            return "Variante:";
                     }
                     break;
             }

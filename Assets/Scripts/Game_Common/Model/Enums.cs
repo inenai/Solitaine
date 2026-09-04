@@ -5,7 +5,8 @@ namespace Common
         KLONDIKE,
         FREECELL,
         SAWAYAMA,
-        SPIDER
+        SPIDER,
+        SCORPION,
     }
 
     public enum CardSuit

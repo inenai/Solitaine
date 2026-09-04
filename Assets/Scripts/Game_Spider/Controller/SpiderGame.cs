@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using static Utils.CommonUtils;
 using Common;
-using UnityEngine;
 using System;
+using Utils;
 
 namespace Spider
 {
@@ -37,7 +37,7 @@ namespace Spider
 
         private void CreateState()
         {
-            _state = new SpiderState(this, SpiderSettings.SuitsAmount);
+            _state = new SpiderState(this);
         }
 
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
@@ -63,32 +63,9 @@ namespace Spider
         public static List<Card> CreateGameDeck()
         {
             List<Card> deck = new();
-            AddOneSetOfCardsToDeck(deck);
-            AddOneSetOfCardsToDeck(deck);
+            CardUtils.AddOneSetOfCardsToDeck(deck, SpiderSettings.SuitsAmount);
+            CardUtils.AddOneSetOfCardsToDeck(deck, SpiderSettings.SuitsAmount);
             return deck;
-        }
-
-        private static void AddOneSetOfCardsToDeck(List<Card> deck)
-        {
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(CardSuit.SPADES, i));
-            }
-            CardSuit suit = SpiderSettings.SuitsAmount > 1 ? CardSuit.HEARTS : CardSuit.SPADES;
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(suit, i));
-            }
-            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.DIAMONDS : SpiderSettings.SuitsAmount == 2 ? CardSuit.HEARTS : CardSuit.SPADES;
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(suit, i));
-            }
-            suit = SpiderSettings.SuitsAmount > 2 ? CardSuit.CLUBS : CardSuit.SPADES;
-            for (int i = 1; i <= 13; i++)
-            {
-                deck.Add(new Card(suit, i));
-            }
         }
 
         private void ShuffleAndDeal(List<Card> deck)
@@ -232,7 +209,7 @@ namespace Spider
                 return null;
 
             List<GameCommandAction> commands = new();
-            GameCommandAction gca = null;
+            GameCommandAction gca;
 
             for (int i = 0; i < TableausAmount; i++)
             {
