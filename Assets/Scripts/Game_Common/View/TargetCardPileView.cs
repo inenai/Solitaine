@@ -17,7 +17,7 @@ public abstract class TargetCardPileView : CardPileView
     }
 
 /// <summary>
-/// triggerHighlight will be turned on if needed in CardUI's late update
+/// triggerHighlight will be turned on if needed in CardView's late update
 /// </summary>
     void Update()
     {

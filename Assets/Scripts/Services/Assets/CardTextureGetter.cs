@@ -11,7 +11,7 @@ public class CardTextureGetter : MonoBehaviour
     [SerializeField] Sprite[] backs;
 
     private static CardTextureGetter _instance;
-    public static CardTextureGetter Instance => _instance;
+   // public static CardTextureGetter Instance => _instance;
 
     void Awake()
     {

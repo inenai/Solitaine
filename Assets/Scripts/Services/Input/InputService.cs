@@ -357,6 +357,7 @@ namespace Services
                   target: ray.GetPoint(distance),
                   currentVelocity: ref _velocity,
                   smoothTime: mouseDragSpeed) + _dragOffset;
+               Logs.Log($"[InputManager] Pointer moved to {ray.GetPoint(distance)}");
             }
          }
       }

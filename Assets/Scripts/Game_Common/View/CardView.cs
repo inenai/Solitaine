@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using Services;
 using UnityEngine;
 using Utils;
 
@@ -15,6 +16,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek, IClick
     [SerializeField] GameObject _lockedGO;
 
     public Card Card => _card;
+    public Bounds Bounds => _frontRend.bounds;
 
     protected Card _card;
     private GameView _view;
@@ -31,6 +33,7 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek, IClick
     private SpriteRenderer _frontRend;
     private Coroutine _revealCoroutine;
     private bool _preventPlayLocked;
+    private Bounds _cardBounds;
 
     //AUX
     private static List<TargetCardPileView> _auxCompatiblePilesList = new();
@@ -322,8 +325,8 @@ public class CardView : MonoBehaviour, IDrag, IDoubleClick, IPeek, IClick
         // Log($"Card {_card} animating...");
         _animating = true;
 
-        Vector3 start = new Vector3(transform.position.x, transform.position.y, -MyInputManager.DragDepth);
-        Vector3 goal = new Vector3(targetPosition.x, targetPosition.y, -MyInputManager.DragDepth);
+        Vector3 start = new Vector3(transform.position.x, transform.position.y, -God.Input.DragDepth);
+        Vector3 goal = new Vector3(targetPosition.x, targetPosition.y, -God.Input.DragDepth);
 
         float elapsed = 0f;
         while (elapsed < duration)

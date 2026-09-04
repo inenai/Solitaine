@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Common;
+using Services;
 using UnityEngine;
 
 namespace Utils
@@ -75,16 +76,12 @@ namespace Utils
 
         public static Sprite GetCardSprite(Card card)
         {
-            if (CardTextureGetter.Instance == null) throw new System.Exception("Card Texture Getter unavailable.");
-
-            return CardTextureGetter.Instance.GetCardFace(card.Suit, card.Value);
+            return God.Assets.Cards.GetCardFace(card.Suit, card.Value);
         }
 
         public static Sprite GetCardBack()
         {
-            if (CardTextureGetter.Instance == null) throw new System.Exception("Card Texture Getter unavailable.");
-
-            return CardTextureGetter.Instance.GetBlueDeck();
+            return God.Assets.Cards.GetBlueDeck();
         }
 
         public static List<CardPile> GetClonedCardPiles(CardPile[] stacks)
