@@ -36,7 +36,6 @@ namespace Services
       }
       private HashSet<string> _inputBlockers;
       private Vector3 _dragOffset;
-      private Camera _mainCamera;
       private Plane _dragPlane;
       private Vector3 _velocity = Vector3.zero;
       private GameObject _draggingObject;
@@ -53,7 +52,6 @@ namespace Services
       public override void Init()
       {
          _inputBlockers = new();
-         _mainCamera = Camera.main;
          _dragPlane = new Plane(Vector3.forward, DragDepth);
       }
 
@@ -126,7 +124,7 @@ namespace Services
 
          _pointerPosition = finger.currentTouch.screenPosition;
 
-         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
@@ -149,7 +147,7 @@ namespace Services
 
          if (dragging)
          {
-            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
             {
                _draggingObject.transform.position = Vector3.SmoothDamp(
@@ -182,7 +180,7 @@ namespace Services
 
          if (clicking)
          {
-            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
             if (hit.collider != null)
@@ -239,7 +237,7 @@ namespace Services
          if (InputBlocked) return;
          _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
 
-         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
@@ -274,7 +272,7 @@ namespace Services
          if (InputBlocked) return;
          _pointerPosition = pointerMovedAction.action.ReadValue<Vector2>();
 
-         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
@@ -349,7 +347,7 @@ namespace Services
          _pointerPosition = context.ReadValue<Vector2>();
          if (dragging)
          {
-            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
             {
                _draggingObject.transform.position = Vector3.SmoothDamp(
@@ -379,7 +377,7 @@ namespace Services
 
          if (clicking)
          {
-            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
             if (hit.collider != null)
@@ -415,7 +413,7 @@ namespace Services
 
          EndDrag(cancelled: true);
 
-         Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+         Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
          RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
          if (hit.collider != null)
@@ -450,7 +448,7 @@ namespace Services
             if (_draggingObject != null)
                EndDrag(cancelled: true);
 
-            Ray ray = _mainCamera.ScreenPointToRay(_pointerPosition);
+            Ray ray = Camera.main.ScreenPointToRay(_pointerPosition);
             if (_dragPlane.Raycast(ray, out float distance))
             {
                Vector3 fullOffset = collider.transform.position - ray.GetPoint(distance);
