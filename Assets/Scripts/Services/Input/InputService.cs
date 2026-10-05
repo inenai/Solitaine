@@ -24,7 +24,7 @@ namespace Services
 
       [SerializeField] private float mouseDragSpeed = 0.1f;
 
-      public float DragDepth = 9f;
+      public float DragDepth => 5f;
 
       private bool InputBlocked
       {
