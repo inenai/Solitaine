@@ -5,7 +5,7 @@ namespace Common
     public class VariantConfigure : MonoBehaviour
     {
         [SerializeField] SolitaireKind _solitaireKind;
-        void OnEnable()
+        void Start()
         {
             ConfigureVariants();
         }
