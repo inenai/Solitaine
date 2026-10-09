@@ -4,6 +4,7 @@ using Scorpion;
 using SQLite;
 using Storage;
 using UnityEngine;
+using Utils;
 
 namespace Services
 {
@@ -11,6 +12,12 @@ namespace Services
     {
         private SQLiteConnection _db;
         private string databaseFileName = $"WonGamesDb.db";
+
+        private void Log(string message)
+        {
+            Logs.Log($"[DatabaseService] " + message);
+        }
+
         public override void Init()
         {
             _db = new SQLiteConnection($"{Application.persistentDataPath}/{databaseFileName}");
@@ -18,6 +25,10 @@ namespace Services
             _db.CreateTable<Settings_Klondike>();
             _db.CreateTable<Settings_Spider>();
             _db.CreateTable<Settings_Scorpion>();
+
+            _db.CreateTable<SavedGame>();
+            _db.CreateTable<GameCommandEntry>();
+            _db.CreateTable<GameCommandActionEntry>();
 
             MigrateOldWinData();
 
@@ -82,7 +93,7 @@ namespace Services
             }
         }
 
-#region WRITE
+        #region WRITE
         public WonGames AddGameEntry(SolitaireKind kind, int timeSeconds, int movesMade, int undos, int redos)
         {
             var game = new WonGames
@@ -138,16 +149,140 @@ namespace Services
 
             _db.Insert(settings_Scorpion);
         }
+
+        public void SaveGameProgress(SolitaireKind kind, int seconds, GameCommand[] doneMoves, int seed)
+        {
+            int[] commandsIDsList = new int[doneMoves.Length];
+            for (int i = 0; i < doneMoves.Length; i++)
+            {
+                commandsIDsList[i] = AddGameCommand(doneMoves[i]);
+            }
+
+            var entry = new SavedGame
+            {
+                SolitaireKind = kind,
+                TimeSeconds = seconds,
+                CommandsList = CommonUtils.ToString(commandsIDsList),
+                RandomSeed = seed,
+            };
+
+            _db.InsertOrReplace(entry);
+            Log($"Saved game progress KIND: {kind} [{entry.RandomSeed}] MOVES: {commandsIDsList.Length}");
+        }
+
+        public void TryDeleteSavedGame(SolitaireKind kind)
+        {
+            var existingGame = GetSavedGameByKind(kind);
+            if (existingGame != null)
+            {
+                DeleteSavedGameData(existingGame);
+            }
+        }
+
+        private void DeleteSavedGameData(SavedGame game)
+        {
+            Log($"Deleting game progress KIND: {game.SolitaireKind} [{game.RandomSeed}]");
+            if (game.CommandsList != null)
+            {
+                foreach (int commandId in game.CommandsList)
+                {
+                    var command = _db.Find<GameCommandEntry>(commandId);
+                    if (command?.ActionsList != null)
+                    {
+                        foreach (int actionId in command.ActionsList)
+                        {
+                            _db.Delete<GameCommandActionEntry>(actionId);
+                        }
+                    }
+
+                    _db.Delete<GameCommandEntry>(commandId);
+                }
+            }
+
+            _db.Delete(game);
+        }
+
+        public int AddGameCommand(GameCommand command)
+        {
+            GameCommandAction[] actionArray = command.Actions.ToArray();
+            int[] actionsIDsList = new int[actionArray.Length];
+
+            for (int i = 0; i < actionArray.Length; i++)
+            {
+                actionsIDsList[i] = AddGameCommandAction(actionArray[i]);
+            }
+
+            var entry = new GameCommandEntry
+            {
+                ActionsList = CommonUtils.ToString(actionsIDsList),
+            };
+
+            _db.Insert(entry);
+            return entry.CommandId;
+        }
+
+        public int AddGameCommandAction(GameCommandAction commandAction)
+        {
+            var entry = new GameCommandActionEntry
+            {
+                CommandActionKind = commandAction.Kind,
+            };
+
+            switch (commandAction.Kind)
+            {
+                case GameCommandActionKind.MOVE:
+                    entry.SourcePile = ((GameCommandActionMove)commandAction).SourcePile;
+                    entry.SourcePileIndex = ((GameCommandActionMove)commandAction).SourceIndex;
+                    entry.TargetPile = ((GameCommandActionMove)commandAction).TargetPile;
+                    entry.TargetPileIndex = ((GameCommandActionMove)commandAction).TargetIndex;
+                    break;
+                case GameCommandActionKind.REVEAL:
+                    entry.RevealedAction = ((GameCommandActionReveal)commandAction).Revealed;
+                    entry.CardSuit = ((GameCommandActionReveal)commandAction).CardSuit;
+                    entry.CardValue = ((GameCommandActionReveal)commandAction).CardValue;
+                    break;
+                case GameCommandActionKind.FREE:
+                    entry.FreedAction = ((GameCommandActionFree)commandAction).Freed;
+                    entry.CardSuit = ((GameCommandActionFree)commandAction).CardSuit;
+                    entry.CardValue = ((GameCommandActionFree)commandAction).CardValue;
+                    break;
+                case GameCommandActionKind.RESTOCK:
+                    entry.Restock = true;
+                    break;
+                case GameCommandActionKind.MOVE_STACK:
+                    entry.SourcePile = ((GameCommandActionMoveStack)commandAction).SourcePile;
+                    entry.SourcePileIndex = ((GameCommandActionMoveStack)commandAction).SourceIndex;
+                    entry.TargetPile = ((GameCommandActionMoveStack)commandAction).TargetPile;
+                    entry.TargetPileIndex = ((GameCommandActionMoveStack)commandAction).TargetIndex;
+                    entry.CardSuit = ((GameCommandActionMoveStack)commandAction).CardSuit;
+                    entry.CardValue = ((GameCommandActionMoveStack)commandAction).CardValue;
+                    break;
+            }
+
+            _db.Insert(entry);
+            return entry.ActionId;
+        }
         #endregion
 
         #region READ
         // Default values can be int.MaxValue or NULL
         //_db.ExecuteScalar<int>("SELECT COUNT(*) WHERE time_seconds IS NOT NULL AND column != ?", int.MaxValue
 
+        public SavedGame GetSavedGameByKind(SolitaireKind kind)
+        {
+            return _db.Table<SavedGame>()
+                               .FirstOrDefault(g => g.SolitaireKind == kind);
+        }
+
         public int GetTotalWins(SolitaireKind kind)
         {
             int wins = _db.ExecuteScalar<int>("SELECT COUNT(*) FROM WonGames WHERE solitaire_kind = ?", kind);
             return wins;
+        }
+
+        public bool HasSavedGame(SolitaireKind kind)
+        {
+            return GetSavedGameByKind(kind) != null;
         }
         #endregion
     }

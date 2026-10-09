@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Common;
 using static Utils.CommonUtils;
 using Utils;
+using Storage;
 
 namespace Klondike
 {
@@ -22,17 +23,17 @@ namespace Klondike
         KlondikeState _state;
 
         #region initialization
-        public KlondikeGame(List<Card> deck)
+        public KlondikeGame(List<Card> deck, SavedGame progress)
         {
             Log("Starting a Klondike game.");
-            CreateState();
+            CreateState(progress);
             ShuffleAndDeal(deck);
             Log();
         }
 
-        private void CreateState()
+        private void CreateState(SavedGame progress)
         {
-            _state = new KlondikeState(this);
+            _state = new KlondikeState(this, progress);
         }
 
         public static List<Card> CreateGameDeck()
@@ -45,7 +46,7 @@ namespace Klondike
         private void ShuffleAndDeal(List<Card> deck)
         {
             //Log("Shuffling and dealing...");
-            CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
+            CardPile deckStack = GetShuffledDeck(deck);
 
             for (int i = 0; i < 7; i++)
             {

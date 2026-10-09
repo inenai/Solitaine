@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Common;
 using Services;
+using Storage;
 using UnityEngine;
 using Utils;
 
@@ -11,6 +12,7 @@ public abstract class GameController : MonoBehaviour
     [SerializeField] protected GameUI _ui;
     [SerializeField] protected GameView _gameView;
 
+    protected abstract SolitaireKind _solitaireKind { get; }
     private const string GAME_BUSY_REASON = "IBR_GameProcessing";
     private const string MENU_OPENED_REASON = "IBR_MenuOpened";
 
@@ -30,7 +32,7 @@ public abstract class GameController : MonoBehaviour
     private GameStatus _status = GameStatus.INITIALIZING;
     private static List<PileKind> AllPileKinds = new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION, PileKind.FREECELL };
     private bool IsBusy => _status != GameStatus.LISTENING;
-    private float _timeSpentSeconds;
+    private bool _initialized;
 
     #region Initialization
     void Start()
@@ -42,7 +44,8 @@ public abstract class GameController : MonoBehaviour
             StartNewGame(() =>
             {
                 Listening();
-            });
+                _initialized = true;
+            }, God.Database.GetSavedGameByKind(_solitaireKind));
         });
     }
 
@@ -56,19 +59,36 @@ public abstract class GameController : MonoBehaviour
         LoadDeckView(onDone);
     }
 
-    protected virtual void StartNewGame(Action onDone)
+    protected virtual void StartNewGame(Action onDone, SavedGame progress = null)
     {
         ResetDeck();
         ResetView();
-        LoadGame();
-        _game.Init();
+        LoadGame(God.Database.GetSavedGameByKind(_solitaireKind));
         CheckRefreshView(new List<PileKind> { PileKind.STOCK, PileKind.TABLEAU, PileKind.WASTE, PileKind.FOUNDATION }, onDone, immediate: true);
-        _timeSpentSeconds = 0f;
     }
 
     void Update()
     {
-        _timeSpentSeconds += Time.unscaledDeltaTime;
+        if (!_initialized) return;
+        _game.State.TimeSpent += Time.unscaledDeltaTime;
+    }
+
+    void OnApplicationQuit()
+    {
+        TrySaveGame();
+    }
+
+    void OnApplicationFocus(bool focus)
+    {
+        if (!focus)
+        {
+            TrySaveGame();
+        }
+    }
+
+    private void TrySaveGame()
+    {
+        _game.TrySaveGame();
     }
 
     private void ResetDeck()
@@ -102,7 +122,7 @@ public abstract class GameController : MonoBehaviour
     public abstract bool IsRestockAvailable();
     protected abstract void LoadDeck();
     protected abstract void UpdateWinsCount();
-    protected abstract void LoadGame();
+    protected abstract void LoadGame(SavedGame progress = null);
     protected virtual void InitConfig() { }
     protected virtual void ResetSettingsToDefault() { }
 
@@ -340,6 +360,7 @@ public abstract class GameController : MonoBehaviour
         EventManager.OnMenuOpened += OnMenuOpened;
         EventManager.OnUndo += OnUndo;
         EventManager.OnRedo += OnRedo;
+        EventManager.OnExitToMainMenu += OnExitToMainMenu;
     }
 
     private void DeregisterFromEvents()
@@ -366,7 +387,6 @@ public abstract class GameController : MonoBehaviour
     private void OnGameWon()
     {
         UpdateWinsCount();
-        _game.ResetSavedMoves();
         _ui.OnGameWon();
     }
 
@@ -378,6 +398,11 @@ public abstract class GameController : MonoBehaviour
     private void OnMenuClosed(string menuID)
     {
         God.Input.UnblockInput(MENU_OPENED_REASON + "_" + menuID);
+    }
+
+    private void OnExitToMainMenu()
+    {
+        TrySaveGame();
     }
 
     private void OnUndo()
@@ -423,9 +448,5 @@ public abstract class GameController : MonoBehaviour
             Listening();
         }
     }
-    #endregion
-
-    #region Statistics
-    public int TimeSpentSeconds => Mathf.CeilToInt(_timeSpentSeconds);
     #endregion
 }

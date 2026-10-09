@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common;
+using Storage;
 using Utils;
 
 namespace FreeCell
@@ -20,11 +21,11 @@ namespace FreeCell
         private FreeCellGameState _state;
 
         #region Initialization
-        public FreeCellGameGame(List<Card> deck)
+        public FreeCellGameGame(List<Card> deck, SavedGame progress)
         {
             Log("Starting a FreeCell game.");
             CreateGameDeck();
-            CreateState();
+            CreateState(progress);
             RegisterToEvents();
             ShuffleAndDealDeck(deck);
             Log();
@@ -40,15 +41,15 @@ namespace FreeCell
             EventManager.OnStateChanged -= OnStateChanged;
         }
 
-        private void CreateState()
+        private void CreateState(SavedGame progress)
         {
-            _state = new FreeCellGameState(this);
+            _state = new FreeCellGameState(this, progress);
         }
 
         private void ShuffleAndDealDeck(List<Card> deck)
         {
             //Log("Shuffling and dealing...");
-            CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
+            CardPile deckStack = GetShuffledDeck(deck);
             int tableauIndex = 0;
 
             while (deckStack.Count > 0)

@@ -1,5 +1,7 @@
 using System;
+using Common;
 using Services;
+using Storage;
 using UnityEngine;
 
 namespace Scorpion
@@ -8,7 +10,9 @@ namespace Scorpion
     {
         [SerializeField] private ScorpionConfig _defaultConfig;
 
-        protected override void StartNewGame(Action onDone)
+        protected override SolitaireKind _solitaireKind => SolitaireKind.SCORPION;
+
+        protected override void StartNewGame(Action onDone, SavedGame progress)
         {
             LoadDeck();
             LoadDeckView(() =>
@@ -16,7 +20,7 @@ namespace Scorpion
                 base.StartNewGame(() =>
                 {
                     onDone.Invoke();
-                });
+                }, progress);
             });
         }
 
@@ -44,15 +48,15 @@ namespace Scorpion
             _deck = ScorpionGame.CreateGameDeck();
         }
 
-        protected override void LoadGame()
+        protected override void LoadGame(SavedGame progress)
         {
-            _game = new ScorpionGame(_deck);
+            _game = new ScorpionGame(_deck, progress);
         }
 
         protected override void UpdateWinsCount()
         {
             God.Database.AddGameEntry_Scorpion(
-                 TimeSpentSeconds,
+                 _game.State.TimeSpentSeconds,
                  _game.State.MovesCount,
                  _game.State.UsedUndos,
                  _game.State.UsedRedos,

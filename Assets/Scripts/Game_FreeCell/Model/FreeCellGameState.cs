@@ -1,17 +1,19 @@
-using System.Collections.Generic;
 using Common;
+using Storage;
 
 namespace FreeCell
 {
     public class FreeCellGameState : GameState
     {
-        public FreeCellGameState(Game game) : base(game)
+        public FreeCellGameState(Game game, SavedGame progress) : base(game, progress)
         {
         }
 
         public override int AvailableRestocks => 0;
 
         public override bool FoundationCardsFree => true;
+
+        public override SolitaireKind SolitaireKind => SolitaireKind.FREECELL;
 
         public int GetFreeMovingSpaces()
         {

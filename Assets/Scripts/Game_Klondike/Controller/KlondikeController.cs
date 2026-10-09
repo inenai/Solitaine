@@ -1,4 +1,6 @@
+using Common;
 using Services;
+using Storage;
 using UnityEngine;
 
 namespace Klondike
@@ -6,6 +8,8 @@ namespace Klondike
     public class KlondikeController : GameController
     {
         [SerializeField] private KlondikeConfig _defaultConfig;
+
+        protected override SolitaireKind _solitaireKind => SolitaireKind.KLONDIKE;
 
         public override bool IsRestockAvailable()
         {
@@ -30,15 +34,15 @@ namespace Klondike
             _deck = KlondikeGame.CreateGameDeck();
         }
 
-        protected override void LoadGame()
+        protected override void LoadGame(SavedGame progress)
         {
-            _game = new KlondikeGame(_deck);
+            _game = new KlondikeGame(_deck, progress);
         }
 
         protected override void UpdateWinsCount()
         {
             God.Database.AddGameEntry_Klondike(
-                 TimeSpentSeconds,
+                 _game.State.TimeSpentSeconds,
                  _game.State.MovesCount,
                  _game.State.UsedUndos,
                  _game.State.UsedRedos,

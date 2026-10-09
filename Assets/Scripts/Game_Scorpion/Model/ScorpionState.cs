@@ -1,4 +1,5 @@
 using Common;
+using Storage;
 
 namespace Scorpion
 {
@@ -7,12 +8,13 @@ namespace Scorpion
         public override int AvailableRestocks => 0;
         public override bool FoundationCardsFree => false;
         public int SuitsUsed => _suitsUsed;
+        public override SolitaireKind SolitaireKind => SolitaireKind.SCORPION;
         private int _suitsUsed;
 
         public ScorpionVariant Variant => _variant;
         private ScorpionVariant _variant;
 
-        public ScorpionState(Game game) : base(game)
+        public ScorpionState(Game game, SavedGame progress) : base(game, progress)
         {
         }
 

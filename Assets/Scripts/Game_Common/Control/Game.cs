@@ -25,16 +25,6 @@ public abstract class Game
         return total == 13 * FoundationsAmount;
     }
 
-    public void Init()
-    {
-        ResetSavedMoves();
-    }
-
-    public void ResetSavedMoves()
-    {
-        State.ResetSavedMoves();
-    }
-
     /// <summary>
     /// Command Wrapper!
     /// </summary>
@@ -87,7 +77,16 @@ public abstract class Game
             Log();
         return undone;
     }
+    #endregion
 
+    #region persistence
+    public void TrySaveGame()
+    {
+        if (State.CanSave)
+        {
+            State.SaveGame();
+        }
+    }
     #endregion
 
     #region utils
@@ -705,6 +704,11 @@ public abstract class Game
     #endregion
 
     #region Utilities
+
+    protected CardPile GetShuffledDeck(List<Card> deck)
+    {
+        return new CardPile(CommonUtils.Shuffle(deck.ToArray(), State.RunSeed));
+    }
 
     public virtual Card GetSolvableCard()
     {

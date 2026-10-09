@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common;
+using Storage;
 using Utils;
 
 namespace Sawayama
@@ -19,17 +20,17 @@ namespace Sawayama
         SawayamaState _state;
 
         #region initialization
-        public SawayamaGame(List<Card> deck)
+        public SawayamaGame(List<Card> deck, SavedGame progress)
         {
             Log("Starting a Sawayama game.");
-            CreateState();
+            CreateState(progress);
             ShuffleAndDealDeck(deck);
             Log();
         }
 
-        private void CreateState()
+        private void CreateState(SavedGame progress)
         {
-            _state = new SawayamaState(this);
+            _state = new SawayamaState(this, progress);
         }
 
         public static List<Card> CreateGameDeck()
@@ -42,7 +43,7 @@ namespace Sawayama
         private void ShuffleAndDealDeck(List<Card> deck)
         {
             //Log("Shuffling and dealing...");
-            CardPile deckStack = new CardPile(CommonUtils.Shuffle(deck.ToArray()));
+            CardPile deckStack = GetShuffledDeck(deck);
             _state.StockPile = deckStack;
             Deal();
         }

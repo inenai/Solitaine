@@ -1,13 +1,18 @@
 using UnityEngine;
 using System;
 using Services;
+using Common;
+using Storage;
 
 namespace Spider
 {
     public class SpiderController : GameController
     {
         [SerializeField] private SpiderConfig _defaultConfig;
-        protected override void StartNewGame(Action onDone)
+
+        protected override SolitaireKind _solitaireKind => SolitaireKind.SPIDER;
+
+        protected override void StartNewGame(Action onDone, SavedGame progress)
         {
             LoadDeck();
             LoadDeckView(()=>
@@ -15,7 +20,7 @@ namespace Spider
                 base.StartNewGame(() =>
                 {
                     onDone.Invoke();
-                });
+                }, progress);
             });
         }
 
@@ -29,15 +34,15 @@ namespace Spider
             _deck = SpiderGame.CreateGameDeck();
         }
 
-        protected override void LoadGame()
+        protected override void LoadGame(SavedGame progress)
         {
-            _game = new SpiderGame(_deck);
+            _game = new SpiderGame(_deck, progress);
         }
 
         protected override void UpdateWinsCount()
         {
             God.Database.AddGameEntry_Spider(
-                TimeSpentSeconds,
+                _game.State.TimeSpentSeconds,
                 _game.State.MovesCount,
                 _game.State.UsedUndos,
                 _game.State.UsedRedos,

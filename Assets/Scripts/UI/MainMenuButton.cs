@@ -6,6 +6,7 @@ namespace Common
     {
         public void ToMainMenu()
         {
+            EventManager.OnExitToMainMenu?.Invoke();
             GameNavigator.ToMainMenu();
         }
     }

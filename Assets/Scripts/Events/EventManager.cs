@@ -15,4 +15,5 @@ public static class EventManager
     public static Action OnRedo;
     public static Action OnStateChanged;
     public static Action<Language> LanguageSet;
+    public static Action OnExitToMainMenu;
 }

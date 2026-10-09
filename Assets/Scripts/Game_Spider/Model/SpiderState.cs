@@ -1,12 +1,14 @@
 using Common;
+using Storage;
 
 namespace Spider
 {
     public class SpiderState : GameState
     {
+        public override SolitaireKind SolitaireKind => SolitaireKind.SPIDER;
         private int _suitsUsed;
         public int SuitsUsed => _suitsUsed;
-        public SpiderState(Game game) : base(game)
+        public SpiderState(Game game, SavedGame progress) : base(game, progress)
         {
         }
 

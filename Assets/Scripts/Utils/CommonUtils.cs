@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using Common;
 using Services;
-using Storage;
 using UnityEngine;
 
 namespace Utils
 {
     public static class CommonUtils
     {
-        public static IList<T> Shuffle<T>(IList<T> list)
+        public static IList<T> Shuffle<T>(IList<T> list, int seed)
         {
-            System.Random rng = new System.Random();
+            System.Random rng = new System.Random(seed);
             int n = list.Count;
             while (n > 1)
             {
@@ -51,6 +50,29 @@ namespace Utils
         internal static string GetKeyboardMouseCtrlsText()
         {
             return God.Settings.Config.GetKeyboardMouseCtrlsDesc();
+        }
+
+        internal static string ToString(int[] intarray)
+        {
+            return string.Join(',', intarray);
+        }
+
+        internal static int[] FromString(string intarray)
+        {
+            if (string.IsNullOrWhiteSpace(intarray))
+            {
+                return System.Array.Empty<int>();
+            }
+
+            string[] parts = intarray.Split(',');
+            int[] result = new int[parts.Length];
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                int.TryParse(parts[i], out result[i]);
+            }
+
+            return result;
         }
     }
 }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Common
 {
@@ -36,11 +34,27 @@ namespace Common
 
     public abstract class GameCommandAction
     {
+        public abstract GameCommandActionKind Kind { get; }
         public abstract void Execute(GameState s, bool undo = false);
+    }
+
+    public enum GameCommandActionKind
+    {
+        MOVE,
+        REVEAL,
+        FREE,
+        RESTOCK,
+        MOVE_STACK,
     }
 
     public class GameCommandActionMove : GameCommandAction
     {
+        public override GameCommandActionKind Kind => GameCommandActionKind.MOVE;
+        public PileKind SourcePile => _sourcePile;
+        public int SourceIndex => _sourceIndex;
+        public PileKind TargetPile => _targetPile;
+        public int TargetIndex => _targetIndex;
+
         private PileKind _sourcePile;
         private int _sourceIndex;
         private PileKind _targetPile;
@@ -85,6 +99,11 @@ namespace Common
 
     public class GameCommandActionReveal : GameCommandAction
     {
+        public override GameCommandActionKind Kind => GameCommandActionKind.REVEAL;
+        public CardSuit CardSuit => _card.Suit;
+        public int CardValue => _card.Value;
+        public RevealedAction Revealed => _revealed;
+
         private Card _card;
         private RevealedAction _revealed;
 
@@ -113,6 +132,11 @@ namespace Common
 
     public class GameCommandActionFree : GameCommandAction
     {
+        public override GameCommandActionKind Kind => GameCommandActionKind.FREE;
+        public CardSuit CardSuit => _card.Suit;
+        public int CardValue => _card.Value;
+        public FreedAction Freed => _freed;
+
         private Card _card;
         private FreedAction _freed;
 
@@ -141,6 +165,7 @@ namespace Common
 
     public class GameCommandActionRestock : GameCommandAction
     {
+        public override GameCommandActionKind Kind => GameCommandActionKind.RESTOCK;
         public override void Execute(GameState s, bool undo = false)
         {
             string message = undo ? "UNDOING " : "";
@@ -161,6 +186,15 @@ namespace Common
 
     public class GameCommandActionMoveStack : GameCommandAction
     {
+
+        public override GameCommandActionKind Kind => GameCommandActionKind.MOVE_STACK;
+        public CardSuit CardSuit => _card.Suit;
+        public int CardValue => _card.Value;
+        public PileKind SourcePile => _sourcePile;
+        public int SourceIndex => _sourceIndex;
+        public PileKind TargetPile => _targetPile;
+        public int TargetIndex => _targetIndex;
+
         private Card _card;
         private PileKind _sourcePile;
         private int _sourceIndex;

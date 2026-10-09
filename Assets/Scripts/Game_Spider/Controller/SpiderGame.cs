@@ -3,6 +3,7 @@ using static Utils.CommonUtils;
 using Common;
 using System;
 using Utils;
+using Storage;
 
 namespace Spider
 {
@@ -27,17 +28,17 @@ namespace Spider
 
         SpiderState _state;
 
-        public SpiderGame(List<Card> deck)
+        public SpiderGame(List<Card> deck, SavedGame progress)
         {
             Log("Starting a Spider game.");
-            CreateState();
+            CreateState(progress);
             ShuffleAndDeal(deck);
             Log();
         }
 
-        private void CreateState()
+        private void CreateState(SavedGame progress)
         {
-            _state = new SpiderState(this);
+            _state = new SpiderState(this, progress);
         }
 
         public override bool CanAddCardToPile(Card card, PileKind targetPile, int targetPileIndex)
@@ -71,7 +72,7 @@ namespace Spider
         private void ShuffleAndDeal(List<Card> deck)
         {
             //Log("Shuffling and dealing...");
-            CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
+            CardPile deckStack = GetShuffledDeck(deck);
             int preDealtCards = 54;
 
             for (int i = 0; i < preDealtCards; i++)

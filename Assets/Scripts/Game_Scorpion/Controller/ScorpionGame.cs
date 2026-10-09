@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Common;
+using Storage;
 using Utils;
 using static Utils.CommonUtils;
 
@@ -22,17 +23,17 @@ namespace Scorpion
         ScorpionState _state;
 
         #region initialization
-        public ScorpionGame(List<Card> deck)
+        public ScorpionGame(List<Card> deck, SavedGame progress)
         {
             Log("Starting a Scorpion game.");
-            CreateState();
+            CreateState(progress);
             ShuffleAndDeal(deck);
             Log();
         }
 
-        private void CreateState()
+        private void CreateState(SavedGame progress)
         {
-            _state = new ScorpionState(this);
+            _state = new ScorpionState(this, progress);
         }
 
         public static List<Card> CreateGameDeck()
@@ -45,7 +46,7 @@ namespace Scorpion
         private void ShuffleAndDeal(List<Card> deck)
         {
             //Log("Shuffling and dealing...");
-            CardPile deckStack = new CardPile(Shuffle(deck.ToArray()));
+            CardPile deckStack = GetShuffledDeck(deck);
 
             int lastTableauIndexCovered = _state.Variant == ScorpionVariant.SCORPION ? 3 : 2;
 

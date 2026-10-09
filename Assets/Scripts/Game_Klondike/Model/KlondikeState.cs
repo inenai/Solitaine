@@ -1,4 +1,5 @@
 using Common;
+using Storage;
 
 namespace Klondike
 {
@@ -7,11 +8,12 @@ namespace Klondike
         public override int AvailableRestocks => _availableRestocks;
         public override bool FoundationCardsFree => true;
         public int DrawAmount => _drawAmount;
+        public override SolitaireKind SolitaireKind => SolitaireKind.KLONDIKE;
 
         int _drawAmount = KlondikeSettings.DEFAULT_DRAW_AMOUNT;
         int _availableRestocks = KlondikeSettings.DEFAULT_RESTOCKS;
 
-        public KlondikeState(Game game) : base(game)
+        public KlondikeState(Game game, SavedGame progress) : base(game, progress)
         {
         }
 

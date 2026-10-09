@@ -32,6 +32,9 @@ namespace Services {
         GS_SP_FOUR,
         GS_SC_TITLE,
         GS_SC_VARIANT,
+        LOC_LOAD_SAVED_CONFIRM,
+        LOC_LOAD_LOAD_SAVED,
+        LOC_LOAD_START_NEW,
     }
 
     public class LocalizationService : Service
@@ -105,6 +108,12 @@ namespace Services {
                             return "Scorpion Settings";
                         case LocalizationKey.GS_SC_VARIANT:
                             return "Variant:";
+                        case LocalizationKey.LOC_LOAD_SAVED_CONFIRM:
+                            return "There is a game in progress. Load game?";
+                        case LocalizationKey.LOC_LOAD_LOAD_SAVED:
+                            return "Load game";
+                        case LocalizationKey.LOC_LOAD_START_NEW:
+                            return "New game";
                     }
                     break;
                 case Language.SPANISH:
@@ -166,6 +175,12 @@ namespace Services {
                             return "Configurar Scorpion";
                         case LocalizationKey.GS_SC_VARIANT:
                             return "Variante:";
+                        case LocalizationKey.LOC_LOAD_SAVED_CONFIRM:
+                            return "Hay una partida guardada. ¿Cargar partida?";
+                        case LocalizationKey.LOC_LOAD_LOAD_SAVED:
+                            return "Cargar partida";
+                        case LocalizationKey.LOC_LOAD_START_NEW:
+                            return "Nueva partida";
                     }
                     break;
             }

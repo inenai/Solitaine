@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Services;
+using Storage;
+using UnityEngine;
 
 namespace Common
 {
@@ -12,13 +15,21 @@ namespace Common
         public CardPile[] Tableaus;
         public Foundation[] Foundations;
 
+        public float TimeSpent;
+
         Stack<GameCommand> _doneMoves;
         Stack<GameCommand> _undoneMoves;
 
+        public abstract SolitaireKind SolitaireKind { get; }
         public abstract int AvailableRestocks { get; }
         public abstract bool FoundationCardsFree { get; }
         public bool RedoAvailable => _undoneMoves?.Count > 0;
         public bool UndoAvailable => _doneMoves?.Count > 0;
+        public GameCommand[] DoneMovesArray => _doneMoves.ToArray();
+        public bool CanSave => !_gameFinished && UndoAvailable;
+        public int RunSeed => _runSeed;
+        private bool _gameFinished;
+        private int _runSeed;
 
         public void OnWin()
         {
@@ -29,18 +40,41 @@ namespace Common
                     card.FreeCard(false);
                 }
             }
+            TryDeleteSavedGame();
+            ResetSavedMoves();
+            _gameFinished = true;
         }
-        protected virtual void ApplyConfig(){}
-        public virtual void OnRestock(bool undo = false){}
 
-        public GameState(Game game)
+        protected virtual void ApplyConfig(){}
+        public virtual void OnRestock(bool undo = false) { }
+
+        private void SetRandomSeed(SavedGame progress)
         {
+            if (progress != null)
+            {
+                Logs.Log($"[GameState] Setting fixed seed: {progress.RandomSeed}");
+                _runSeed = progress.RandomSeed;
+            }
+            else
+            {
+                _runSeed = new System.Random().Next();
+            }
+            Logs.Log($"[GameState] Creating new seed: {_runSeed}");
+        }
+
+        public GameState(Game game, SavedGame progress)
+        {
+            TimeSpent = 0f;
             ApplyConfig();
+            ResetSavedMoves();
+            SetRandomSeed(progress);
             InitFoundations(game.FoundationsAmount);
             InitTableau(game.TableausAmount);
             InitFreeCells(game.FreeCellsAmount);
             if (game.HasStock) InitStock();
             if (game.HasWaste) InitWaste();
+
+            if (progress != null) LoadProgrees(progress);
         }
 
         public void ResetSavedMoves()
@@ -262,7 +296,25 @@ namespace Common
             }
         }
 
+        #region Persistence
+        private void TryDeleteSavedGame()
+        {
+            God.Database.TryDeleteSavedGame(SolitaireKind);
+        }
+
+        public void SaveGame()
+        {
+            God.Database.SaveGameProgress(SolitaireKind, TimeSpentSeconds, DoneMovesArray, _runSeed);
+        }
+
+        internal void LoadProgrees(SavedGame progressData)
+        {
+
+        }
+        #endregion
+
         #region Statistics
+        public int TimeSpentSeconds => Mathf.CeilToInt(TimeSpent);
         public int MovesCount => _doneMoves.Count;
         public int UsedUndos { get; private set; }
         public int UsedRedos { get; private set; }
